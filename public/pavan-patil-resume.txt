@@ -1,0 +1,38 @@
+PAVAN PATIL
+Software Engineer
+
+Email: thepavanpatil.official@gmail.com
+GitHub: https://github.com/The-Pavan-Patil
+LinkedIn: https://www.linkedin.com/in/thepavanpatilofficial
+
+SUMMARY
+Software Engineer experienced in fast-paced development environments, building scalable web and mobile applications, design-system documentation workflows, operations platforms, and real-time data services.
+
+SKILLS
+Languages: JavaScript, TypeScript, Python, SQL
+Frontend & Mobile: React.js, Next.js, React Native, Expo, Tailwind CSS, Redux
+Backend & Databases: Node.js, Express.js, REST APIs, Prisma, PostgreSQL, Supabase, MongoDB
+Tools & Platforms: Git, Docker, AWS, Railway, Firebase, Jest, Supertest
+
+EXPERIENCE
+Ownpath Pvt. Ltd. — Software Engineer | Nov 2025–Present
+- Built Echo, a Git-backed design-system documentation platform using Next.js, TypeScript, PostgreSQL, and GitHub APIs.
+- Implemented branch-based collaboration, pull-request review, RBAC, immutable publishing, autosaved drafts, optimistic concurrency control, and IndexedDB caching.
+- Delivered Philips Greenheart’s multilingual React/TypeScript website and Nudge’s offline-first React Native application.
+
+Sonai Engineering & Services — Full Stack Developer | Feb 2025–Oct 2025
+- Built a workforce management platform supporting 1,000+ worker records across multiple construction sites.
+- Automated configurable overtime calculations and Excel payroll exports.
+- Implemented attendance workflows, authentication middleware, REST APIs, and AWS deployment.
+
+Defence Research and Development Organisation — Project Intern | Feb 2024–Apr 2024
+- Deployed LiDAR object-detection models behind an Express.js service with sub-100 ms response times.
+- Processed more than 10 GB of point-cloud data daily using Python and the Ouster SDK.
+- Reduced Python-to-Node transfer latency by 30%.
+
+EDUCATION
+Bachelor of Engineering, Electronics and Computer Engineering
+PES Modern College of Engineering, Pune — 9.4 SGPA | 2022–2025
+
+Diploma in Computer Engineering
+Ajeenkya D. Y. Patil School of Engineering, Pune — 83.09% | 2019–2022
