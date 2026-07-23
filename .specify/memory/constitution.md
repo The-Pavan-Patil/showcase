@@ -65,7 +65,7 @@ disclosure and decorative effects that compete with the content are prohibited.
 
 Public pages SHOULD be statically generated and server-rendered wherever interaction does not
 require client state. Client-side JavaScript MUST be limited to necessary behavior such as
-theme selection and the mobile menu. Images, fonts, metadata, structured data, canonical URLs,
+theme selection, active-section navigation, desktop density, and the mobile utility menu. Images, fonts, metadata, structured data, canonical URLs,
 the sitemap, and robots rules MUST be optimized and complete. Release candidates MUST meet the
 portfolio's documented performance and search-audit thresholds on the production build.
 

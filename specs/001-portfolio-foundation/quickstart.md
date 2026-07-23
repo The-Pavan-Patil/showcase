@@ -50,8 +50,10 @@ Expected critical scenarios:
    experience, skills/about content, contact, and footer.
 2. Each canonical project path opens directly, exposes distinguishing content, and links onward.
 3. `/work/not-a-real-project` produces a non-indexable not-found page with selected-work recovery.
-4. Desktop and mobile navigation reach every real section; the Drawer supports focus containment,
-   Escape, dismissal, focus restoration, and destination-close behavior.
+4. Desktop navigation compacts on deliberate downward scroll and expands on upward scroll, near the
+   top, or on focus without hiding destinations. Mobile exposes the four section destinations in a
+   persistent bottom pill; its utility Popover supports Escape/outside dismissal and focus
+   restoration.
 5. The explicit theme survives navigation and reload without a hydration error or incorrect-theme
    flash.
 6. Internal and fragment links resolve, approved external links have safe semantics, and no same-
@@ -67,7 +69,7 @@ npm run test:e2e:update
 ```
 
 The automated matrix covers all four indexable routes at 390x844 and 1440x900 in light and dark,
-plus the open mobile Drawer in both themes. Axe must return zero violations without broad rule
+plus compact desktop navigation and the open mobile utility Popover in both themes. Axe must return zero violations without broad rule
 exclusions. Visual baselines are generated and reviewed in the same operating-system/browser
 environment used for comparison.
 
@@ -75,7 +77,8 @@ Complete these manual checks before release:
 
 - Keyboard-only navigation and visible focus
 - Skip-link behavior and logical focus/heading order
-- Drawer containment, dismissal, and focus restoration
+- Desktop scroll-density thresholds, focus expansion, and unchanged link availability
+- Mobile utility-Popover dismissal and focus restoration
 - 200% zoom and 320 CSS-pixel reflow without horizontal page scrolling
 - VoiceOver landmark and control names
 - Both-theme contrast and non-color state cues

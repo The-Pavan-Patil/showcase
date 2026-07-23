@@ -6,8 +6,8 @@
 | --- | --- | --- |
 | Container | Centers content, applies responsive gutters, caps width at 72rem | Portfolio-owned div |
 | SectionHeading | Eyebrow, required title, optional muted phrase and description | Portfolio-owned semantic composition |
-| SiteHeader | Fixed glass shell, brand, primary navigation, résumé action, theme and mobile controls | Semantic header/nav plus HeroUI Drawer |
-| ThemeToggle | Toggles persisted light/dark selection with an updated accessible name | HeroUI Button |
+| SiteHeader | Direction-aware desktop glass shell plus persistent mobile destination and utility layers | Semantic header/nav plus HeroUI Popover |
+| ThemeToggle | Toggles persisted light/dark selection in icon or labeled-menu presentation | HeroUI Button |
 | Button and link variants | Primary, secondary, inverse, icon, text, social, and navigation treatments | Semantic links and HeroUI Button |
 | Proof metrics | Four evidence-led facts with value/label pairing | Semantic content grid |
 | ProjectGrid / ProjectCard | One featured card and two supporting cards sourced from shared records | CSS grid plus HeroUI Card and Chip |
@@ -36,17 +36,19 @@ Provide one concise eyebrow and a sentence-case title. The optional muted phrase
 
 ### SiteHeader
 
-The header is portfolio-owned because HeroUI v3 has no Navbar. It must remain a semantic header containing labeled nav elements and lists. At 760px, desktop navigation and the desktop résumé action are replaced by a HeroUI Drawer. The theme control remains visible.
+The header is portfolio-owned because HeroUI v3 has no Navbar. It remains a semantic header containing labeled nav elements and lists. Above 760px, it uses an expanded 60px regular-glass pill capped at 64rem. After the page is below 96px and 24px of downward movement accumulates, it compresses to 48px and approximately 44rem. Sixteen pixels of upward travel, returning within 64px of the top, a route change, or keyboard focus entering the header restores the expanded state.
 
-On the homepage, an IntersectionObserver tracks the Work, Experience, About, and Contact sections. The matching desktop and mobile link receives aria-current="location". On /work/[slug] routes, Work is current. Desktop current links use foreground text and a persistent underline; mobile current links use accent-text.
+At 760px and below, the desktop header is absent. A safe-area-aware bottom glass pill permanently exposes Work, Experience, About, and Contact with icons above labels; the current destination receives a softly tinted inner capsule. A separate utility orb opens a HeroUI Popover for Home, labeled theme selection, and résumé download. Footer clearance prevents either surface from covering the final actions.
 
-The drawer must:
+On the homepage, an IntersectionObserver tracks the Work, Experience, About, and Contact sections. The matching desktop and mobile link receives aria-current="location". On /work/[slug] routes, Work is current. Active destinations use the accessible blue text role plus an inner capsule; focus retains a separate visible outline.
 
-- open and close from labeled controls;
-- retain HeroUI focus management and dismissal behavior;
-- close when a navigation destination is selected;
-- provide the résumé download as its final action;
-- use a surface token, border, and 24px radius;
+The responsive navigation must:
+
+- keep all four section destinations visible in expanded and compact desktop states;
+- use a passive, requestAnimationFrame-coordinated scroll listener;
+- expose utility-orb state through a named, keyboard-focusable trigger;
+- close the Popover on Escape, outside interaction, destination choice, or theme selection;
+- use one glass layer per surface, with a solid fallback when transparency is reduced or unsupported;
 - never duplicate visible desktop and mobile navigation at the same breakpoint.
 
 ### ProjectCard
@@ -79,11 +81,11 @@ Every interactive component must be evaluated in all eight states below. The mat
 | Component | Default | Hover | Pressed | Focus-visible | Disabled | Dark theme | Mobile | Reduced motion |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Brand / home link | Foreground wordmark and inverse mark | No separate visual change | No separate styling; navigation is immediate | Global 2px focus outline | Links are not disabled; remove destination rather than fake it | Tokens invert the mark | Name hides at 760px; mark remains | No moving effect |
-| Desktop nav link | Muted 12.8px label; current location uses foreground plus persistent underline | Hover uses the same foreground/underline treatment | Returns through the same immediate link activation; no transform | Global focus outline | Not applicable to available destinations | Token-driven | Hidden at 760px | Underline transition becomes effectively instant |
-| Résumé download | Foreground-filled pill | −1px lift and 0.86 opacity | Returns to baseline and lowers opacity to 0.72 | Global focus outline | If unavailable, remove action and explain why | Token inversion retains contrast | Desktop version replaced by full-width drawer action | Lift is suppressed |
-| Theme toggle | Muted circular icon button | Secondary surface and foreground icon | HeroUI button semantics; styling must be visually verified | Global focus plus HeroUI semantics | HeroUI disabled semantics if used; not used currently | Label/icon describe the next theme | Always visible, 36px square | Theme transitions disabled; hover transition suppressed |
-| Menu trigger / close | Labeled 36px icon control | Trigger gets secondary surface; close already has secondary surface | HeroUI control semantics; styling must be verified after upgrades | Global focus plus verified HeroUI focus management | Not disabled in normal navigation | Token-driven | Trigger appears at 760px; right-side drawer | Global reduced-motion rules collapse transition/animation duration |
-| Mobile nav link | Large Manrope row with accent-text numeric index; current location changes the full label to accent-text | No separate hover style | No separate styling; selecting navigates and closes the Drawer | Global focus outline | Not applicable | Token-driven | Drawer-only | No authored movement |
+| Desktop nav link | Muted label in a centered inner capsule; current location uses accent text and a tinted item capsule | Foreground and stronger surface | Immediate link activation; no transform | Global focus outline | Not applicable | Token-driven glass | Hidden at 760px | Density and color changes become immediate |
+| Résumé download | Foreground-filled pill with icon and label | −1px lift and 0.86 opacity | Returns to baseline and lowers opacity to 0.72 | Global focus outline | Remove if unavailable | Token inversion retains contrast | Moved into utility Popover | Label compression and lift are suppressed |
+| Theme toggle | Muted circular icon button or labeled menu row | Secondary surface and foreground icon | HeroUI button semantics | Global focus plus HeroUI semantics | Not used | Label/icon describe the next theme | Labeled inside utility Popover | State change is immediate |
+| Utility orb | Labeled circular ellipsis control | Stronger edge highlight and surface | HeroUI press semantics | Global focus plus Popover focus restoration | Not used | Token-driven glass | Adjacent to bottom destination pill | Transition duration collapses |
+| Mobile nav link | Icon above compact label; current location uses accent text and a tinted inner capsule | Stronger text/surface where hover exists | Immediate destination activation | Global focus outline | Not applicable | Token-driven glass | Persistent at 760px and below | No authored movement |
 | Primary CTA | #006FEE pill with white text | −2px lift | Returns to baseline and scales to 0.98 | Global focus outline | Custom link has no disabled form; remove if unavailable | Same action blue in both themes | Shares row, then full width at 420px | Lift and transitions suppressed |
 | Secondary / email CTA | Bordered or inverse pill | Lift/border feedback on hero secondary | Hero secondary returns to baseline and scales to 0.98; contact email scales to 0.98 | Global focus outline | Links have no disabled form | Semantic tokens/inverse contact surface | Wraps safely; direct email uses anywhere wrapping at 420px | Authored transitions suppressed |
 | Project case-study link | Text and arrow in card footer | Arrow moves 2px up/right; parent card lifts | No separate styling; navigation is immediate | Link gets global focus and parent card receives matching focus-within elevation | Not applicable | Card/surface tokens adapt | Single-column card layout | Card and arrow motion suppressed |
@@ -131,6 +133,6 @@ All authored transitions and animations collapse to 0.01ms under prefers-reduced
 | --- | --- |
 | Use a real Link for navigation and a Button for an action. | Add click handlers to a non-interactive div. |
 | Keep one explicit CTA per project card. | Make nested links inside a clickable card surface. |
-| Preserve Drawer semantics and focus management. | Rebuild the mobile drawer from unlabelled positioned divs. |
+| Preserve Popover dismissal/focus semantics and persistent section links. | Hide primary mobile destinations inside an unlabelled overlay. |
 | Give icon-only controls an action-oriented aria-label. | Use an icon name such as “moon” as the accessible label. |
 | Verify HeroUI slot selectors after library upgrades. | Assume a visual override still applies after a package update. |

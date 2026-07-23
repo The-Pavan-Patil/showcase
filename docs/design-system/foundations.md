@@ -8,7 +8,7 @@ Semantic variables live in src/app/globals.css. Components must use semantic rol
 | --- | --- | --- | --- |
 | background | #F5F5F5 | #060607 | Page canvas |
 | foreground | #18181B | #FAFAFA | Primary text and inverse surfaces |
-| surface | #FFFFFF | #18181B | Cards, drawers, and contained regions |
+| surface | #FFFFFF | #18181B | Cards, popovers, and contained regions |
 | surface-secondary | #EEEEEF | #232325 | Subtle fields, tags, and diagram panels |
 | surface-tertiary | #E7E7E9 | #2A2A2D | Quiet controls and diagram details |
 | muted | #6B6B73 | #9F9FA9 | Secondary copy and metadata |

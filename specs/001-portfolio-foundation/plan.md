@@ -57,7 +57,7 @@ design-system documentation topics, and a small static content model
 | Evidence Before Promotion | PASS | PASS | Resume-backed content model, explicit source precedence, optional unverified fields, and content-invariant tests |
 | Accessible by Default | PASS | PASS | Semantic contracts, keyboard/focus requirements, Axe coverage, manual WCAG review, and reduced-motion behavior |
 | Token-Driven Original Design | PASS | PASS | CSS token foundation, documented component states, and original abstract project visuals |
-| Responsive and Motion-Safe | PASS | PASS | 320px/200% requirements, mobile drawer contract, reduced-motion CSS, and responsive/visual tests |
+| Responsive and Motion-Safe | PASS | PASS | 320px/200% requirements, safe-area bottom navigation, direction-aware desktop density, reduced-motion CSS, and responsive/visual tests |
 | Static, Fast, and Discoverable | PASS | PASS | Static parameters, server-first pages, canonical metadata, JSON-LD, sitemap, robots, and Lighthouse gates |
 | Verify Before Release | PASS | PASS | Unit, component, E2E, accessibility, link, metadata, visual, build, and performance tasks |
 | Minimal Data and Scope | PASS | PASS | Local content only; no backend, CMS, auth, analytics, cookies, or runtime collection |
@@ -143,7 +143,8 @@ lighthouserc.cjs
 
 **Structure Decision**: Keep one App Router application because every public page consumes the
 same local content and design foundation. Server components own static content and metadata;
-client boundaries are limited to theme and drawer state. Shared portfolio records live in
+client boundaries are limited to theme, active-section observation, scroll-density state, and the
+mobile utility popover. Shared portfolio records live in
 `src/lib/portfolio.ts`, reusable visual behavior lives in `src/components`, and all route-owned
 composition remains under `src/app`.
 

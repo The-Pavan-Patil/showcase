@@ -126,21 +126,22 @@ journey without relying on client-side routing.
 target devices and input methods.
 
 **Independent Test**: Use only the keyboard at 320px, 200% zoom, in both themes, with reduced motion;
-all content and actions remain available and Drawer focus/dismissal behavior is correct.
+all content and actions remain available, the bottom navigation stays unobstructed, and utility
+Popover focus/dismissal behavior is correct.
 
 ### Tests for User Story 3
 
-- [ ] T032 [P] [US3] Write failing mounted-state, action-label, and light/dark selection coverage in `tests/components/theme-toggle.test.tsx`
-- [ ] T033 [P] [US3] Write failing menu-name, expanded-state, destination-close, and navigation-contract coverage in `tests/components/site-header.test.tsx`
+- [ ] T032 [P] [US3] Write failing mounted-state, icon/menu presentations, callback, action-label, and light/dark selection coverage in `tests/unit/theme-toggle.test.tsx`
+- [ ] T033 [P] [US3] Write failing desktop scroll thresholds, direction hysteresis, top/focus/route reset, active-section, and compact-link coverage in `tests/unit/site-header.test.tsx`
 - [ ] T034 [P] [US3] Write failing first-visit light, explicit persistence, reload, route-change, and no-hydration-error journeys in `tests/e2e/theme.spec.ts`
-- [ ] T035 [P] [US3] Write failing mobile Drawer focus containment, Escape/backdrop/close/destination dismissal, focus restoration, and scroll-lock journeys in `tests/e2e/navigation.spec.ts`
+- [ ] T035 [P] [US3] Write failing bottom-navigation presence, utility Popover actions, Escape/outside dismissal, focus restoration, safe-area, 320px overflow, and content-clearance journeys in `tests/e2e/site.spec.ts`
 
 ### Implementation for User Story 3
 
 - [ ] T036 [US3] Implement the persisted light-first theme provider contract in `src/components/providers.tsx`
 - [ ] T037 [P] [US3] Implement mounted-safe icon state and action-oriented accessible labels in `src/components/theme-toggle.tsx`
-- [ ] T038 [US3] Implement the semantic desktop nav, HeroUI Drawer mobile nav, resume action, contact target, and theme control in `src/components/site-header.tsx`
-- [ ] T039 [US3] Implement header offsets, 320px reflow, touch targets, visible focus, Drawer presentation, 200% zoom resilience, and reduced-motion behavior in `src/app/globals.css`
+- [ ] T038 [US3] Implement the semantic direction-aware desktop nav, persistent mobile bottom nav, HeroUI utility Popover, resume action, contact target, and theme control in `src/components/site-header.tsx`
+- [ ] T039 [US3] Implement regular-glass and solid-fallback surfaces, compact/expanded geometry, safe-area bottom positioning, footer clearance, 320px reflow, touch targets, visible focus, 200% zoom resilience, and reduced-motion behavior in `src/app/globals.css`
 - [ ] T040 [US3] Wire root theme classes, hydration boundary, theme-color metadata, and skip-navigation placement in `src/app/layout.tsx`
 
 **Checkpoint**: US3 passes keyboard, theme, narrow-layout, zoom, and reduced-motion acceptance without
@@ -175,8 +176,8 @@ the approved information architecture.
 **Purpose**: Complete documentation, metadata assets, accessibility, visual coverage, and release
 evidence spanning all stories.
 
-- [ ] T044 [P] Add Axe scans and ARIA snapshots for all four routes in both themes, both viewports, and the open Drawer in `tests/a11y/accessibility.spec.ts`
-- [ ] T045 [P] Add 16 full-page and two open-Drawer deterministic visual comparisons in `tests/visual/portfolio.visual.spec.ts`
+- [ ] T044 [P] Add Axe scans for all four routes in both themes and viewports, plus compact desktop navigation and the open mobile utility Popover, in `tests/e2e/a11y.spec.ts`
+- [ ] T045 [P] Add deterministic visual comparisons for full pages, compact desktop navigation, mobile bottom navigation, and the open utility Popover in both themes in `tests/e2e/visual.spec.ts`
 - [ ] T046 [P] Add title, description, canonical, Open Graph, Twitter, JSON-LD, sitemap, robots, favicon, and same-origin link coverage in `tests/e2e/metadata.spec.ts`
 - [ ] T047 [P] Add the original 1200x630 branded social-preview asset in `public/og.png`
 - [ ] T048 [P] Document component states, responsive patterns, and composition rules in `docs/design-system/components.md` and `docs/design-system/patterns.md`
@@ -254,7 +255,7 @@ T028–T030: not-found, sitemap, and robots routes
 ### User Story 3
 
 ```text
-T032–T035: theme, header, persistence, and Drawer tests
+T032–T035: theme, desktop density, persistent mobile navigation, utility Popover, and persistence tests
 T037: mounted-safe theme toggle after provider contract is fixed
 ```
 

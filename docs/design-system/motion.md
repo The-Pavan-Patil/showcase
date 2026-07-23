@@ -9,7 +9,7 @@ Motion is restrained and functional. It confirms an interaction or clarifies lay
 | motion-fast · 150ms | Navigation color, skip-link reveal, résumé feedback |
 | 160–180ms optical range | CTA, text-arrow, underline, and next-project feedback |
 | motion-base · 220ms | Project-card lift and elevation |
-| motion-slow · 300ms | Reserved for future bounded overlays or layout transitions |
+| motion-slow · 300ms | Header density, glass geometry, and bounded overlay transitions |
 
 The semantic range is 150–300ms, with current visible interactions concentrated between 150ms and 220ms.
 
@@ -34,6 +34,8 @@ The semantic range is 150–300ms, with current visible interactions concentrate
 | Contact email/social press | Scales to 0.98 |
 | Next-project arrow hover | Moves 5px right |
 | Hero composition | Static rotations only; no animation |
+| Desktop header density | Width, height, padding, gaps, and utility labels compress over 280ms |
+| Mobile utility Popover | HeroUI bounded enter/exit transition; destination bar remains stationary |
 
 Static rotations on hero windows communicate layered workspaces. They are not animated and are removed from the main window at the mobile breakpoint.
 
@@ -47,7 +49,7 @@ The global prefers-reduced-motion: reduce rule:
 
 No state may rely only on transform. Color, border, text, or shadow must continue to communicate the result when movement is removed.
 
-CSS inspection verifies the reduced-motion contract: smooth scrolling is removed and transition/animation durations collapse. The automated browser suite must emulate the preference before production release. Drawer keyboard QA confirmed focus enters the dialog, Escape closes it, and focus returns to the menu trigger.
+CSS inspection verifies the reduced-motion contract: smooth scrolling is removed and transition/animation durations collapse. The automated browser suite must emulate the preference before production release. Header density changes become immediate, while utility-Popover dismissal and focus restoration remain unchanged.
 
 ## Motion contract
 

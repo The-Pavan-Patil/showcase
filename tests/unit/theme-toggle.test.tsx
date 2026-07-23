@@ -35,4 +35,17 @@ describe("ThemeToggle", () => {
     await user.click(screen.getByRole("button", { name: "Switch to light theme" }));
     expect(themeState.setTheme).toHaveBeenCalledWith("light");
   });
+
+  it("supports a labeled utility-menu presentation and callback", async () => {
+    const user = userEvent.setup();
+    const onThemeChange = vi.fn();
+    render(<ThemeToggle presentation="menu" onThemeChange={onThemeChange} />);
+
+    const toggle = screen.getByRole("button", { name: "Switch to dark theme" });
+    expect(toggle).toHaveTextContent("Switch to dark theme");
+
+    await user.click(toggle);
+    expect(themeState.setTheme).toHaveBeenCalledWith("dark");
+    expect(onThemeChange).toHaveBeenCalledOnce();
+  });
 });

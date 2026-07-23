@@ -17,16 +17,16 @@ no runtime data or mutations.
 
 **Decision**: Import Tailwind before `@heroui/styles`, use HeroUI v3 primitives where they add
 accessible behavior, and implement the site header as portfolio-owned semantic markup. Use the
-HeroUI Drawer compound component for modal mobile navigation.
+HeroUI Popover compound component for the bounded mobile utility surface.
 
 **Rationale**: HeroUI v3 is CSS-first and does not require a global HeroUI provider. Its former
-Navbar abstraction is not part of the v3 component set, while the Drawer supplies modal semantics,
-focus handling, and dismissal behavior. A custom `<nav>` preserves the information architecture
-and keeps navigation markup explicit.
+Navbar abstraction is not part of the v3 component set. A custom `<nav>` preserves the information
+architecture and keeps primary destinations explicit, while Popover supplies focus handling and
+dismissal semantics for secondary utility actions.
 
 **Alternatives considered**: Copying a HeroUI Pro navbar is disallowed and unnecessary. Building a
-drawer from generic divs would duplicate complex accessibility behavior. Retaining a removed v2
-Navbar would couple the project to obsolete APIs.
+popover from generic divs would duplicate accessibility behavior. Hiding primary destinations in a
+modal adds friction, and retaining a removed v2 Navbar would couple the project to obsolete APIs.
 
 ## Decision 3: Theme Initialization
 
@@ -113,7 +113,7 @@ canonicals. Omitting a metadata base breaks absolute social and sitemap addresse
 ## Decision 9: Layered Verification
 
 **Decision**: Use Vitest and Testing Library for local content and interactive client components;
-Playwright for App Router pages, keyboard flows, Drawer behavior, theme persistence, route and link
+Playwright for App Router pages, keyboard flows, responsive navigation behavior, theme persistence, route and link
 coverage; Axe for automated accessibility; Playwright snapshots for 390x844 and 1440x900 visual
 states; and Lighthouse CI against a production server.
 
@@ -136,3 +136,22 @@ the constitution's privacy and simplicity requirements.
 
 **Alternatives considered**: A contact-form service introduces data handling and abuse controls.
 Analytics add consent and privacy decisions that the user excluded from version one.
+
+## Decision 11: Apple-Neutral Liquid Glass Navigation
+
+**Decision**: Use an original CSS regular-glass surface informed by Apple's public Liquid Glass
+guidance. Desktop navigation changes from a 60px, 64rem-wide state to a 48px, approximately
+44rem-wide state after deliberate downward scrolling, then expands on upward travel, near-page-top
+position, route changes, or keyboard focus. At 760px and below, replace it with a persistent bottom
+pill for four section destinations and a separate HeroUI Popover utility orb for Home, theme, and
+résumé actions.
+
+**Rationale**: The density change preserves navigation context while returning vertical space on
+desktop. A persistent bottom destination layer is reachable on phones and avoids hiding core
+routes behind a modal. Safe-area positioning, a solid transparency fallback, and immediate
+reduced-motion changes preserve access across devices and preferences.
+
+**Alternatives considered**: Copying Apple's proprietary shaders, assets, SF Symbols, or fonts is
+unnecessary and disallowed. A glass-on-glass modal adds visual noise and hides destinations.
+Cursor-following refraction and continuous scroll animation increase cost without improving the
+hiring journey.

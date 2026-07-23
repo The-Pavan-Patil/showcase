@@ -14,7 +14,7 @@ WCAG 2.2 AA is the release baseline. Accessibility applies to content accuracy, 
 
 ## Names and descriptions
 
-- Icon-only controls need a verb-led accessible name: “Switch to dark theme,” “Open navigation menu,” and “Close navigation menu.”
+- Icon-only controls need a verb-led accessible name, such as “Switch to dark theme” and “Open utility menu.”
 - Decorative Lucide icons use aria-hidden.
 - ProjectVisual exposes one role="img" label describing the system relationship; its internal pseudo-interface is aria-hidden.
 - External-link icons are decorative. Link text or aria-label names the destination.
@@ -26,8 +26,8 @@ Required test path:
 
 1. Tab from the skip link into the header.
 2. Reach every desktop control without pointer input.
-3. Open, traverse, and close the mobile Drawer by keyboard.
-4. Confirm focus is trapped while the Drawer is open and restored to its trigger on close.
+3. Traverse every persistent mobile destination, then open and close the utility Popover by keyboard.
+4. Confirm Escape and outside dismissal close the Popover and focus returns to its trigger.
 5. Reach every project CTA, résumé/email/social destination, and next-project link.
 6. Confirm Enter activates links and Enter/Space activates buttons.
 7. Confirm focus remains visible against every surface in both themes.
@@ -88,8 +88,9 @@ The reduced-motion stylesheet disables smooth scrolling and collapses authored t
 - Skip link, html language, semantic page landmarks, and labeled navigation.
 - One primary page heading and ordered section headings.
 - Labeled icon buttons and aria-hidden decorative icons.
-- HeroUI Drawer and Button primitives for mobile navigation and theme state.
-- Browser-verified Drawer keyboard behavior: focus enters the dialog, Escape closes it, and focus returns to the trigger.
+- HeroUI Popover and Button primitives for mobile utility navigation and theme state.
+- Persistent mobile section destinations never require opening an overlay.
+- Browser-verified utility behavior: focus enters the Popover, Escape closes it, and focus returns to the trigger.
 - Homepage section observation and case-study routing expose the current destination with aria-current="location" in desktop and mobile navigation.
 - Global focus-visible outline.
 - Matching project-card hover and focus-within elevation.

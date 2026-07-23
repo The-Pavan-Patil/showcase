@@ -61,7 +61,7 @@ Stack the hero, keep the system visual centered and capped at 44rem, simplify th
 
 ### 421–760px
 
-Use the mobile Drawer, one-column project and content grids, a two-by-two proof grid, smaller section intervals, and stacked case-study facts.
+Remove the top header and use the persistent bottom destination pill plus utility orb. Use one-column project and content grids, a two-by-two proof grid, smaller section intervals, and stacked case-study facts.
 
 ### 320–420px
 
@@ -99,7 +99,12 @@ Add a field to the shared type before displaying new project information. Live, 
 - Homepage section links use root-qualified hashes so they work from case-study routes.
 - Homepage section observation marks the most relevant Work, Experience, About, or Contact link with aria-current="location" in both navigation variants.
 - Every case-study route treats Work as the current location.
-- html scroll-padding and section scroll-margin both clear the fixed header.
+- Desktop navigation compacts only after deliberate downward scrolling below the hero region and
+  expands after upward travel, near the page top, a route change, or keyboard focus.
+- At 760px and below, Work, Experience, About, and Contact remain permanently available in a
+  safe-area-aware bottom pill. Home, theme, and résumé live in the adjacent utility Popover.
+- html scroll-padding and section scroll-margin clear the fixed desktop header; mobile targets use
+  reduced top offsets and footer clearance protects final content from the bottom navigation.
 - The résumé is a direct download, not a modal.
 - Email uses a direct mailto destination; no backend form is implied.
 - External social links open a new tab and include noopener/noreferrer.

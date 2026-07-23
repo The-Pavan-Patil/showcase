@@ -45,13 +45,22 @@ Fixed-header offset behavior keeps the target heading visible after fragment nav
 - Unknown slugs call the framework not-found boundary and expose `noindex, nofollow` metadata.
 - Missing optional media or project links produce no empty container or inactive control.
 
-## Header and Mobile Drawer Contract
+## Header and Responsive Navigation Contract
 
 - The brand link returns home and has the accessible name “Pavan Patil, home”.
 - Desktop navigation is a semantic `nav` list with Work, Experience, About, and Contact.
-- The mobile trigger reports its accessible name and open state.
-- While open, the Drawer is modal, focus remains inside it, background interaction and scroll are
-  suppressed, Escape/backdrop/close-control/destination dismiss it, and focus returns to the trigger.
+- Desktop navigation begins as a 60px-high regular-glass surface capped at 64rem. After the page is
+  below 96px and 24px of downward travel accumulates, it compacts to 48px and approximately 44rem.
+- Sixteen pixels of upward travel, returning within 64px of the page top, route changes, or keyboard
+  focus entering the header restores the expanded state. Section destinations remain visible in
+  both densities.
+- At 760px and below, the desktop header is absent. A persistent safe-area-aware bottom pill exposes
+  Work, Experience, About, and Contact with icons above labels and an inner active capsule.
+- A separate, accessibly named utility orb opens a HeroUI Popover containing Home, theme, and résumé.
+  Escape, outside interaction, a destination, or a completed theme action dismisses it and restores
+  focus according to the Popover contract.
+- Mobile navigation never compacts while scrolling and must not obstruct the footer or create
+  horizontal overflow at 320 CSS pixels.
 - Selecting any fragment from a case-study route returns to the corresponding homepage target.
 
 ## Theme Contract
@@ -99,4 +108,4 @@ Open Graph title/description/image, and Twitter summary-large-image metadata.
   transient external outage must not make pull-request tests flaky.
 - Font failure: compatible fallbacks preserve reading order and legibility.
 - JavaScript failure: server-rendered content, internal routes, email, resume, and professional
-  anchors remain usable; only Drawer and theme enhancement may degrade.
+  anchors remain usable; only theme, active-section, Popover, and density enhancements may degrade.

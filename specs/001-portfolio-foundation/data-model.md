@@ -131,6 +131,7 @@ point-cloud processing, and `30%` lower pipeline transfer latency.
 |-------|------|----------|------------|
 | `label` | string | Yes | Unique visible label |
 | `href` | same-site URL or fragment | Yes | Existing route or section target |
+| `icon` | presentation identifier | Yes | Decorative icon with a visible or programmatic label |
 
 The approved labels and targets are Work `/#work`, Experience `/#experience`, About `/#about`,
 and Contact `/#contact`.
@@ -148,12 +149,14 @@ persisted light/dark -> same theme (navigation and reload)
 System preference does not alter the first-visit default. Until client mounting resolves the
 stored value, the toggle does not announce an incorrect state.
 
-### Mobile Drawer
+### Responsive Navigation
 
 ```text
-closed -> open: menu trigger
-open -> closed: destination, close control, Escape, or dismissible backdrop
-closed -> trigger focused: after every dismissal
+desktop expanded -> compact: deliberate downward scroll below the introductory region
+desktop compact -> expanded: upward scroll, near-page-top position, route change, or header focus
+mobile utility closed -> open: utility control
+mobile utility open -> closed: destination, Escape, outside dismissal, or completed theme action
+mobile utility closed -> trigger focused: after dismissal
 ```
 
 ### Project Route

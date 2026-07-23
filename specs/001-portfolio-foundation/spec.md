@@ -75,14 +75,17 @@ width, using only the keyboard, in both themes, at 200% zoom, and with reduced m
 
 **Acceptance Scenarios**:
 
-1. **Given** a narrow viewport, **When** the visitor opens the navigation menu, **Then** navigation
-   is presented in an accessible modal surface that closes by destination choice, dismissal,
-   or Escape and returns focus to its trigger.
+1. **Given** a narrow viewport, **When** the visitor navigates the site, **Then** Work, Experience,
+   About, and Contact remain available in a persistent bottom navigation while a separate named
+   utility control exposes Home, theme, and résumé actions with dismissal and focus restoration.
 2. **Given** a visitor changes the theme, **When** they navigate or reload, **Then** the explicit
    choice persists and the page does not expose an incorrect-theme flash.
 3. **Given** keyboard-only or assistive-technology use, **When** the visitor moves through the site,
    **Then** landmarks, headings, controls, focus order, accessible names, and skip navigation make
    every core action available.
+4. **Given** a desktop visitor scrolls deliberately down and then up, **When** the header changes
+   density, **Then** every section destination remains available, the header expands near the page
+   top or on keyboard focus, and reduced-motion users receive the same state changes immediately.
 
 ---
 
@@ -119,7 +122,8 @@ traceable to the resume.
 - If custom web fonts are delayed or unavailable, the content remains legible and the layout uses
   compatible fallback fonts.
 - With JavaScript unavailable, the static content and direct links remain readable; only explicit
-  client-side enhancements such as the theme control and modal menu may be unavailable.
+  client-side enhancements such as theme selection, active-section indication, utility-popover
+  behavior, and direction-aware header density may be unavailable.
 - Reduced-motion users receive immediate state changes without smooth scrolling, parallax, or
   non-essential transition sequences.
 
@@ -146,10 +150,15 @@ traceable to the resume.
   three featured projects, experience, skills and about content, a contact call to action, and a
   footer.
 - **FR-002**: The global header MUST identify Pavan, provide routes to Work, Experience, About, and
-  Contact, expose the theme control, and make the approved resume available when present.
-- **FR-003**: Narrow viewports MUST replace the desktop navigation with a modal menu that has an
-  accessible name, keyboard containment, Escape and backdrop dismissal, destination-close
-  behavior, scroll containment, and focus restoration.
+  Contact, expose the theme control, and make the approved resume available when present. On wide
+  viewports it MUST compact after deliberate downward scrolling and expand after upward scrolling,
+  near the page top, on route changes, or when keyboard focus enters it, without removing section
+  destinations or accessible action names.
+- **FR-003**: Narrow viewports MUST replace the desktop header with a persistent, safe-area-aware
+  bottom navigation for Work, Experience, About, and Contact plus a separate, accessibly named
+  utility control for Home, theme, and résumé. The utility surface MUST support Escape and outside
+  dismissal, destination-close behavior, and focus restoration; the combined navigation MUST not
+  cause horizontal overflow or obstruct final-page content at 320 CSS pixels.
 - **FR-004**: The hero MUST state Pavan's name, Software Engineer role, web/mobile/backend focus, and
   evidence-based positioning, with actions for selected work and direct email.
 - **FR-005**: Proof points MUST use only resume-verified values and MUST retain enough context to

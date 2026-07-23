@@ -32,7 +32,7 @@ The system is light-first, supports an optional dark theme, and uses verified pr
 | Shared content and project records | src/lib/portfolio.ts |
 | Page width | src/components/container.tsx |
 | Section heading composition | src/components/section-heading.tsx |
-| Header, navigation, and mobile drawer | src/components/site-header.tsx |
+| Direction-aware header and mobile bottom navigation | src/components/site-header.tsx |
 | Project cards and diagrams | src/components/project-card.tsx and src/components/project-visual.tsx |
 | Homepage composition | src/app/page.tsx |
 | Case-study composition | src/app/work/[slug]/page.tsx |
@@ -47,6 +47,6 @@ The CSS variables are the runtime token source. This documentation records both 
 
 ## Library boundary
 
-HeroUI v3 supplies accessible primitives such as Button, Card, Chip, and Drawer. Portfolio-owned components supply the semantic structure, content model, visual hierarchy, and styling. The header is deliberately owned by the portfolio because HeroUI v3 does not provide a Navbar component.
+HeroUI v3 supplies accessible primitives such as Button, Card, Chip, and Popover. Portfolio-owned components supply the semantic structure, content model, visual hierarchy, and styling. The header is deliberately owned by the portfolio because HeroUI v3 does not provide a Navbar component.
 
 Do not introduce HeroUI Pro source, licensed templates, copied screenshots, or unverified product imagery. When a real screenshot is unavailable, use an honest system diagram like the current ProjectVisual compositions.
