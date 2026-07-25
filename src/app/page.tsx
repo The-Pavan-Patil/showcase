@@ -4,7 +4,9 @@ import {
   ArrowRight,
   ArrowUpRight,
   Blocks,
+  Briefcase,
   Braces,
+  ChevronUp,
   CloudCog,
   Code2,
   Database,
@@ -13,7 +15,9 @@ import {
   MapPin,
   Smartphone,
   Sparkles,
+  Trophy,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
@@ -131,6 +135,7 @@ export default function Home() {
           <Container>
             <div className="section-header-row">
               <SectionHeading
+                id="work-heading"
                 eyebrow="Selected work"
                 title="Built for real constraints."
                 muted="Designed to hold up."
@@ -149,26 +154,87 @@ export default function Home() {
         <section className="section-block experience-section" id="experience" aria-labelledby="experience-heading">
           <Container>
             <SectionHeading
+              id="experience-heading"
               eyebrow="Experience"
               title="Product delivery,"
               muted="from interface to infrastructure."
               description="Experience across client products, internal platforms, cloud operations, and real-time research systems."
             />
             <div className="experience-list">
-              {experience.map((item, index) => (
+              {experience.map((item) => (
                 <article className="experience-item" key={`${item.company}-${item.role}`}>
-                  <div className="experience-index">0{index + 1}</div>
-                  <div className="experience-role">
-                    <h3>{item.role}</h3>
-                    <p>{item.company}</p>
+                  <div className="experience-node" aria-hidden="true">
+                    <Briefcase size={15} />
                   </div>
-                  <div className="experience-meta">
-                    <p>{item.period}</p>
-                    <span>{item.location}</span>
+                  <div className="experience-content">
+                    <div className="experience-company-row">
+                      <div className="experience-company-lockup">
+                        <span className="experience-logo">
+                          <Image src={item.logoUrl} alt="" fill sizes="48px" />
+                        </span>
+                        <div className="experience-role">
+                          <h3>{item.company}</h3>
+                          <p>
+                            <span>{item.role}</span>
+                            <span aria-hidden="true" className="experience-meta-dot" />
+                            <span>{item.location}</span>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="experience-card-meta">
+                        {item.status ? (
+                          <span className="experience-status">
+                            <Trophy aria-hidden="true" size={13} />
+                            {item.status}
+                          </span>
+                        ) : null}
+                        <span className="experience-period">{item.period}</span>
+                      </div>
+                    </div>
+
+                    <p className="experience-description">{item.description}</p>
+
+                    <div className="experience-tech-list" aria-label={`${item.company} technology stack`}>
+                      {item.technologies.map((technology) => (
+                        <span className="experience-tech-chip" key={technology}>{technology}</span>
+                      ))}
+                    </div>
+
+                    {item.projects?.length ? (
+                      <details className="client-projects" open>
+                        <summary>
+                          <span className="client-project-summary-open">Collapse projects</span>
+                          <span className="client-project-summary-closed">Show projects</span>
+                          <span className="client-project-count">{item.projects.length}</span>
+                          <span className="client-project-toggle-icon" aria-hidden="true">
+                            <ChevronUp size={13} />
+                          </span>
+                        </summary>
+                        <div className="client-project-list">
+                          {item.projects.map((project) => (
+                            <article className="client-project-item" key={`${item.company}-${project.client}-${project.project}`}>
+                              <span className="client-project-logo">
+                                <Image src={project.logoUrl} alt="" fill sizes="40px" />
+                              </span>
+                              <div className="client-project-body">
+                                <h4>
+                                  <span>{project.client}</span>
+                                  <ArrowRight aria-hidden="true" size={16} />
+                                  <span>{project.project}</span>
+                                </h4>
+                                <p>{project.description}</p>
+                                <div className="client-project-tech" aria-label={`${project.client} project technology stack`}>
+                                  {project.technologies.map((technology) => (
+                                    <span key={technology}>{technology}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            </article>
+                          ))}
+                        </div>
+                      </details>
+                    ) : null}
                   </div>
-                  <ul>
-                    {item.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}
-                  </ul>
                 </article>
               ))}
             </div>
@@ -179,7 +245,7 @@ export default function Home() {
           <Container>
             <div className="about-grid">
               <div className="about-copy">
-                <SectionHeading eyebrow="About" title="Engineering with" muted="clarity and ownership." />
+                <SectionHeading id="about-heading" eyebrow="About" title="Engineering with" muted="clarity and ownership." />
                 <p>{profile.about}</p>
                 <p className="education-note">{profile.education}</p>
                 <a className="text-link" href="/pavan-patil-resume.txt" download>

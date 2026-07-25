@@ -13,13 +13,13 @@ Semantic variables live in src/app/globals.css. Components must use semantic rol
 | surface-tertiary | #E7E7E9 | #2A2A2D | Quiet controls and diagram details |
 | muted | #6B6B73 | #9F9FA9 | Secondary copy and metadata |
 | border | #DEDEE0 | #28282C | Dividers and component outlines |
-| accent | #006FEE | #006FEE | Filled actions and selected controls |
-| accent-text | #005FC5 | #4BA8FF | Accessible blue text and small labels |
+| accent | #0D7377 | #0D7377 | Filled actions and selected controls |
+| accent-text | #0A5C5F | #5EEAD4 | Accessible teal text and small labels |
 | accent-foreground | #FFFFFF | #FFFFFF | Text on accent fills |
-| accent-bright | #0485F7 | #0485F7 | Decorative glow only |
-| accent-soft | #E6F1FE | #0B2D4F | Quiet selected or informative surfaces |
-| inverse-accent | #66B5FF | #005FC5 | Blue text on the inverse contact surface |
-| focus | #006FEE | #4BA8FF | Focus-visible outline |
+| accent-bright | #14919B | #14919B | Decorative glow only |
+| accent-soft | #E6F4F4 | #0A2E30 | Quiet selected or informative surfaces |
+| inverse-accent | #5EC8CC | #0A5C5F | Teal text on the inverse contact surface |
+| focus | #0D7377 | #5EEAD4 | Focus-visible outline |
 
 Status green is a limited exception. Availability uses #22C55E, and success labels use coordinated light and dark foreground/background pairs. Do not use green as a second brand color.
 
@@ -32,15 +32,15 @@ Measured ratios for core pairs:
 | light foreground on light background | 16.25:1 | Pass |
 | light muted on white surface | 5.28:1 | Pass for normal text |
 | light muted on light background | 4.84:1 | Pass for normal text |
-| light accent-text on white surface | 6.10:1 | Pass for normal text |
-| light accent-text on light background | 5.59:1 | Pass for normal text |
-| white on action accent | 4.66:1 | Pass for normal text |
+| light accent-text on white surface | 7.75:1 | Pass for normal text |
+| light accent-text on light background | 7.11:1 | Pass for normal text |
+| white on action accent | 5.62:1 | Pass for normal text |
 | dark foreground on dark background | 19.40:1 | Pass |
 | dark muted on dark background | 7.72:1 | Pass |
-| dark accent-text on dark background | 8.05:1 | Pass |
-| dark accent-text on dark surface | 7.04:1 | Pass |
-| light inverse-accent on light inverse surface | 8.11:1 | Pass |
-| dark inverse-accent on dark inverse surface | 5.84:1 | Pass |
+| dark accent-text on dark background | 13.69:1 | Pass |
+| dark accent-text on dark surface | 11.98:1 | Pass |
+| light inverse-accent on light inverse surface | 8.95:1 | Pass |
+| dark inverse-accent on dark inverse surface | 7.43:1 | Pass |
 
 Decorative accent-bright must not carry text or state by itself. See [Accessibility](./accessibility.md) before changing foreground roles.
 
@@ -48,8 +48,8 @@ Decorative accent-bright must not carry text or state by itself. See [Accessibil
 
 | Do | Don’t |
 | --- | --- |
-| Use accent for a primary action or selected control. | Use action blue for paragraphs or small labels. |
-| Use accent-text for eyebrows, code labels, and other blue text. | Use decorative accent-bright for text. |
+| Use accent for a primary action or selected control. | Use action teal for paragraphs or small labels. |
+| Use accent-text for eyebrows, code labels, and other teal text. | Use decorative accent-bright for text. |
 | Use muted for supporting information on page or surface backgrounds. | Reduce muted text opacity below the verified token value. |
 | Use borders and surface changes for quiet grouping. | Rely on low-opacity color alone to separate required content. |
 | Keep status colors semantic and pair them with text. | Communicate status through color alone. |

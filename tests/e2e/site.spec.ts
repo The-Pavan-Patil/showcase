@@ -25,9 +25,10 @@ for (const [slug, title] of projects) {
   test(`${title} has a static case-study route`, async ({ page }) => {
     await page.goto(`/work/${slug}`);
     await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
-    await expect(page.getByText("The challenge")).toBeVisible();
-    await expect(page.getByText("The approach")).toBeVisible();
-    await expect(page.getByText("The outcome")).toBeVisible();
+    const article = page.locator(".case-article");
+    await expect(article.getByRole("heading", { name: "The challenge" })).toBeVisible();
+    await expect(article.getByRole("heading", { name: "The approach" })).toBeVisible();
+    await expect(article.getByText("The outcome", { exact: true })).toBeVisible();
   });
 }
 

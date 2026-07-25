@@ -47,7 +47,9 @@ Playwright browser binaries must be available in the local or CI environment bef
 
 ## Content model
 
-Portfolio content lives in `src/lib/portfolio.ts`. Project cards, case-study routes, metadata, and structured data consume the same typed records so verified facts cannot drift between views.
+Editable portfolio content lives in `content/portfolio.ts`. Project cards, case-study routes, metadata, and structured data consume the same typed records through `src/lib/portfolio.ts` so verified facts cannot drift between views.
+
+Use `content/README.md` for the edit checklist and `docs/design-system/content.md` for voice, evidence, and claim rules.
 
 The public résumé file intentionally omits the private phone number from the supplied source résumé. Replace or augment project media only with assets approved for public use.
 

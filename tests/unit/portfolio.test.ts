@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  experience,
   getNextProject,
   getProjectBySlug,
   profile,
@@ -38,6 +39,45 @@ describe("portfolio content", () => {
   it("cycles through next projects", () => {
     expect(getNextProject("nudge").slug).toBe("philips-greenheart");
     expect(getNextProject("workforce-management-system").slug).toBe("nudge");
+  });
+
+  it("publishes the detailed Nudge case study material", () => {
+    const nudge = getProjectBySlug("nudge");
+    expect(nudge?.media?.src).toBe("/nudge-case-study.png");
+    expect(nudge?.caseStudy?.sections.map((section) => section.id)).toEqual([
+      "overview",
+      "context",
+      "challenge",
+      "product-surface",
+      "approach",
+      "architectural-adaptation",
+      "access-control",
+      "collaboration-model",
+      "data-model",
+      "role-aware-gestures",
+      "debugging-tooling",
+      "what-shipped",
+      "development-principle",
+      "why-this-work-matters",
+    ]);
+    expect(JSON.stringify(nudge?.caseStudy)).toContain("Row Level Security");
+    expect(JSON.stringify(nudge?.caseStudy)).toContain("PowerSync handled local task data and replication");
+  });
+
+  it("models experience as company-scoped project journeys", () => {
+    expect(experience).toHaveLength(3);
+    expect(experience.every((item) => item.logoUrl && item.description && item.technologies.length)).toBe(true);
+    expect(experience.flatMap((item) => item.projects ?? [])).toHaveLength(5);
+    expect(experience.map((item) => item.company)).toEqual([
+      "Ownpath Pvt. Ltd.",
+      "Sonai Engineering & Services",
+      "Defence Research and Development Organization",
+    ]);
+    expect(experience[0].projects?.map((project) => project.client)).toEqual([
+      "Hero Vida",
+      "Philips",
+      "Vendaka Pvt. Ltd.",
+    ]);
   });
 
   it("publishes verified contact links without a phone number", () => {

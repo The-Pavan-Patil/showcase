@@ -1,12 +1,14 @@
 import { cn } from "@/lib/utils";
 
 export function SectionHeading({
+  id,
   eyebrow,
   title,
   muted,
   description,
   align = "left",
 }: {
+  id?: string;
   eyebrow: string;
   title: string;
   muted?: string;
@@ -21,7 +23,7 @@ export function SectionHeading({
       )}
     >
       <p className="eyebrow">{eyebrow}</p>
-      <h2>
+      <h2 id={id}>
         {title}
         {muted ? <span className="heading-muted"> {muted}</span> : null}
       </h2>

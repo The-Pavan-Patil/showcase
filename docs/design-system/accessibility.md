@@ -45,16 +45,16 @@ Current measured audit:
 | #18181B on #F5F5F5 | 16.25:1 | Pass |
 | #6B6B73 on #FFFFFF | 5.28:1 | Pass |
 | #6B6B73 on #F5F5F5 | 4.84:1 | Pass |
-| #005FC5 on #FFFFFF | 6.10:1 | Pass |
-| #005FC5 on #F5F5F5 | 5.59:1 | Pass |
-| #FFFFFF on #006FEE | 4.66:1 | Pass |
+| #0A5C5F on #FFFFFF | 7.75:1 | Pass |
+| #0A5C5F on #F5F5F5 | 7.11:1 | Pass |
+| #FFFFFF on #0D7377 | 5.62:1 | Pass |
 | #9F9FA9 on #060607 | 7.72:1 | Pass |
 | #9F9FA9 on #18181B | 6.75:1 | Pass |
 | #FAFAFA on #060607 | 19.40:1 | Pass |
-| #4BA8FF on #060607 | 8.05:1 | Pass |
-| #4BA8FF on #18181B | 7.04:1 | Pass |
-| #66B5FF on #18181B | 8.11:1 | Pass |
-| #005FC5 on #FAFAFA | 5.84:1 | Pass |
+| #5EEAD4 on #060607 | 13.69:1 | Pass |
+| #5EEAD4 on #18181B | 11.98:1 | Pass |
+| #5EC8CC on #18181B | 8.95:1 | Pass |
+| #0A5C5F on #FAFAFA | 7.43:1 | Pass |
 
 Action fill, text accent, decorative accent, and inverse-surface accent are separate roles. Preserve that split when adding components. Re-test color-mix results, status colors, contact-card copy, focus rings, and diagram microcopy with rendered styles.
 
