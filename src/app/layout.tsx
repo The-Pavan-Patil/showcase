@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Manrope } from "next/font/google";
+import { Inter, Manrope, Michroma } from "next/font/google";
 
 import { Providers } from "@/components/providers";
 import { getSiteUrl } from "@/lib/site";
@@ -15,6 +15,13 @@ const inter = Inter({
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const michroma = Michroma({
+  variable: "--font-michroma",
+  subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
 
@@ -81,7 +88,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${manrope.variable}`}
+      className={`${inter.variable} ${manrope.variable} ${michroma.variable}`}
     >
       <body>
         <a className="skip-link" href="#main-content">Skip to main content</a>

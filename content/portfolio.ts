@@ -11,7 +11,7 @@ export const portfolioContent: PortfolioContent = {
     heroDescription:
       "I’m Pavan Patil, a software engineer working across web, mobile, backend, and data-intensive systems. I’ve built offline-first collaboration products, enterprise documentation workflows, workforce automation, and real-time LiDAR services.",
     about:
-      "I’m a software engineer from India with experience across product development, client delivery, and research engineering. I enjoy turning complex requirements into reliable software—from offline-first mobile synchronization and Git-backed publishing workflows to payroll automation and real-time LiDAR APIs.",
+      "I work across product development, client delivery, and research engineering, usually close to the places where requirements are still changing. My focus is reliable interfaces, API development, backend systems, data workflows, and mobile experiences that stay understandable after the first release.",
     education:
       "Bachelor of Engineering in Electronics and Computer Engineering · PES Modern College of Engineering · 9.4 SGPA",
   },

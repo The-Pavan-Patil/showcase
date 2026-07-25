@@ -37,6 +37,13 @@ export function SiteFooter() {
           <p>© {new Date().getFullYear()} {profile.name}. Designed and built with care.</p>
           <p>Next.js · HeroUI · TypeScript</p>
         </div>
+        <div className="footer-watermark" aria-hidden="true">
+          <p>
+            {"PAVAN".split("").map((letter, index) => (
+              <span key={`${letter}-${index}`}>{letter}</span>
+            ))}
+          </p>
+        </div>
       </Container>
     </footer>
   );

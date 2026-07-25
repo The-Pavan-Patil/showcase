@@ -3,14 +3,18 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUpRight,
+  Bike,
   Blocks,
+  BookOpen,
   Briefcase,
   Braces,
   ChevronUp,
   CloudCog,
   Code2,
+  Compass,
   Database,
   GitBranch,
+  Languages,
   Mail,
   MapPin,
   Smartphone,
@@ -38,6 +42,37 @@ import { getSiteUrl } from "@/lib/site";
 
 export default function Home() {
   const siteUrl = getSiteUrl();
+  const aboutHighlights = [
+    {
+      label: "I build",
+      value: "Web, mobile, backend, APIs, and data workflows",
+    },
+    {
+      label: "I work best with",
+      value: "Clear requirements, practical architecture, and steady delivery",
+    },
+    {
+      label: "I am looking toward",
+      value: "Product-minded engineering teams, including Japan-focused companies",
+    },
+  ];
+  const personalNotes = [
+    {
+      label: "Japanese",
+      text: "Learning the language to work better with Japan-based teams and startups.",
+      icon: Languages,
+    },
+    {
+      label: "Horse riding",
+      text: "A reset habit that helps me slow down and clear my head.",
+      icon: Compass,
+    },
+    {
+      label: "Bike rides",
+      text: "Weekend rides keep me relaxed, observant, and steady.",
+      icon: Bike,
+    },
+  ];
 
   return (
     <>
@@ -243,15 +278,77 @@ export default function Home() {
 
         <section className="section-block" id="about" aria-labelledby="about-heading">
           <Container>
-            <div className="about-grid">
-              <div className="about-copy">
-                <SectionHeading id="about-heading" eyebrow="About" title="Engineering with" muted="clarity and ownership." />
-                <p>{profile.about}</p>
-                <p className="education-note">{profile.education}</p>
-                <a className="text-link" href="/pavan-patil-resume.txt" download>
-                  Download résumé <ArrowRight aria-hidden="true" size={16} />
-                </a>
+            <div className="about-shell">
+              <aside className="about-portrait" aria-label="Portrait and profile summary">
+                <div className="about-photo-frame">
+                  <Image
+                    src="/pavan-profile.jpg"
+                    alt="Pavan Patil smiling outdoors at night"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 32vw"
+                  />
+                </div>
+                <div className="about-portrait-caption">
+                  <span>India · Software Engineer</span>
+                  <strong>Calm builder for product teams.</strong>
+                </div>
+              </aside>
+
+              <div className="about-content">
+                <div className="about-copy">
+                  <SectionHeading
+                    id="about-heading"
+                    eyebrow="About"
+                    title="Who I am,"
+                    muted="and how I build."
+                    description="I’m Pavan, a software engineer who likes turning messy product requirements into dependable software people can actually use."
+                  />
+                  <p>{profile.about}</p>
+                </div>
+
+                <div className="about-highlight-grid" aria-label="About Pavan">
+                  {aboutHighlights.map((item) => (
+                    <div className="about-highlight" key={item.label}>
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="about-personality">
+                  <div>
+                    <p className="eyebrow">Beyond code</p>
+                    <h3>A little personality, kept useful.</h3>
+                  </div>
+                  <div className="about-personality-grid" aria-label="Personal interests">
+                    {personalNotes.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <div className="about-personality-item" key={item.label}>
+                          <span className="about-personality-icon">
+                            <Icon aria-hidden="true" size={16} />
+                          </span>
+                          <div>
+                            <strong>{item.label}</strong>
+                            <p>{item.text}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="about-footer-row">
+                  <p className="education-note">
+                    <BookOpen aria-hidden="true" size={16} />
+                    {profile.education}
+                  </p>
+                  <a className="text-link" href="/pavan-patil-resume.txt" download>
+                    Download résumé <ArrowRight aria-hidden="true" size={16} />
+                  </a>
+                </div>
               </div>
+
               <div className="skills-grid" aria-label="Technical skills">
                 {skillGroups.map((group, index) => {
                   const icons = [Braces, Blocks, Database, CloudCog];
