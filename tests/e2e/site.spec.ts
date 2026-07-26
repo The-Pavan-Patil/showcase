@@ -6,12 +6,19 @@ const projects = [
   ["workforce-management-system", "Workforce Management"],
 ] as const;
 
+async function skipLaunchIntro(page: import("@playwright/test").Page) {
+  await page.addInitScript(() => {
+    window.sessionStorage.setItem("launch-terminal-seen", "true");
+  });
+}
+
 test("homepage exposes the primary portfolio journey", async ({ page }) => {
   const errors: string[] = [];
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
   });
 
+  await skipLaunchIntro(page);
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
   await expect(page.getByRole("main")).toBeVisible();
@@ -19,6 +26,37 @@ test("homepage exposes the primary portfolio journey", async ({ page }) => {
   await expect(page.getByRole("contentinfo")).toBeVisible();
   await expect(page.locator("html")).not.toHaveClass(/dark/);
   expect(errors).toEqual([]);
+});
+
+test("homepage first load plays the terminal launch intro", async ({ page }) => {
+  await page.goto("/");
+
+  const dialog = page.getByRole("dialog", { name: "pavanpatil.dev launch" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveCSS("background-color", "rgb(2, 2, 3)");
+
+  const command = page.locator(".launch-terminal-command");
+  await expect(command).toHaveAttribute("aria-label", "npm rundev", { timeout: 4000 });
+  await expect(command).toHaveAttribute("aria-label", "npm run dev", { timeout: 4000 });
+  await expect(page.getByText("Website: https://pavanpatil.dev")).toBeVisible({ timeout: 7000 });
+  await expect(dialog).toBeHidden({ timeout: 3000 });
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
+});
+
+test("homepage skips the terminal launch intro after it has played this session", async ({ page }) => {
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  await expect(page.getByRole("dialog", { name: "pavanpatil.dev launch" })).toHaveCount(0);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
+});
+
+test("homepage can force replay the terminal launch intro for testing", async ({ page }) => {
+  await skipLaunchIntro(page);
+  await page.goto("/?intro=1");
+
+  await expect(page.getByRole("dialog", { name: "pavanpatil.dev launch" })).toBeVisible();
+  await expect(page.locator(".launch-terminal-command")).toHaveAttribute("aria-label", "npm rundev", { timeout: 4000 });
 });
 
 for (const [slug, title] of projects) {
@@ -47,6 +85,7 @@ test("desktop navigation shrinks down and expands up without losing destinations
   test.skip(testInfo.project.name.startsWith("mobile"));
 
   await page.setViewportSize({ width: 1440, height: 900 });
+  await skipLaunchIntro(page);
   await page.goto("/");
   await page.getByRole("banner").getByRole("link", { name: "Pavan Patil, home" }).focus();
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
@@ -76,6 +115,7 @@ test("mobile bottom navigation and utility controls are keyboard-operable", asyn
   test.skip(!testInfo.project.name.startsWith("mobile"));
 
   await page.setViewportSize({ width: 390, height: 844 });
+  await skipLaunchIntro(page);
   await page.goto("/");
 
   await expect(page.locator(".site-header-shell")).toBeHidden();

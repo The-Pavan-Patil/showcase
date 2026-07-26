@@ -7,8 +7,15 @@ const routes = [
   ["workforce", "/work/workforce-management-system"],
 ] as const;
 
+async function skipLaunchIntro(page: import("@playwright/test").Page) {
+  await page.addInitScript(() => {
+    window.sessionStorage.setItem("launch-terminal-seen", "true");
+  });
+}
+
 for (const [name, route] of routes) {
   test(`${name} light and dark visual baselines`, async ({ page }, testInfo) => {
+    if (route === "/") await skipLaunchIntro(page);
     await page.goto(route);
     await page.evaluate(() => document.fonts.ready);
     await expect(page).toHaveScreenshot(`${name}-light.png`, { fullPage: true, animations: "disabled" });
@@ -25,6 +32,7 @@ for (const [name, route] of routes) {
 test("desktop compact navbar light and dark visual baselines", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "chromium");
 
+  await skipLaunchIntro(page);
   await page.goto("/");
   await page.getByRole("banner").getByRole("link", { name: "Pavan Patil, home" }).focus();
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
@@ -42,6 +50,7 @@ test("desktop compact navbar light and dark visual baselines", async ({ page }, 
 test("mobile utility popover light and dark visual baselines", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "mobile-chromium");
 
+  await skipLaunchIntro(page);
   await page.goto("/");
   await page.evaluate(() => document.fonts.ready);
   const menu = page.getByRole("button", { name: "Open navigation utilities" });

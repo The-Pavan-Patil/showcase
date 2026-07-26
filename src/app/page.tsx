@@ -1,11 +1,8 @@
-import { Card, Chip } from "@heroui/react";
 import {
   ArrowDown,
   ArrowRight,
   ArrowUpRight,
   Bike,
-  Blocks,
-  BookOpen,
   Briefcase,
   Braces,
   ChevronUp,
@@ -26,6 +23,7 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
+import { LaunchTerminal } from "@/components/launch-terminal";
 import { ProjectCard } from "@/components/project-card";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
@@ -42,34 +40,20 @@ import { getSiteUrl } from "@/lib/site";
 
 export default function Home() {
   const siteUrl = getSiteUrl();
-  const aboutHighlights = [
-    {
-      label: "I build",
-      value: "Web, mobile, backend, APIs, and data workflows",
-    },
-    {
-      label: "I work best with",
-      value: "Clear requirements, practical architecture, and steady delivery",
-    },
-    {
-      label: "I am looking toward",
-      value: "Product-minded engineering teams, including Japan-focused companies",
-    },
-  ];
   const personalNotes = [
     {
       label: "Japanese",
-      text: "Learning the language to work better with Japan-based teams and startups.",
+      text: "Learning the language with a long-term goal of working with Japan-based companies and startups.",
       icon: Languages,
     },
     {
       label: "Horse riding",
-      text: "A reset habit that helps me slow down and clear my head.",
+      text: "My reset button when I need to slow down, clear my head, and come back sharper.",
       icon: Compass,
     },
     {
       label: "Bike rides",
-      text: "Weekend rides keep me relaxed, observant, and steady.",
+      text: "A simple way to stay relaxed, observant, and steady outside work.",
       icon: Bike,
     },
   ];
@@ -88,6 +72,7 @@ export default function Home() {
           knowsAbout: skillGroups.flatMap((group) => [...group.skills]),
         }}
       />
+      <LaunchTerminal />
       <SiteHeader />
       <main id="main-content">
         <section className="hero-section" aria-labelledby="hero-title">
@@ -288,10 +273,6 @@ export default function Home() {
                     sizes="(max-width: 1024px) 100vw, 32vw"
                   />
                 </div>
-                <div className="about-portrait-caption">
-                  <span>India · Software Engineer</span>
-                  <strong>Calm builder for product teams.</strong>
-                </div>
               </aside>
 
               <div className="about-content">
@@ -306,26 +287,17 @@ export default function Home() {
                   <p>{profile.about}</p>
                 </div>
 
-                <div className="about-highlight-grid" aria-label="About Pavan">
-                  {aboutHighlights.map((item) => (
-                    <div className="about-highlight" key={item.label}>
-                      <span>{item.label}</span>
-                      <strong>{item.value}</strong>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="about-personality">
+                <div className="about-beyond">
                   <div>
                     <p className="eyebrow">Beyond code</p>
-                    <h3>A little personality, kept useful.</h3>
+                    <h3>Small signals about how I think.</h3>
                   </div>
-                  <div className="about-personality-grid" aria-label="Personal interests">
+                  <div className="about-beyond-list" aria-label="Personal interests">
                     {personalNotes.map((item) => {
                       const Icon = item.icon;
                       return (
-                        <div className="about-personality-item" key={item.label}>
-                          <span className="about-personality-icon">
+                        <div className="about-beyond-item" key={item.label}>
+                          <span className="about-beyond-icon">
                             <Icon aria-hidden="true" size={16} />
                           </span>
                           <div>
@@ -338,37 +310,9 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="about-footer-row">
-                  <p className="education-note">
-                    <BookOpen aria-hidden="true" size={16} />
-                    {profile.education}
-                  </p>
-                  <a className="text-link" href="/pavan-patil-resume.txt" download>
-                    Download résumé <ArrowRight aria-hidden="true" size={16} />
-                  </a>
-                </div>
-              </div>
-
-              <div className="skills-grid" aria-label="Technical skills">
-                {skillGroups.map((group, index) => {
-                  const icons = [Braces, Blocks, Database, CloudCog];
-                  const Icon = icons[index];
-                  return (
-                    <Card className="skill-card" key={group.label} variant="secondary">
-                      <Card.Header>
-                        <span className="skill-icon"><Icon aria-hidden="true" size={17} /></span>
-                        <Card.Title>{group.label}</Card.Title>
-                      </Card.Header>
-                      <Card.Content>
-                        <div className="skill-chips">
-                          {group.skills.map((skill) => (
-                            <Chip key={skill} size="sm" variant="tertiary">{skill}</Chip>
-                          ))}
-                        </div>
-                      </Card.Content>
-                    </Card>
-                  );
-                })}
+                <a className="resume-capsule" href="/pavan-patil-resume.txt" download>
+                  Download résumé <ArrowRight aria-hidden="true" size={16} />
+                </a>
               </div>
             </div>
           </Container>
