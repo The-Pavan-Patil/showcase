@@ -1,6 +1,6 @@
 "use client";
 
-import { Popover } from "@heroui/react";
+import { Popover } from "@heroui/react/popover";
 import {
   ArrowUpRight,
   BriefcaseBusiness,

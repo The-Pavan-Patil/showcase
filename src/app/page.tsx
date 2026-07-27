@@ -11,7 +11,6 @@ import {
   Compass,
   Database,
   GitBranch,
-  Languages,
   Mail,
   MapPin,
   Smartphone,
@@ -40,20 +39,40 @@ import { getSiteUrl } from "@/lib/site";
 
 export default function Home() {
   const siteUrl = getSiteUrl();
+  const buildPrinciples = [
+    {
+      label: "Product thinking",
+      text: "I turn uncertain requirements into clear flows, useful decisions, and software that solves the right problem.",
+      icon: Sparkles,
+    },
+    {
+      label: "System architecture",
+      text: "I enjoy mapping how interfaces, APIs, data, and infrastructure should fit together before complexity takes over.",
+      icon: GitBranch,
+    },
+    {
+      label: "End-to-end delivery",
+      text: "I’m comfortable moving across web, mobile, backend, and data to carry a product from plan to dependable release.",
+      icon: CloudCog,
+    },
+  ];
   const personalNotes = [
     {
-      label: "Japanese",
-      text: "Learning the language with a long-term goal of working with Japan-based companies and startups.",
-      icon: Languages,
+      label: "Calisthenics",
+      meta: "National competitor · 2024",
+      text: "Training—and competing on a national stage—taught me to value consistency, patience, and showing up for difficult goals.",
+      icon: Trophy,
     },
     {
       label: "Horse riding",
-      text: "My reset button when I need to slow down, clear my head, and come back sharper.",
+      meta: "Adrenaline",
+      text: "Riding gives me the rush I occasionally need and the confidence to stay composed while moving fast.",
       icon: Compass,
     },
     {
-      label: "Bike rides",
-      text: "A simple way to stay relaxed, observant, and steady outside work.",
+      label: "Long bike rides",
+      meta: "Clarity",
+      text: "When my mind needs quiet, I get on the bike. The road creates space to reset, reflect, and return with better ideas.",
       icon: Bike,
     },
   ];
@@ -264,7 +283,7 @@ export default function Home() {
         <section className="section-block" id="about" aria-labelledby="about-heading">
           <Container>
             <div className="about-shell">
-              <aside className="about-portrait" aria-label="Portrait and profile summary">
+              <aside className="about-portrait" aria-label="Portrait and a note about Pavan's early interest in programming">
                 <div className="about-photo-frame">
                   <Image
                     src="/pavan-profile.jpg"
@@ -273,6 +292,11 @@ export default function Home() {
                     sizes="(max-width: 1024px) 100vw, 32vw"
                   />
                 </div>
+                <div className="about-portrait-caption">
+                  <p className="eyebrow">Where it started</p>
+                  <strong>First line of code, class 6.</strong>
+                  <span>The tools have changed. The curiosity has not.</span>
+                </div>
               </aside>
 
               <div className="about-content">
@@ -280,31 +304,42 @@ export default function Home() {
                   <SectionHeading
                     id="about-heading"
                     eyebrow="About"
-                    title="Who I am,"
-                    muted="and how I build."
-                    description="I’m Pavan, a software engineer who likes turning messy product requirements into dependable software people can actually use."
+                    title="Curiosity became"
+                    muted="a lifelong craft."
+                    description="A childhood question—“how does this work?”—grew into a career designing and building useful software."
                   />
-                  <p>{profile.about}</p>
+                  <div className="about-story">
+                    <p className="about-story-lead">{profile.about}</p>
+                    <p>
+                      What keeps me interested is everything around the code: shaping the product,
+                      planning how its pieces fit together, and designing an architecture that can
+                      grow without becoming fragile. I was lucky enough to turn that habit of
+                      making and understanding things into my profession.
+                    </p>
+                  </div>
                 </div>
 
-                <div className="about-beyond">
-                  <div>
-                    <p className="eyebrow">Beyond code</p>
-                    <h3>Small signals about how I think.</h3>
+                <div className="about-principles">
+                  <div className="about-principles-heading">
+                    <p className="eyebrow">How I work</p>
+                    <h3>Thinking beyond the implementation.</h3>
                   </div>
-                  <div className="about-beyond-list" aria-label="Personal interests">
-                    {personalNotes.map((item) => {
+                  <div className="about-principles-list" aria-label="Engineering strengths">
+                    {buildPrinciples.map((item, index) => {
                       const Icon = item.icon;
                       return (
-                        <div className="about-beyond-item" key={item.label}>
-                          <span className="about-beyond-icon">
+                        <article className="about-principle" key={item.label}>
+                          <span className="about-principle-index" aria-hidden="true">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <span className="about-principle-icon">
                             <Icon aria-hidden="true" size={16} />
                           </span>
                           <div>
                             <strong>{item.label}</strong>
                             <p>{item.text}</p>
                           </div>
-                        </div>
+                        </article>
                       );
                     })}
                   </div>
@@ -314,6 +349,39 @@ export default function Home() {
                   Download résumé <ArrowRight aria-hidden="true" size={16} />
                 </a>
               </div>
+
+              <section className="about-life" aria-labelledby="about-life-heading">
+                <div className="about-life-heading">
+                  <div>
+                    <p className="eyebrow">Outside the editor</p>
+                    <h3 id="about-life-heading">Different disciplines. Same focus.</h3>
+                  </div>
+                  <p>
+                    Movement keeps me disciplined, clears mental noise, and gives me
+                    perspectives I rarely find behind a screen.
+                  </p>
+                </div>
+                <div className="about-life-grid">
+                  {personalNotes.map((item, index) => {
+                    const Icon = item.icon;
+                    return (
+                      <article className="about-life-card" key={item.label}>
+                        <div className="about-life-card-top">
+                          <span className="about-life-icon">
+                            <Icon aria-hidden="true" size={17} />
+                          </span>
+                          <span className="about-life-index" aria-hidden="true">
+                            0{index + 1}
+                          </span>
+                        </div>
+                        <p className="about-life-meta">{item.meta}</p>
+                        <h4>{item.label}</h4>
+                        <p>{item.text}</p>
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
             </div>
           </Container>
         </section>

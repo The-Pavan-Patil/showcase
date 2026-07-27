@@ -1,4 +1,5 @@
-import { Card, Chip } from "@heroui/react";
+import { Card } from "@heroui/react/card";
+import { Chip } from "@heroui/react/chip";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
