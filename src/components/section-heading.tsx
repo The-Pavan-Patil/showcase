@@ -7,6 +7,7 @@ export function SectionHeading({
   muted,
   description,
   align = "left",
+  accentAnchor,
 }: {
   id?: string;
   eyebrow: string;
@@ -14,6 +15,7 @@ export function SectionHeading({
   muted?: string;
   description?: string;
   align?: "left" | "center";
+  accentAnchor?: "work" | "experience";
 }) {
   return (
     <div
@@ -22,7 +24,17 @@ export function SectionHeading({
         align === "center" && "section-heading-center",
       )}
     >
-      <p className="eyebrow">{eyebrow}</p>
+      <p className={cn("eyebrow", accentAnchor && "scroll-accent-eyebrow")}>
+        {accentAnchor ? (
+          <span
+            className="scroll-accent-heading-target"
+            data-scroll-accent-anchor={accentAnchor}
+            data-scroll-accent-phase="heading"
+            aria-hidden="true"
+          />
+        ) : null}
+        {eyebrow}
+      </p>
       <h2 id={id}>
         {title}
         {muted ? <span className="heading-muted"> {muted}</span> : null}

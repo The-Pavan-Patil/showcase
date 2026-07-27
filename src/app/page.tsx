@@ -14,8 +14,8 @@ import {
   Mail,
   MapPin,
   Smartphone,
-  Sparkles,
   Trophy,
+  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,9 +24,9 @@ import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
 import { ProjectCard } from "@/components/project-card";
+import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import {
   experience,
   profile,
@@ -39,40 +39,23 @@ import { getSiteUrl } from "@/lib/site";
 
 export default function Home() {
   const siteUrl = getSiteUrl();
-  const buildPrinciples = [
-    {
-      label: "Product thinking",
-      text: "I turn uncertain requirements into clear flows, useful decisions, and software that solves the right problem.",
-      icon: Sparkles,
-    },
-    {
-      label: "System architecture",
-      text: "I enjoy mapping how interfaces, APIs, data, and infrastructure should fit together before complexity takes over.",
-      icon: GitBranch,
-    },
-    {
-      label: "End-to-end delivery",
-      text: "I’m comfortable moving across web, mobile, backend, and data to carry a product from plan to dependable release.",
-      icon: CloudCog,
-    },
-  ];
   const personalNotes = [
     {
       label: "Calisthenics",
       meta: "National competitor · 2024",
-      text: "Training—and competing on a national stage—taught me to value consistency, patience, and showing up for difficult goals.",
+      text: "Discipline, patience, and showing up for difficult goals.",
       icon: Trophy,
     },
     {
       label: "Horse riding",
       meta: "Adrenaline",
-      text: "Riding gives me the rush I occasionally need and the confidence to stay composed while moving fast.",
+      text: "A clean rush that teaches calm while moving fast.",
       icon: Compass,
     },
     {
       label: "Long bike rides",
       meta: "Clarity",
-      text: "When my mind needs quiet, I get on the bike. The road creates space to reset, reflect, and return with better ideas.",
+      text: "Space to reset, think, and come back sharper.",
       icon: Bike,
     },
   ];
@@ -92,13 +75,18 @@ export default function Home() {
         }}
       />
       <LaunchTerminal />
-      <SiteHeader />
+      <ScrollAccent />
       <main id="main-content">
         <section className="hero-section" aria-labelledby="hero-title">
           <Container className="hero-container">
             <div className="hero-copy">
-              <p className="eyebrow hero-eyebrow">
-                <span className="availability-dot" aria-hidden="true" />
+              <p className="eyebrow hero-eyebrow scroll-accent-eyebrow">
+                <span
+                  className="scroll-accent-heading-target scroll-accent-fallback"
+                  data-scroll-accent-anchor="hero"
+                  data-scroll-accent-phase="heading"
+                  aria-hidden="true"
+                />
                 {profile.heroEyebrow}
               </p>
               <h1 id="hero-title">
@@ -176,6 +164,7 @@ export default function Home() {
               <SectionHeading
                 id="work-heading"
                 eyebrow="Selected work"
+                accentAnchor="work"
                 title="Built for real constraints."
                 muted="Designed to hold up."
                 description="Three products that show how I approach synchronization, multilingual experiences, operational workflows, and reliable delivery."
@@ -190,19 +179,30 @@ export default function Home() {
           </Container>
         </section>
 
-        <section className="section-block experience-section" id="experience" aria-labelledby="experience-heading">
+        <section
+          className="section-block experience-section"
+          id="experience"
+          aria-labelledby="experience-heading"
+          data-scroll-accent-experience
+        >
           <Container>
             <SectionHeading
               id="experience-heading"
               eyebrow="Experience"
+              accentAnchor="experience"
               title="Product delivery,"
               muted="from interface to infrastructure."
               description="Experience across client products, internal platforms, cloud operations, and real-time research systems."
             />
             <div className="experience-list">
-              {experience.map((item) => (
+              {experience.map((item, experienceIndex) => (
                 <article className="experience-item" key={`${item.company}-${item.role}`}>
-                  <div className="experience-node" aria-hidden="true">
+                  <div
+                    className="experience-node"
+                    data-scroll-accent-anchor={`experience-company-${experienceIndex}`}
+                    data-scroll-accent-phase="experience-major"
+                    aria-hidden="true"
+                  >
                     <Briefcase size={15} />
                   </div>
                   <div className="experience-content">
@@ -240,7 +240,7 @@ export default function Home() {
                     </div>
 
                     {item.projects?.length ? (
-                      <details className="client-projects" open>
+                      <details className="client-projects" data-scroll-accent-details open>
                         <summary>
                           <span className="client-project-summary-open">Collapse projects</span>
                           <span className="client-project-summary-closed">Show projects</span>
@@ -250,8 +250,14 @@ export default function Home() {
                           </span>
                         </summary>
                         <div className="client-project-list">
-                          {item.projects.map((project) => (
+                          {item.projects.map((project, projectIndex) => (
                             <article className="client-project-item" key={`${item.company}-${project.client}-${project.project}`}>
+                              <span
+                                className="client-project-node"
+                                data-scroll-accent-anchor={`experience-project-${experienceIndex}-${projectIndex}`}
+                                data-scroll-accent-phase="experience-minor"
+                                aria-hidden="true"
+                              />
                               <span className="client-project-logo">
                                 <Image src={project.logoUrl} alt="" fill sizes="40px" />
                               </span>
@@ -280,10 +286,15 @@ export default function Home() {
           </Container>
         </section>
 
-        <section className="section-block" id="about" aria-labelledby="about-heading">
+        <section
+          className="section-block"
+          id="about"
+          aria-labelledby="about-heading"
+          data-scroll-accent-pass
+        >
           <Container>
             <div className="about-shell">
-              <aside className="about-portrait" aria-label="Portrait and a note about Pavan's early interest in programming">
+              <aside className="about-portrait" aria-label="Portrait of Pavan Patil">
                 <div className="about-photo-frame">
                   <Image
                     src="/pavan-profile.jpg"
@@ -292,58 +303,25 @@ export default function Home() {
                     sizes="(max-width: 1024px) 100vw, 32vw"
                   />
                 </div>
-                <div className="about-portrait-caption">
-                  <p className="eyebrow">Where it started</p>
-                  <strong>First line of code, class 6.</strong>
-                  <span>The tools have changed. The curiosity has not.</span>
-                </div>
               </aside>
 
               <div className="about-content">
                 <div className="about-copy">
-                  <SectionHeading
-                    id="about-heading"
-                    eyebrow="About"
-                    title="Curiosity became"
-                    muted="a lifelong craft."
-                    description="A childhood question—“how does this work?”—grew into a career designing and building useful software."
-                  />
+                  <p className="eyebrow">About</p>
+                  <h2 id="about-heading">Curiosity became a craft.</h2>
                   <div className="about-story">
-                    <p className="about-story-lead">{profile.about}</p>
+                    <p>{profile.about}</p>
                     <p>
-                      What keeps me interested is everything around the code: shaping the product,
-                      planning how its pieces fit together, and designing an architecture that can
-                      grow without becoming fragile. I was lucky enough to turn that habit of
-                      making and understanding things into my profession.
+                      I like the full shape of building: understanding the product,
+                      planning the architecture, and turning ideas into dependable
+                      software across web, mobile, backend, and data systems.
                     </p>
                   </div>
                 </div>
 
-                <div className="about-principles">
-                  <div className="about-principles-heading">
-                    <p className="eyebrow">How I work</p>
-                    <h3>Thinking beyond the implementation.</h3>
-                  </div>
-                  <div className="about-principles-list" aria-label="Engineering strengths">
-                    {buildPrinciples.map((item, index) => {
-                      const Icon = item.icon;
-                      return (
-                        <article className="about-principle" key={item.label}>
-                          <span className="about-principle-index" aria-hidden="true">
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
-                          <span className="about-principle-icon">
-                            <Icon aria-hidden="true" size={16} />
-                          </span>
-                          <div>
-                            <strong>{item.label}</strong>
-                            <p>{item.text}</p>
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                </div>
+                <p className="about-expertise">
+                  Product thinking · system architecture · end-to-end engineering
+                </p>
 
                 <a className="resume-capsule" href="/pavan-patil-resume.txt" download>
                   Download résumé <ArrowRight aria-hidden="true" size={16} />
@@ -352,14 +330,8 @@ export default function Home() {
 
               <section className="about-life" aria-labelledby="about-life-heading">
                 <div className="about-life-heading">
-                  <div>
-                    <p className="eyebrow">Outside the editor</p>
-                    <h3 id="about-life-heading">Different disciplines. Same focus.</h3>
-                  </div>
-                  <p>
-                    Movement keeps me disciplined, clears mental noise, and gives me
-                    perspectives I rarely find behind a screen.
-                  </p>
+                  <p className="eyebrow">Outside the editor</p>
+                  <h3 id="about-life-heading">Movement keeps the mind sharp.</h3>
                 </div>
                 <div className="about-life-grid">
                   {personalNotes.map((item, index) => {
@@ -386,7 +358,12 @@ export default function Home() {
           </Container>
         </section>
 
-        <section className="contact-section" id="contact" aria-labelledby="contact-heading">
+        <section
+          className="contact-section"
+          id="contact"
+          aria-labelledby="contact-heading"
+          data-scroll-accent-contact
+        >
           <Container>
             <div className="contact-card">
               <div>

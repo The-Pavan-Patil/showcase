@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Manrope, Michroma } from "next/font/google";
 
 import { Providers } from "@/components/providers";
+import { SiteHeader } from "@/components/site-header";
 import { getSiteUrl } from "@/lib/site";
 
 import "./globals.css";
@@ -92,7 +93,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <body>
         <a className="skip-link" href="#main-content">Skip to main content</a>
-        <Providers>{children}</Providers>
+        <Providers>
+          <SiteHeader />
+          {children}
+        </Providers>
       </body>
     </html>
   );

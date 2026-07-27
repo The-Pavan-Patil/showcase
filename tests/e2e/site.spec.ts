@@ -141,3 +141,132 @@ test("mobile bottom navigation and utility controls are keyboard-operable", asyn
   expect(barBox!.y + barBox!.height).toBeLessThanOrEqual(844);
   expect(barBox!.y).toBeGreaterThan(700);
 });
+
+test("the navigation selection bubble travels to the chosen tab", async ({ page }, testInfo) => {
+  await skipLaunchIntro(page);
+  await page.goto("/work/nudge");
+
+  const isMobile = testInfo.project.name.startsWith("mobile");
+  const navigation = page.locator(isMobile ? ".mobile-tab-bar" : ".desktop-nav");
+  const bubble = navigation.locator(".nav-selection-bubble");
+  const destination = navigation.getByRole("link", { name: "Experience" });
+
+  await expect(bubble).toHaveAttribute("data-ready", "true");
+  const initialBox = await bubble.boundingBox();
+  expect(initialBox).not.toBeNull();
+
+  await destination.click();
+
+  await expect(destination).toHaveAttribute("aria-current", "location");
+  expect(
+    await bubble.evaluate((element) =>
+      element.getAnimations().some((animation) => animation.playState === "running"),
+    ),
+  ).toBe(true);
+
+  await expect
+    .poll(async () => (await bubble.boundingBox())?.x ?? 0)
+    .toBeGreaterThan(initialBox!.x);
+});
+
+test("the single accent dot follows headings and Experience timeline nodes", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await skipLaunchIntro(page);
+  await page.goto("/");
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior = "auto";
+  });
+
+  const traveler = page.locator(".scroll-accent-traveler");
+  await expect(page.locator(".availability-dot")).toHaveCount(0);
+  await expect(traveler).toHaveCount(1);
+  await expect(traveler).toHaveAttribute("data-ready", "true");
+  await expect(traveler).toHaveAttribute("data-active-anchor", "hero", {
+    timeout: 2000,
+  });
+
+  async function activate(anchor: string) {
+    await page.locator(`[data-scroll-accent-anchor="${anchor}"]`).evaluate((element) => {
+      const bounds = element.getBoundingClientRect();
+      const activationY = Math.min(360, Math.max(180, window.innerHeight * 0.38));
+      window.scrollTo(0, bounds.top + window.scrollY + bounds.height / 2 - activationY);
+    });
+    await expect(traveler).toHaveAttribute("data-active-anchor", anchor);
+  }
+
+  await activate("work");
+  await expect(traveler).toHaveAttribute("data-phase", "heading");
+
+  await activate("experience");
+  await expect(traveler).toHaveAttribute("data-phase", "heading");
+
+  await activate("experience-company-0");
+  await expect(traveler).toHaveAttribute("data-phase", "experience-major");
+  const companyNodeWidth = await page
+    .locator('[data-scroll-accent-anchor="experience-company-0"]')
+    .evaluate((element) => element.getBoundingClientRect().width);
+  await expect
+    .poll(async () => (await traveler.boundingBox())?.width ?? 0)
+    .toBeCloseTo(companyNodeWidth, 0);
+
+  await activate("experience-project-0-0");
+  await expect(traveler).toHaveAttribute("data-phase", "experience-minor");
+  await expect
+    .poll(async () => (await traveler.boundingBox())?.width ?? 0)
+    .toBeCloseTo(8, 0);
+
+  const firstProjects = page.locator("details[data-scroll-accent-details]").first();
+  await firstProjects.locator("summary").click();
+  await expect(firstProjects).not.toHaveAttribute("open", "");
+  await expect
+    .poll(async () => traveler.getAttribute("data-active-anchor"))
+    .not.toBe("experience-project-0-0");
+
+  await page.locator("#about").evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    window.scrollTo(0, bounds.top + window.scrollY + bounds.height * 0.45);
+  });
+  await expect(traveler).toHaveAttribute("data-phase", "global-rail");
+  await expect
+    .poll(async () => Number.parseFloat(await traveler.evaluate((element) => getComputedStyle(element).opacity)))
+    .toBeGreaterThan(0.9);
+
+  const heroRailX = await page
+    .locator('[data-scroll-accent-anchor="hero"]')
+    .evaluate((element) => element.getBoundingClientRect().left + element.getBoundingClientRect().width / 2);
+  await expect
+    .poll(async () => {
+      const box = await traveler.boundingBox();
+      return box ? box.x + box.width / 2 : 0;
+    })
+    .toBeCloseTo(heroRailX, 0);
+
+  await page.locator("#contact").scrollIntoViewIfNeeded();
+  await expect
+    .poll(async () => Number.parseFloat(await traveler.evaluate((element) => getComputedStyle(element).opacity)))
+    .toBeLessThan(0.1);
+});
+
+test("the accent dot snaps between anchors with reduced motion", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  const traveler = page.locator(".scroll-accent-traveler");
+  await expect(traveler).toHaveAttribute("data-ready", "true");
+  await page.locator('[data-scroll-accent-anchor="work"]').evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    const activationY = Math.min(360, Math.max(180, window.innerHeight * 0.38));
+    window.scrollTo(0, bounds.top + window.scrollY + bounds.height / 2 - activationY);
+  });
+
+  await expect(traveler).toHaveAttribute("data-active-anchor", "work");
+  expect(
+    await traveler.evaluate((element) =>
+      element.getAnimations().some((animation) => animation.playState === "running"),
+    ),
+  ).toBe(false);
+});

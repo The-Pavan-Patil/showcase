@@ -9,7 +9,6 @@ import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { ProjectVisual } from "@/components/project-visual";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
 import {
   getNextProject,
   getProjectBySlug,
@@ -81,7 +80,6 @@ export default async function WorkPage({ params }: WorkPageProps) {
           ...(project.media ? { image: `${siteUrl}${project.media.src}` } : {}),
         }}
       />
-      <SiteHeader />
       <main id="main-content" className="case-study-main">
         <section className="case-hero" aria-labelledby="case-title">
           <Container>
