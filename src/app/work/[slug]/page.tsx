@@ -1,4 +1,4 @@
-import { Chip } from "@heroui/react/chip";
+import { Chip } from "@heroui/react";
 import { ArrowLeft, ArrowRight, CheckCircle2, Quote, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";

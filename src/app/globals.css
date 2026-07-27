@@ -2015,155 +2015,93 @@ a {
 
 .about-shell {
   display: grid;
-  grid-template-columns: minmax(18rem, 0.8fr) minmax(0, 1.2fr);
-  gap: 3.5rem;
-  align-items: center;
+  grid-template-columns: minmax(17rem, 0.78fr) minmax(0, 1.22fr);
+  gap: 1rem 4rem;
+  align-items: start;
 }
-
 .about-portrait {
+  position: sticky;
+  top: 7rem;
+  grid-row: span 2;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--radius-feature);
   background: var(--surface);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
-  padding: 0.65rem;
+  box-shadow: var(--shadow-card);
+  padding: 0.75rem;
 }
-
 .about-photo-frame {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 0.82;
+  aspect-ratio: 0.72;
   border-radius: 1rem;
   background: var(--surface-secondary);
 }
-
 .about-photo-frame img {
   object-fit: cover;
   object-position: 50% 46%;
-  filter: saturate(0.88) contrast(1.02);
 }
-
 .about-content {
   min-width: 0;
 }
-
-.about-copy h2 {
-  max-width: 11ch;
-  margin: 0.75rem 0 0;
-  font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: clamp(2.2rem, 4.6vw, 4.1rem);
-  font-weight: 620;
-  line-height: 1.05;
-}
-
-.about-story {
+.about-copy > p { max-width: 42rem; margin: 1.8rem 0 0; color: var(--muted); font-size: 0.94rem; line-height: 1.78; }
+.about-beyond {
   display: grid;
-  gap: 1.2rem;
-  max-width: 42rem;
-  margin-top: 1.7rem;
+  grid-template-columns: minmax(10rem, 0.34fr) minmax(0, 1fr);
+  gap: 1.6rem;
+  margin-top: 2.2rem;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 1.4rem 0;
 }
-
-.about-story p {
-  margin: 0;
-  color: var(--muted);
-  font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: 20px;
-  font-weight: 520;
-  line-height: 1.65;
-}
-
-.about-life {
-  grid-column: 1 / -1;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-feature);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 45%, transparent), transparent 46%),
-    var(--surface-secondary);
-  padding: clamp(1.35rem, 3vw, 2rem);
-}
-
-.about-life-heading {
-  margin-bottom: 1.5rem;
-}
-
-.about-life-heading h3 {
+.about-beyond h3 {
+  max-width: 14ch;
   margin: 0.7rem 0 0;
   font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: clamp(1.45rem, 2.4vw, 2rem);
-  font-weight: 610;
-  line-height: 1.18;
+  font-size: 1.45rem;
+  font-weight: 620;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
 }
-
-.about-life-grid {
+.about-beyond-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  background: var(--border);
+  gap: 0;
 }
-
-.about-life-card {
-  position: relative;
-  min-height: 12.5rem;
-  background: var(--surface);
-  padding: 1.25rem;
-}
-
-.about-life-card-top {
-  display: flex;
+.about-beyond-item {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.95rem;
   align-items: center;
-  justify-content: space-between;
+  min-height: 4.6rem;
+  border-top: 1px solid var(--border);
+  padding: 0.9rem 0;
 }
-
-.about-life-icon {
+.about-beyond-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.about-beyond-item:last-child {
+  padding-bottom: 0;
+}
+.about-beyond-icon {
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: var(--radius-pill);
   background: var(--accent-soft);
   color: var(--accent);
 }
-
-.about-life-index {
+.about-beyond-item strong {
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+.about-beyond-item p {
+  margin: 0.28rem 0 0;
   color: var(--muted);
-  font-family: var(--font-michroma), Michroma, monospace;
-  font-size: 0.56rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
 }
-
-.about-life-meta {
-  margin: 1.9rem 0 0;
-  color: var(--accent-text);
-  font-size: 0.75rem;
-  font-weight: 760;
-  letter-spacing: 0.08em;
-  line-height: 1.45;
-  text-transform: uppercase;
-}
-
-.about-life-card h4 {
-  margin: 0.55rem 0 0;
-  font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: 1.15rem;
-  font-weight: 650;
-  line-height: 1.35;
-}
-
-.about-life-card > p:last-child {
-  margin: 0.75rem 0 0;
-  color: var(--muted);
-  font-size: 20px;
-  line-height: 1.55;
-}
-
-@media (hover: hover) {
-  .about-life-card:hover {
-    background: color-mix(in srgb, var(--surface) 86%, var(--accent-soft));
-  }
-}
-
 .text-link { display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.5rem; color: var(--foreground); font-size: 0.8rem; font-weight: 750; }
 .text-link svg { transition: transform 160ms ease; } .text-link:hover svg { transform: translateX(3px); }
 .resume-capsule {
@@ -2705,11 +2643,12 @@ a {
   .project-card:first-child .project-card-footer { padding: 1rem 1.4rem 1.4rem !important; }
   .experience-company-row { align-items: flex-start; }
   .experience-card-meta { flex-direction: column; align-items: flex-end; }
-  .about-shell { grid-template-columns: 1fr; gap: 3.5rem; }
+  .about-shell { grid-template-columns: 1fr; gap: 1rem; }
   .about-portrait {
-    width: min(100%, 32rem);
+    position: relative;
+    top: auto;
   }
-  .about-photo-frame { aspect-ratio: 1.35; }
+  .about-photo-frame { aspect-ratio: 1.05; }
   .about-content { grid-column: auto; }
   .case-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .case-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
@@ -2789,15 +2728,12 @@ a {
   }
   .client-project-logo { width: 2.2rem; height: 2.2rem; }
   .about-portrait {
-    width: min(100%, 25rem);
+    display: block;
     padding: 0.65rem;
   }
-  .about-photo-frame { aspect-ratio: 0.9; }
-  .about-life-grid { grid-template-columns: 1fr; }
-  .about-life-card {
-    min-height: auto;
-  }
-  .about-life-meta { margin-top: 1.7rem; }
+  .about-photo-frame { aspect-ratio: 0.82; }
+  .about-beyond { grid-template-columns: 1fr; gap: 1.1rem; }
+  .about-beyond h3 { max-width: 18ch; }
   .contact-section { padding-bottom: 4rem; scroll-margin-top: 2rem; }
   .contact-card { grid-template-columns: 1fr; gap: 2rem; border-radius: var(--radius-feature); }
   .contact-email { font-size: 0.66rem; }
@@ -2898,6 +2834,8 @@ a {
   .ops-stats > div { padding: 0.4rem; }
   .ops-table > div { font-size: 0.42rem; }
   .contact-email { overflow-wrap: anywhere; border-radius: 1rem; }
+  .about-beyond-item { grid-template-columns: 1.9rem minmax(0, 1fr); }
+  .about-beyond-icon { width: 1.9rem; height: 1.9rem; }
   .project-card-media span { font-size: 0.54rem; }
   .case-media figcaption { position: static; border-width: 1px 0 0; border-radius: 0; background: var(--surface); }
   .case-ordered-list li { grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.65rem; }

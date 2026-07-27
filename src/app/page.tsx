@@ -11,6 +11,7 @@ import {
   Compass,
   Database,
   GitBranch,
+  Languages,
   Mail,
   MapPin,
   Smartphone,
@@ -41,21 +42,18 @@ export default function Home() {
   const siteUrl = getSiteUrl();
   const personalNotes = [
     {
-      label: "Calisthenics",
-      meta: "National competitor · 2024",
-      text: "Discipline, patience, and showing up for difficult goals.",
-      icon: Trophy,
+      label: "Japanese",
+      text: "Learning the language with a long-term goal of working with Japan-based companies and startups.",
+      icon: Languages,
     },
     {
       label: "Horse riding",
-      meta: "Adrenaline",
-      text: "A clean rush that teaches calm while moving fast.",
+      text: "My reset button when I need to slow down, clear my head, and come back sharper.",
       icon: Compass,
     },
     {
-      label: "Long bike rides",
-      meta: "Clarity",
-      text: "Space to reset, think, and come back sharper.",
+      label: "Bike rides",
+      text: "A simple way to stay relaxed, observant, and steady outside work.",
       icon: Bike,
     },
   ];
@@ -294,7 +292,7 @@ export default function Home() {
         >
           <Container>
             <div className="about-shell">
-              <aside className="about-portrait" aria-label="Portrait of Pavan Patil">
+              <aside className="about-portrait" aria-label="Portrait and profile summary">
                 <div className="about-photo-frame">
                   <Image
                     src="/pavan-profile.jpg"
@@ -307,15 +305,36 @@ export default function Home() {
 
               <div className="about-content">
                 <div className="about-copy">
-                  <p className="eyebrow">About</p>
-                  <h2 id="about-heading">Curiosity became a craft.</h2>
-                  <div className="about-story">
-                    <p>{profile.about}</p>
-                    <p>
-                      I like the full shape of building: understanding the product,
-                      planning the architecture, and turning ideas into dependable
-                      software across web, mobile, backend, and data systems.
-                    </p>
+                  <SectionHeading
+                    id="about-heading"
+                    eyebrow="About"
+                    title="Who I am,"
+                    muted="and how I build."
+                    description="I’m Pavan, a software engineer who likes turning messy product requirements into dependable software people can actually use."
+                  />
+                  <p>{profile.about}</p>
+                </div>
+
+                <div className="about-beyond">
+                  <div>
+                    <p className="eyebrow">Beyond code</p>
+                    <h3>Small signals about how I think.</h3>
+                  </div>
+                  <div className="about-beyond-list" aria-label="Personal interests">
+                    {personalNotes.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <div className="about-beyond-item" key={item.label}>
+                          <span className="about-beyond-icon">
+                            <Icon aria-hidden="true" size={16} />
+                          </span>
+                          <div>
+                            <strong>{item.label}</strong>
+                            <p>{item.text}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -323,33 +342,6 @@ export default function Home() {
                   Download résumé <ArrowRight aria-hidden="true" size={16} />
                 </a>
               </div>
-
-              <section className="about-life" aria-labelledby="about-life-heading">
-                <div className="about-life-heading">
-                  <p className="eyebrow">Outside the editor</p>
-                  <h3 id="about-life-heading">Movement keeps the mind sharp.</h3>
-                </div>
-                <div className="about-life-grid">
-                  {personalNotes.map((item, index) => {
-                    const Icon = item.icon;
-                    return (
-                      <article className="about-life-card" key={item.label}>
-                        <div className="about-life-card-top">
-                          <span className="about-life-icon">
-                            <Icon aria-hidden="true" size={17} />
-                          </span>
-                          <span className="about-life-index" aria-hidden="true">
-                            0{index + 1}
-                          </span>
-                        </div>
-                        <p className="about-life-meta">{item.meta}</p>
-                        <h4>{item.label}</h4>
-                        <p>{item.text}</p>
-                      </article>
-                    );
-                  })}
-                </div>
-              </section>
             </div>
           </Container>
         </section>
