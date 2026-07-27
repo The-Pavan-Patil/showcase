@@ -319,18 +319,16 @@ a {
 }
 
 .scroll-accent-eyebrow {
-  position: relative;
-  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
 
 .scroll-accent-heading-target {
-  position: absolute;
-  top: 50%;
-  left: -1rem;
   display: block;
+  flex: none;
   width: 0.5rem;
   height: 0.5rem;
-  transform: translateY(-50%);
   border-radius: 999px;
   background: transparent;
 }
@@ -2734,7 +2732,6 @@ a {
 @media (max-width: 760px) {
   html { scroll-padding-top: 2rem; }
   .site-container { width: min(100% - 2rem, var(--container-page)); }
-  .scroll-accent-heading-target { left: -0.75rem; }
   .site-header {
     top: auto;
     bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px));

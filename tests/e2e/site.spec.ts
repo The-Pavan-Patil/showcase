@@ -186,33 +186,6 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
     timeout: 2000,
   });
 
-  const globalRailLayout = await page.evaluate(() => {
-    const eyebrow = document.querySelector<HTMLElement>(".hero-eyebrow");
-    const heading = document.querySelector<HTMLElement>("#hero-title");
-    const anchor = document.querySelector<HTMLElement>(
-      '[data-scroll-accent-anchor="hero"]',
-    );
-    if (!eyebrow || !heading || !anchor) return null;
-
-    const eyebrowBounds = eyebrow.getBoundingClientRect();
-    const headingBounds = heading.getBoundingClientRect();
-    const anchorBounds = anchor.getBoundingClientRect();
-
-    return {
-      anchorCenter: anchorBounds.left + anchorBounds.width / 2,
-      eyebrowLeft: eyebrowBounds.left,
-      headingLeft: headingBounds.left,
-    };
-  });
-  expect(globalRailLayout).not.toBeNull();
-  expect(globalRailLayout!.eyebrowLeft).toBeCloseTo(
-    globalRailLayout!.headingLeft,
-    0,
-  );
-  expect(globalRailLayout!.anchorCenter).toBeLessThan(
-    globalRailLayout!.headingLeft,
-  );
-
   async function activate(anchor: string) {
     await page.locator(`[data-scroll-accent-anchor="${anchor}"]`).evaluate((element) => {
       const bounds = element.getBoundingClientRect();
