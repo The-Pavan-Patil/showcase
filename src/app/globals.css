@@ -2048,12 +2048,12 @@ a {
 }
 
 .about-copy h2 {
-  max-width: 22rem;
+  max-width: 11ch;
   margin: 0.75rem 0 0;
   font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: 20px;
-  font-weight: 680;
-  line-height: 1.4;
+  font-size: clamp(2.2rem, 4.6vw, 4.1rem);
+  font-weight: 620;
+  line-height: 1.05;
 }
 
 .about-story {
@@ -2066,24 +2066,10 @@ a {
 .about-story p {
   margin: 0;
   color: var(--muted);
+  font-family: var(--font-manrope), Manrope, sans-serif;
   font-size: 20px;
-  line-height: 1.65;
-}
-
-.about-story p:first-child {
-  color: var(--foreground);
   font-weight: 520;
-}
-
-.about-expertise {
-  max-width: 42rem;
-  margin: 1.6rem 0 0;
-  border-top: 1px solid var(--border);
-  padding-top: 1.2rem;
-  color: var(--accent-text);
-  font-size: 20px;
-  font-weight: 650;
-  line-height: 1.55;
+  line-height: 1.65;
 }
 
 .about-life {
@@ -2103,9 +2089,9 @@ a {
 .about-life-heading h3 {
   margin: 0.7rem 0 0;
   font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: 20px;
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
   font-weight: 610;
-  line-height: 1.45;
+  line-height: 1.18;
 }
 
 .about-life-grid {
@@ -2150,15 +2136,17 @@ a {
 .about-life-meta {
   margin: 1.9rem 0 0;
   color: var(--accent-text);
-  font-size: 20px;
+  font-size: 0.75rem;
   font-weight: 760;
+  letter-spacing: 0.08em;
   line-height: 1.45;
+  text-transform: uppercase;
 }
 
 .about-life-card h4 {
   margin: 0.55rem 0 0;
   font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: 20px;
+  font-size: 1.15rem;
   font-weight: 650;
   line-height: 1.35;
 }

@@ -319,10 +319,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                <p className="about-expertise">
-                  Product thinking · system architecture · end-to-end engineering
-                </p>
-
                 <a className="resume-capsule" href="/pavan-patil-resume.txt" download>
                   Download résumé <ArrowRight aria-hidden="true" size={16} />
                 </a>
