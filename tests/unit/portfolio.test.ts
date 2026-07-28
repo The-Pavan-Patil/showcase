@@ -2,12 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import {
   experience,
+  getPortfolioContent,
   getNextProject,
   getProjectBySlug,
   profile,
   projects,
   socialLinks,
 } from "@/lib/portfolio";
+import { supportedLocales } from "@/lib/i18n";
 
 describe("portfolio content", () => {
   it("contains exactly three unique case studies", () => {
@@ -84,5 +86,18 @@ describe("portfolio content", () => {
     expect(profile.email).toMatch(/@/);
     expect(JSON.stringify(profile)).not.toContain("7350913864");
     expect(socialLinks.every((link) => link.href.startsWith("https://"))).toBe(true);
+  });
+
+  it("keeps localized portfolio content aligned by project slug", () => {
+    const englishSlugs = getPortfolioContent("en").projects.map((project) => project.slug);
+
+    for (const locale of supportedLocales) {
+      const content = getPortfolioContent(locale);
+
+      expect(content.projects.map((project) => project.slug)).toEqual(englishSlugs);
+      expect(content.projects.every((project) => project.summary && project.metrics.length === 3)).toBe(true);
+      expect(content.experience).toHaveLength(3);
+      expect(content.socialLinks).toHaveLength(2);
+    }
   });
 });

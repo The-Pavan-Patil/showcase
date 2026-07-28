@@ -10,39 +10,67 @@ import { JsonLd } from "@/components/json-ld";
 import { ProjectVisual } from "@/components/project-visual";
 import { SiteFooter } from "@/components/site-footer";
 import {
+  getAlternateLanguages,
+  getHashHref,
+  getWorkPath,
+  type Locale,
+} from "@/lib/i18n";
+import {
   getNextProject,
+  getPortfolioContent,
   getProjectBySlug,
-  projects,
+  getProjects,
   type CaseStudyArticle,
   type CaseStudySection,
   type CaseStudyTextBlock,
   type ProjectCaseStudy,
 } from "@/lib/portfolio";
 import { getSiteUrl } from "@/lib/site";
+import { formatCopy, uiCopyByLocale } from "@/lib/ui-copy";
 
-type WorkPageProps = { params: Promise<{ slug: string }> };
-
-export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+export function getWorkStaticParams(locale: Locale) {
+  return getProjects(locale).map((project) => ({ slug: project.slug }));
 }
 
-export async function generateMetadata({ params }: WorkPageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const project = getProjectBySlug(slug);
-  if (!project) return { title: "Work not found", robots: { index: false, follow: false } };
+export async function generateWorkMetadata({
+  locale,
+  slug,
+}: {
+  locale: Locale;
+  slug: string;
+}): Promise<Metadata> {
+  const ui = uiCopyByLocale[locale];
+  const project = getProjectBySlug(locale, slug);
+
+  if (!project) {
+    return {
+      title: ui.metadata.workNotFoundTitle,
+      robots: { index: false, follow: false },
+    };
+  }
 
   const description = project.caseStudy?.oneLineSummary ?? project.summary;
+  const pathname = `/work/${project.slug}`;
+  const canonical = getWorkPath(locale, project.slug);
   const image = project.media
     ? { url: project.media.src, width: 1672, height: 941, alt: project.media.alt }
-    : { url: "/og.png", width: 1200, height: 630, alt: `${project.title} case study` };
+    : {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: formatCopy(ui.work.caseStudyAlt, { title: project.title }),
+      };
 
   return {
     title: project.title,
     description,
-    alternates: { canonical: `/work/${project.slug}` },
+    alternates: {
+      canonical,
+      languages: getAlternateLanguages(pathname),
+    },
     openGraph: {
       type: "article",
-      url: `/work/${project.slug}`,
+      url: canonical,
       title: `${project.title} — Pavan Patil`,
       description,
       images: [image],
@@ -56,15 +84,22 @@ export async function generateMetadata({ params }: WorkPageProps): Promise<Metad
   };
 }
 
-export default async function WorkPage({ params }: WorkPageProps) {
-  const { slug } = await params;
-  const project = getProjectBySlug(slug);
+export function WorkPage({
+  locale,
+  slug,
+}: {
+  locale: Locale;
+  slug: string;
+}) {
+  const ui = uiCopyByLocale[locale];
+  const { profile, socialLinks } = getPortfolioContent(locale);
+  const project = getProjectBySlug(locale, slug);
   if (!project) notFound();
 
-  const article = getCaseStudyArticle(project);
-  const nextProject = getNextProject(project.slug);
+  const article = getCaseStudyArticle(project, ui.work);
+  const nextProject = getNextProject(locale, project.slug);
   const siteUrl = getSiteUrl();
-  const canonicalUrl = `${siteUrl}/work/${project.slug}`;
+  const canonicalUrl = `${siteUrl}${getWorkPath(locale, project.slug)}`;
 
   return (
     <>
@@ -83,9 +118,9 @@ export default async function WorkPage({ params }: WorkPageProps) {
       <main id="main-content" className="case-study-main">
         <section className="case-hero" aria-labelledby="case-title">
           <Container>
-            <Link className="back-link" href="/#work">
+            <Link className="back-link" href={getHashHref(locale, "#work")}>
               <ArrowLeft aria-hidden="true" size={16} />
-              Selected work
+              {ui.work.selectedWork}
             </Link>
 
             <div className="case-hero-grid">
@@ -94,7 +129,10 @@ export default async function WorkPage({ params }: WorkPageProps) {
                 <h1 id="case-title">{project.title}</h1>
                 <p className="case-lede">{article.oneLineSummary}</p>
                 <p className="case-summary">{project.summary}</p>
-                <div className="case-tags" aria-label={`${project.title} technologies`}>
+                <div
+                  className="case-tags"
+                  aria-label={formatCopy(ui.work.technologiesAria, { title: project.title })}
+                >
                   {project.technologies.map((technology) => (
                     <Chip key={technology} variant="secondary">
                       {technology}
@@ -105,20 +143,20 @@ export default async function WorkPage({ params }: WorkPageProps) {
 
               <dl className="case-facts">
                 <div>
-                  <dt>Role</dt>
+                  <dt>{ui.work.role}</dt>
                   <dd>{project.role}</dd>
                 </div>
                 <div>
-                  <dt>Experience context</dt>
+                  <dt>{ui.work.experienceContext}</dt>
                   <dd>{project.experienceContext}</dd>
                 </div>
                 <div>
-                  <dt>Client / company</dt>
+                  <dt>{ui.work.clientCompany}</dt>
                   <dd>{project.client}</dd>
                 </div>
                 <div>
-                  <dt>Article length</dt>
-                  <dd>{article.sections.length} sections</dd>
+                  <dt>{ui.work.articleLengthLabel}</dt>
+                  <dd>{formatCopy(ui.work.articleLength, { count: article.sections.length })}</dd>
                 </div>
               </dl>
             </div>
@@ -135,12 +173,19 @@ export default async function WorkPage({ params }: WorkPageProps) {
                 {project.media.caption ? <figcaption>{project.media.caption}</figcaption> : null}
               </figure>
             ) : (
-              <ProjectVisual type={project.visual} label={project.visualLabel} />
+              <ProjectVisual
+                copy={ui.projectVisual}
+                type={project.visual}
+                label={project.visualLabel}
+              />
             )}
           </Container>
         </section>
 
-        <section className="case-metrics" aria-label={`${project.title} project facts`}>
+        <section
+          className="case-metrics"
+          aria-label={formatCopy(ui.work.factsAria, { title: project.title })}
+        >
           <Container>
             <div className="case-metrics-grid">
               {project.metrics.map((metric) => (
@@ -153,11 +198,14 @@ export default async function WorkPage({ params }: WorkPageProps) {
           </Container>
         </section>
 
-        <section className="case-longform" aria-label={`${project.title} case study article`}>
+        <section
+          className="case-longform"
+          aria-label={formatCopy(ui.work.articleAria, { title: project.title })}
+        >
           <Container className="case-longform-grid">
             <aside className="case-toc">
-              <p className="eyebrow">Article map</p>
-              <nav aria-label={`${project.title} case study sections`}>
+              <p className="eyebrow">{ui.work.articleMap}</p>
+              <nav aria-label={formatCopy(ui.work.sectionsNavigationAria, { title: project.title })}>
                 <ol>
                   {article.sections.map((section) => (
                     <li key={section.id}>
@@ -187,8 +235,8 @@ export default async function WorkPage({ params }: WorkPageProps) {
           <Container>
             <div className="contribution-card">
               <div>
-                <p className="eyebrow">My contribution</p>
-                <h2>What I owned across this build.</h2>
+                <p className="eyebrow">{ui.work.contributionEyebrow}</p>
+                <h2>{ui.work.contributionTitle}</h2>
               </div>
               <ul>
                 {project.contributions.map((contribution) => (
@@ -204,8 +252,8 @@ export default async function WorkPage({ params }: WorkPageProps) {
 
         <section className="next-project-section">
           <Container>
-            <p className="eyebrow">Next case study</p>
-            <Link href={`/work/${nextProject.slug}`}>
+            <p className="eyebrow">{ui.work.nextCaseStudy}</p>
+            <Link href={getWorkPath(locale, nextProject.slug)}>
               <span>{nextProject.title}</span>
               <strong>{nextProject.cardHeadline}</strong>
               <ArrowRight aria-hidden="true" size={26} />
@@ -213,29 +261,37 @@ export default async function WorkPage({ params }: WorkPageProps) {
           </Container>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter
+        copy={{ ...ui.footer, brandAria: ui.header.brandAria, navigation: ui.header.navigation }}
+        locale={locale}
+        profile={profile}
+        socialLinks={socialLinks}
+      />
     </>
   );
 }
 
-function getCaseStudyArticle(project: ProjectCaseStudy): CaseStudyArticle {
+function getCaseStudyArticle(
+  project: ProjectCaseStudy,
+  copy: typeof uiCopyByLocale.en.work,
+): CaseStudyArticle {
   return (
     project.caseStudy ?? {
       oneLineSummary: project.summary,
       sections: [
         {
           id: "challenge",
-          title: "The challenge",
+          title: copy.fallbackChallenge,
           blocks: [{ type: "paragraph", text: project.challenge }],
         },
         {
           id: "approach",
-          title: "The approach",
+          title: copy.fallbackApproach,
           blocks: [{ type: "paragraph", text: project.approach }],
         },
         {
           id: "outcome",
-          title: "The outcome",
+          title: copy.fallbackOutcome,
           blocks: [
             { type: "paragraph", text: project.outcome },
             { type: "list", items: project.contributions },

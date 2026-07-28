@@ -8,15 +8,15 @@ import {
   ChevronUp,
   CloudCog,
   Code2,
-  Compass,
   Database,
+  Dumbbell,
   GitBranch,
-  Languages,
   Mail,
   MapPin,
   Smartphone,
   Trophy,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,34 +28,26 @@ import { ProjectCard } from "@/components/project-card";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
-import {
-  experience,
-  profile,
-  projects,
-  proofMetrics,
-  skillGroups,
-  socialLinks,
-} from "@/lib/portfolio";
+import { getHashHref, type Locale } from "@/lib/i18n";
+import { getPortfolioContent } from "@/lib/portfolio";
 import { getSiteUrl } from "@/lib/site";
+import { formatCopy, uiCopyByLocale } from "@/lib/ui-copy";
 
-export default function Home() {
+export function HomePage({ locale }: { locale: Locale }) {
   const siteUrl = getSiteUrl();
+  const ui = uiCopyByLocale[locale];
+  const {
+    experience,
+    profile,
+    projects,
+    proofMetrics,
+    skillGroups,
+    socialLinks,
+  } = getPortfolioContent(locale);
   const personalNotes = [
-    {
-      label: "Japanese",
-      text: "Learning the language with a long-term goal of working with Japan-based companies and startups.",
-      icon: Languages,
-    },
-    {
-      label: "Horse riding",
-      text: "My reset button when I need to slow down, clear my head, and come back sharper.",
-      icon: Compass,
-    },
-    {
-      label: "Bike rides",
-      text: "A simple way to stay relaxed, observant, and steady outside work.",
-      icon: Bike,
-    },
+    { ...ui.home.personalNotes[0], icon: Dumbbell },
+    { ...ui.home.personalNotes[1], icon: Zap },
+    { ...ui.home.personalNotes[2], icon: Bike },
   ];
 
   return (
@@ -72,7 +64,7 @@ export default function Home() {
           knowsAbout: skillGroups.flatMap((group) => [...group.skills]),
         }}
       />
-      <LaunchTerminal />
+      <LaunchTerminal copy={ui.launch} />
       <ScrollAccent />
       <main id="main-content">
         <section className="hero-section" aria-labelledby="hero-title">
@@ -93,19 +85,21 @@ export default function Home() {
               </h1>
               <p className="hero-description">{profile.heroDescription}</p>
               <div className="hero-actions">
-                <Link className="primary-cta" href="#work">
-                  View selected work
+                <Link className="primary-cta" href={getHashHref(locale, "#work")}>
+                  {ui.home.heroPrimaryCta}
                   <ArrowDown aria-hidden="true" size={17} />
                 </Link>
                 <a className="secondary-cta" href={`mailto:${profile.email}`}>
-                  Email me
+                  {ui.home.heroSecondaryCta}
                   <ArrowUpRight aria-hidden="true" size={17} />
                 </a>
               </div>
-              <p className="hero-location"><MapPin aria-hidden="true" size={15} /> India · Open to software engineering roles</p>
+              <p className="hero-location">
+                <MapPin aria-hidden="true" size={15} /> {ui.home.heroLocation}
+              </p>
             </div>
 
-            <div className="hero-stage" role="img" aria-label="A software delivery system connecting product requirements, typed code, data, and reliable releases">
+            <div className="hero-stage" role="img" aria-label={ui.home.heroStageAria}>
               <div className="hero-stage-glow" />
               <div className="hero-window hero-window-main">
                 <div className="window-bar">
@@ -121,29 +115,29 @@ export default function Home() {
                   <p><i>05</i>&#125;;</p>
                 </div>
                 <div className="pipeline-row" aria-hidden="true">
-                  <span><GitBranch size={14} /> Plan</span>
+                  <span><GitBranch size={14} /> {ui.home.plan}</span>
                   <i />
-                  <span><Braces size={14} /> Build</span>
+                  <span><Braces size={14} /> {ui.home.build}</span>
                   <i />
-                  <span><CloudCog size={14} /> Ship</span>
+                  <span><CloudCog size={14} /> {ui.home.ship}</span>
                 </div>
               </div>
               <div className="hero-window hero-window-stack" aria-hidden="true">
-                <p>Product stack</p>
-                <div><Code2 size={16} /><span>Web</span><strong>Next.js</strong></div>
-                <div><Smartphone size={16} /><span>Mobile</span><strong>React Native</strong></div>
-                <div><Database size={16} /><span>Data</span><strong>PostgreSQL</strong></div>
+                <p>{ui.home.productStack}</p>
+                <div><Code2 size={16} /><span>{ui.home.web}</span><strong>Next.js</strong></div>
+                <div><Smartphone size={16} /><span>{ui.home.mobile}</span><strong>React Native</strong></div>
+                <div><Database size={16} /><span>{ui.home.data}</span><strong>PostgreSQL</strong></div>
               </div>
               <div className="hero-signal" aria-hidden="true">
                 <Sparkles size={15} />
-                <span>Build signal</span>
-                <strong>Healthy</strong>
+                <span>{ui.home.buildSignal}</span>
+                <strong>{ui.home.healthy}</strong>
               </div>
             </div>
           </Container>
         </section>
 
-        <section className="proof-section" aria-label="Selected engineering metrics">
+        <section className="proof-section" aria-label={ui.home.proofAria}>
           <Container>
             <div className="proof-grid">
               {proofMetrics.map((metric) => (
@@ -161,17 +155,24 @@ export default function Home() {
             <div className="section-header-row">
               <SectionHeading
                 id="work-heading"
-                eyebrow="Selected work"
+                eyebrow={ui.home.workEyebrow}
                 accentAnchor="work"
-                title="Built for real constraints."
-                muted="Designed to hold up."
-                description="Three products that show how I approach synchronization, multilingual experiences, operational workflows, and reliable delivery."
+                title={ui.home.workTitle}
+                muted={ui.home.workMuted}
+                description={ui.home.workDescription}
               />
-              <span className="section-count">03 case studies</span>
+              <span className="section-count">{ui.home.workCount}</span>
             </div>
             <div className="project-grid">
               {projects.map((project, index) => (
-                <ProjectCard key={project.slug} project={project} index={index} />
+                <ProjectCard
+                  copy={ui.projectCard}
+                  key={project.slug}
+                  locale={locale}
+                  project={project}
+                  projectVisualCopy={ui.projectVisual}
+                  index={index}
+                />
               ))}
             </div>
           </Container>
@@ -186,11 +187,11 @@ export default function Home() {
           <Container>
             <SectionHeading
               id="experience-heading"
-              eyebrow="Experience"
+              eyebrow={ui.home.experienceEyebrow}
               accentAnchor="experience"
-              title="Product delivery,"
-              muted="from interface to infrastructure."
-              description="Experience across client products, internal platforms, cloud operations, and real-time research systems."
+              title={ui.home.experienceTitle}
+              muted={ui.home.experienceMuted}
+              description={ui.home.experienceDescription}
             />
             <div className="experience-list">
               {experience.map((item, experienceIndex) => (
@@ -231,7 +232,10 @@ export default function Home() {
 
                     <p className="experience-description">{item.description}</p>
 
-                    <div className="experience-tech-list" aria-label={`${item.company} technology stack`}>
+                    <div
+                      className="experience-tech-list"
+                      aria-label={formatCopy(ui.home.technologyStackAria, { name: item.company })}
+                    >
                       {item.technologies.map((technology) => (
                         <span className="experience-tech-chip" key={technology}>{technology}</span>
                       ))}
@@ -240,8 +244,8 @@ export default function Home() {
                     {item.projects?.length ? (
                       <details className="client-projects" data-scroll-accent-details open>
                         <summary>
-                          <span className="client-project-summary-open">Collapse projects</span>
-                          <span className="client-project-summary-closed">Show projects</span>
+                          <span className="client-project-summary-open">{ui.home.collapseProjects}</span>
+                          <span className="client-project-summary-closed">{ui.home.showProjects}</span>
                           <span className="client-project-count">{item.projects.length}</span>
                           <span className="client-project-toggle-icon" aria-hidden="true">
                             <ChevronUp size={13} />
@@ -266,7 +270,10 @@ export default function Home() {
                                   <span>{project.project}</span>
                                 </h4>
                                 <p>{project.description}</p>
-                                <div className="client-project-tech" aria-label={`${project.client} project technology stack`}>
+                                <div
+                                  className="client-project-tech"
+                                  aria-label={formatCopy(ui.home.technologyStackAria, { name: project.client })}
+                                >
                                   {project.technologies.map((technology) => (
                                     <span key={technology}>{technology}</span>
                                   ))}
@@ -292,35 +299,23 @@ export default function Home() {
         >
           <Container>
             <div className="about-shell">
-              <aside className="about-portrait" aria-label="Portrait and profile summary">
-                <div className="about-photo-frame">
-                  <Image
-                    src="/pavan-profile.jpg"
-                    alt="Pavan Patil smiling outdoors at night"
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 32vw"
-                  />
-                </div>
-              </aside>
-
               <div className="about-content">
                 <div className="about-copy">
                   <SectionHeading
                     id="about-heading"
-                    eyebrow="About"
-                    title="Who I am,"
-                    muted="and how I build."
-                    description="I’m Pavan, a software engineer who likes turning messy product requirements into dependable software people can actually use."
+                    eyebrow={ui.home.aboutEyebrow}
+                    title={ui.home.aboutTitle}
+                    muted={ui.home.aboutMuted}
+                    description={profile.about}
                   />
-                  <p>{profile.about}</p>
                 </div>
 
                 <div className="about-beyond">
                   <div>
-                    <p className="eyebrow">Beyond code</p>
-                    <h3>Small signals about how I think.</h3>
+                    <p className="eyebrow">{ui.home.beyondCode}</p>
+                    <h3>{ui.home.beyondHeading}</h3>
                   </div>
-                  <div className="about-beyond-list" aria-label="Personal interests">
+                  <div className="about-beyond-list" aria-label={ui.home.personalInterestsAria}>
                     {personalNotes.map((item) => {
                       const Icon = item.icon;
                       return (
@@ -339,9 +334,20 @@ export default function Home() {
                 </div>
 
                 <a className="resume-capsule" href="/pavan-patil-resume.txt" download>
-                  Download résumé <ArrowRight aria-hidden="true" size={16} />
+                  {ui.home.downloadResume} <ArrowRight aria-hidden="true" size={16} />
                 </a>
               </div>
+
+              <aside className="about-portrait" aria-label={ui.home.portraitAria}>
+                <div className="about-photo-frame">
+                  <Image
+                    src="/pavan-profile.jpg"
+                    alt={ui.home.portraitAlt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 32vw"
+                  />
+                </div>
+              </aside>
             </div>
           </Container>
         </section>
@@ -355,9 +361,9 @@ export default function Home() {
           <Container>
             <div className="contact-card">
               <div>
-                <p className="eyebrow">Let’s build something dependable</p>
-                <h2 id="contact-heading">Looking for an engineer who can own the details?</h2>
-                <p>I’m open to software engineering roles across product, platform, web, and mobile teams.</p>
+                <p className="eyebrow">{ui.home.contactEyebrow}</p>
+                <h2 id="contact-heading">{ui.home.contactTitle}</h2>
+                <p>{ui.home.contactDescription}</p>
               </div>
               <div className="contact-actions">
                 <a className="contact-email" href={`mailto:${profile.email}`}>
@@ -376,7 +382,12 @@ export default function Home() {
           </Container>
         </section>
       </main>
-      <SiteFooter />
+      <SiteFooter
+        copy={{ ...ui.footer, brandAria: ui.header.brandAria, navigation: ui.header.navigation }}
+        locale={locale}
+        profile={profile}
+        socialLinks={socialLinks}
+      />
     </>
   );
 }

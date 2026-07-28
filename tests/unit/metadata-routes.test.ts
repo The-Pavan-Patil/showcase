@@ -8,15 +8,39 @@ describe("metadata routes", () => {
     vi.unstubAllEnvs();
   });
 
-  it("publishes exactly the homepage and three canonical case studies", () => {
+  it("publishes canonical home and case-study routes for all supported locales", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example/");
 
     expect(sitemap().map((entry) => entry.url)).toEqual([
       "https://portfolio.example",
+      "https://portfolio.example/ja",
+      "https://portfolio.example/de",
       "https://portfolio.example/work/nudge",
+      "https://portfolio.example/ja/work/nudge",
+      "https://portfolio.example/de/work/nudge",
       "https://portfolio.example/work/philips-greenheart",
+      "https://portfolio.example/ja/work/philips-greenheart",
+      "https://portfolio.example/de/work/philips-greenheart",
       "https://portfolio.example/work/workforce-management-system",
+      "https://portfolio.example/ja/work/workforce-management-system",
+      "https://portfolio.example/de/work/workforce-management-system",
     ]);
+  });
+
+  it("adds alternate-language sitemap entries", () => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example/");
+
+    expect(sitemap()[3]).toMatchObject({
+      url: "https://portfolio.example/work/nudge",
+      alternates: {
+        languages: {
+          en: "https://portfolio.example/work/nudge",
+          ja: "https://portfolio.example/ja/work/nudge",
+          de: "https://portfolio.example/de/work/nudge",
+          "x-default": "https://portfolio.example/work/nudge",
+        },
+      },
+    });
   });
 
   it("allows public crawling and points to the canonical sitemap", () => {

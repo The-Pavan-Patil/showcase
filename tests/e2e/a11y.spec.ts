@@ -3,7 +3,11 @@ import { expect, test } from "@playwright/test";
 
 const routes = [
   "/",
+  "/ja",
+  "/de",
   "/work/nudge",
+  "/ja/work/nudge",
+  "/de/work/nudge",
   "/work/philips-greenheart",
   "/work/workforce-management-system",
 ];
@@ -18,15 +22,16 @@ for (const route of routes) {
   test(`axe reports no violations on ${route} in both themes`, async ({ page }, testInfo) => {
     test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
-    if (route === "/") await skipLaunchIntro(page);
+    if (route === "/" || route === "/ja" || route === "/de") await skipLaunchIntro(page);
     await page.goto(route);
     const lightResults = await new AxeBuilder({ page }).analyze();
     expect(lightResults.violations).toEqual([]);
 
     if (testInfo.project.name === "mobile-chromium") {
-      await page.getByRole("button", { name: "Open navigation utilities" }).click();
+      await page.locator(".mobile-utility-trigger").click();
     }
-    await page.getByRole("button", { name: "Switch to dark theme" }).click();
+    const darkThemePattern = /Switch to dark theme|ダークテーマに切り替える|Zum dunklen Design wechseln/;
+    await page.getByRole("button", { name: darkThemePattern }).click();
     const darkResults = await new AxeBuilder({ page }).analyze();
     expect(darkResults.violations).toEqual([]);
   });

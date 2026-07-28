@@ -22,17 +22,31 @@ import {
   useState,
 } from "react";
 
+import { LanguageToggle } from "@/components/language-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
+import {
+  getHashHref,
+  getHomePath,
+  isHomePath,
+  isWorkPath,
+  type Locale,
+} from "@/lib/i18n";
+import type { UiCopy } from "@/lib/ui-copy";
 
 const navigation = [
-  { id: "work", label: "Work", href: "/#work", icon: BriefcaseBusiness },
-  { id: "experience", label: "Experience", href: "/#experience", icon: Route },
-  { id: "about", label: "About", href: "/#about", icon: UserRound },
-  { id: "contact", label: "Contact", href: "/#contact", icon: Mail },
+  { id: "work", icon: BriefcaseBusiness },
+  { id: "experience", icon: Route },
+  { id: "about", icon: UserRound },
+  { id: "contact", icon: Mail },
 ] as const;
 
 type NavigationId = (typeof navigation)[number]["id"];
 type NavigationSurface = "desktop" | "mobile";
+type SiteHeaderProps = {
+  copy: UiCopy["header"];
+  locale: Locale;
+  themeCopy: UiCopy["theme"];
+};
 
 type BubbleMetrics = {
   height: number;
@@ -41,15 +55,21 @@ type BubbleMetrics = {
   width: number;
 };
 
-export function SiteHeader() {
+export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
   const pathname = usePathname();
+  const homeHref = getHomePath(locale);
+  const localizedNavigation = navigation.map((item) => ({
+    ...item,
+    href: getHashHref(locale, `#${item.id}`),
+    label: copy.navigation[item.id],
+  }));
   const [compactPathname, setCompactPathname] = useState<string | null>(null);
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false);
   const [activeSelection, setActiveSelection] = useState<{
     id: NavigationId | null;
     pathname: string;
   }>({
-    id: pathname.startsWith("/work/") ? "work" : null,
+    id: isWorkPath(pathname) ? "work" : null,
     pathname,
   });
   const desktopNavRef = useRef<HTMLElement>(null);
@@ -66,7 +86,7 @@ export function SiteHeader() {
   const currentSection =
     activeSelection.pathname === pathname
       ? activeSelection.id
-      : pathname.startsWith("/work/")
+      : isWorkPath(pathname)
         ? "work"
         : activeSelection.id;
 
@@ -254,7 +274,7 @@ export function SiteHeader() {
   );
 
   useEffect(() => {
-    if (pathname !== "/") return;
+    if (!isHomePath(pathname, locale)) return;
 
     const sections = navigation
       .map((item) => document.getElementById(item.id))
@@ -281,7 +301,7 @@ export function SiteHeader() {
 
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, [pathname]);
+  }, [locale, pathname]);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -365,20 +385,20 @@ export function SiteHeader() {
       onFocusCapture={() => setCompactPathname(null)}
     >
       <div className="site-header-shell">
-        <Link className="brand-link" href="/" aria-label="Pavan Patil, home">
+        <Link className="brand-link" href={homeHref} aria-label={copy.brandAria}>
           <span className="brand-mark" aria-hidden="true">P</span>
           <span className="brand-name">Pavan Patil</span>
         </Link>
 
-        <nav className="desktop-nav" aria-label="Primary navigation" ref={desktopNavRef}>
+        <nav className="desktop-nav" aria-label={copy.primaryNavigationAria} ref={desktopNavRef}>
           <span
             aria-hidden="true"
             className="nav-selection-bubble desktop-selection-bubble"
             ref={desktopBubbleRef}
           />
           <ul>
-            {navigation.map((item) => (
-              <li key={item.href}>
+            {localizedNavigation.map((item) => (
+              <li key={item.id}>
                 <Link
                   href={item.href}
                   data-navigation-id={item.id}
@@ -393,27 +413,28 @@ export function SiteHeader() {
         </nav>
 
         <div className="header-actions">
-          <ThemeToggle />
+          <LanguageToggle copy={copy} locale={locale} />
+          <ThemeToggle copy={themeCopy} />
           <a className="resume-link desktop-resume" href="/pavan-patil-resume.txt" download>
-            <span>Résumé</span>
+            <span>{copy.resume}</span>
             <ArrowUpRight aria-hidden="true" size={15} />
           </a>
         </div>
       </div>
 
       <div className="mobile-navigation-shell">
-        <nav className="mobile-tab-bar" aria-label="Primary navigation" ref={mobileNavRef}>
+        <nav className="mobile-tab-bar" aria-label={copy.primaryNavigationAria} ref={mobileNavRef}>
           <span
             aria-hidden="true"
             className="nav-selection-bubble mobile-selection-bubble"
             ref={mobileBubbleRef}
           />
           <ul>
-            {navigation.map((item) => {
+            {localizedNavigation.map((item) => {
               const Icon = item.icon;
 
               return (
-                <li key={item.href}>
+                <li key={item.id}>
                   <Link
                     href={item.href}
                     data-navigation-id={item.id}
@@ -431,7 +452,7 @@ export function SiteHeader() {
 
         <Popover isOpen={isUtilitiesOpen} onOpenChange={setIsUtilitiesOpen}>
           <Popover.Trigger
-            aria-label="Open navigation utilities"
+            aria-label={copy.openUtilities}
             className="mobile-utility-trigger"
             tabIndex={0}
           >
@@ -442,16 +463,23 @@ export function SiteHeader() {
             offset={12}
             className="mobile-utility-popover"
           >
-            <Popover.Dialog aria-label="Navigation utilities">
-              <Popover.Heading className="sr-only">Navigation utilities</Popover.Heading>
+            <Popover.Dialog aria-label={copy.utilitiesDialog}>
+              <Popover.Heading className="sr-only">{copy.utilitiesHeading}</Popover.Heading>
               <div className="mobile-utility-menu">
-                <Link href="/" onClick={() => setIsUtilitiesOpen(false)}>
+                <Link href={homeHref} onClick={() => setIsUtilitiesOpen(false)}>
                   <House aria-hidden="true" size={17} />
-                  <span>Home</span>
+                  <span>{copy.home}</span>
                 </Link>
                 <ThemeToggle
+                  copy={themeCopy}
                   presentation="menu"
                   onThemeChange={() => setIsUtilitiesOpen(false)}
+                />
+                <LanguageToggle
+                  copy={copy}
+                  locale={locale}
+                  onNavigate={() => setIsUtilitiesOpen(false)}
+                  presentation="menu"
                 />
                 <a
                   href="/pavan-patil-resume.txt"
@@ -459,7 +487,7 @@ export function SiteHeader() {
                   onClick={() => setIsUtilitiesOpen(false)}
                 >
                   <FileDown aria-hidden="true" size={17} />
-                  <span>Download résumé</span>
+                  <span>{copy.downloadResume}</span>
                 </a>
               </div>
             </Popover.Dialog>

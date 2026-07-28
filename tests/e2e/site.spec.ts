@@ -12,6 +12,29 @@ async function skipLaunchIntro(page: import("@playwright/test").Page) {
   });
 }
 
+async function expectLanguageOption(
+  page: import("@playwright/test").Page,
+  testInfo: import("@playwright/test").TestInfo,
+  name: string,
+  href: string,
+) {
+  const isMobile = testInfo.project.name.startsWith("mobile");
+  const scope = isMobile
+    ? page.getByRole("dialog")
+    : page.getByRole("banner");
+
+  if (isMobile) {
+    await page.locator(".mobile-utility-trigger").click();
+  }
+
+  await expect(scope.getByRole("link", { name })).toHaveAttribute("href", href);
+  await expect(scope.getByText("Deutsch")).toHaveCount(0);
+
+  if (isMobile) {
+    await page.keyboard.press("Escape");
+  }
+}
+
 test("homepage exposes the primary portfolio journey", async ({ page }) => {
   const errors: string[] = [];
   page.on("console", (message) => {
@@ -51,6 +74,28 @@ test("homepage skips the terminal launch intro after it has played this session"
   await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
 });
 
+test("localized homepages render natural Japanese and German copy", async ({ page }, testInfo) => {
+  await skipLaunchIntro(page);
+  await page.goto("/ja");
+  await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("信頼できるソフトウェア");
+  await expectLanguageOption(page, testInfo, "言語を切り替える: EN", "/");
+
+  await skipLaunchIntro(page);
+  await page.goto("/de");
+  await expect(page.locator("html")).toHaveAttribute("lang", "de");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("zuverlässige Software");
+  await expectLanguageOption(page, testInfo, "Sprache wechseln: EN", "/");
+});
+
+test("English locale prefix redirects to canonical unprefixed URLs", async ({ page }) => {
+  await page.goto("/en");
+  await expect(page).toHaveURL("/");
+
+  await page.goto("/en/work/nudge");
+  await expect(page).toHaveURL("/work/nudge");
+});
+
 test("homepage can force replay the terminal launch intro for testing", async ({ page }) => {
   await skipLaunchIntro(page);
   await page.goto("/?intro=1");
@@ -70,6 +115,22 @@ for (const [slug, title] of projects) {
   });
 }
 
+test("localized case-study routes render translated article shells", async ({ page }) => {
+  await page.goto("/ja/work/nudge");
+  await expect(page.locator("html")).toHaveAttribute("lang", "ja");
+  await expect(page.getByRole("heading", { level: 1, name: "Nudge" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "課題" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "取り組み" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "結果" })).toBeVisible();
+
+  await page.goto("/de/work/nudge");
+  await expect(page.locator("html")).toHaveAttribute("lang", "de");
+  await expect(page.getByRole("heading", { level: 1, name: "Nudge" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Die Herausforderung" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Der Ansatz" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Das Ergebnis" })).toBeVisible();
+});
+
 test("unknown work returns a not-found response", async ({ request }) => {
   const response = await request.get("/work/not-a-real-project");
   expect(response.status()).toBe(404);
@@ -79,6 +140,30 @@ test("unknown work offers a recovery path", async ({ page }) => {
   await page.goto("/work/not-a-real-project");
   await expect(page.getByRole("heading", { level: 1, name: "This route doesn’t exist." })).toBeVisible();
   await expect(page.getByRole("link", { name: "View selected work" })).toHaveAttribute("href", "/#work");
+});
+
+test("unknown localized work offers localized recovery paths", async ({ page }) => {
+  await page.goto("/ja/work/not-a-real-project");
+  await expect(page.getByRole("heading", { level: 1, name: "このページは存在しません。" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "主な実績を見る" })).toHaveAttribute("href", "/ja#work");
+
+  await page.goto("/de/work/not-a-real-project");
+  await expect(page.getByRole("heading", { level: 1, name: "Diese Route existiert nicht." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Ausgewählte Arbeit ansehen" })).toHaveAttribute("href", "/de#work");
+});
+
+test("localized pages avoid horizontal overflow on narrow screens", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await skipLaunchIntro(page);
+
+  for (const route of ["/ja", "/de", "/ja/work/nudge", "/de/work/nudge"]) {
+    await page.goto(route);
+    await expect
+      .poll(async () =>
+        page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      )
+      .toBe(true);
+  }
 });
 
 test("desktop navigation shrinks down and expands up without losing destinations", async ({ page }, testInfo) => {

@@ -12,13 +12,16 @@ import {
 } from "lucide-react";
 
 import type { ProjectVisual as ProjectVisualType } from "@/lib/portfolio";
+import { uiCopyByLocale, type UiCopy } from "@/lib/ui-copy";
 import { cn } from "@/lib/utils";
 
 export function ProjectVisual({
+  copy = uiCopyByLocale.en.projectVisual,
   type,
   label,
   compact = false,
 }: {
+  copy?: UiCopy["projectVisual"];
   type: ProjectVisualType;
   label: string;
   compact?: boolean;
@@ -29,37 +32,37 @@ export function ProjectVisual({
       role="img"
       aria-label={label}
     >
-      {type === "sync" ? <SyncVisual /> : null}
-      {type === "web" ? <WebVisual /> : null}
-      {type === "operations" ? <OperationsVisual /> : null}
+      {type === "sync" ? <SyncVisual copy={copy.sync} /> : null}
+      {type === "web" ? <WebVisual copy={copy.web} /> : null}
+      {type === "operations" ? <OperationsVisual copy={copy.operations} /> : null}
     </div>
   );
 }
 
-function SyncVisual() {
+function SyncVisual({ copy }: { copy: UiCopy["projectVisual"]["sync"] }) {
   return (
     <div className="sync-diagram" aria-hidden="true">
       <div className="visual-topline">
-        <span><Radio size={13} /> Live collaboration</span>
-        <span className="status-dot">Synced</span>
+        <span><Radio size={13} /> {copy.liveCollaboration}</span>
+        <span className="status-dot">{copy.synced}</span>
       </div>
       <div className="device-row">
         <div className="phone-frame">
           <div className="phone-notch" />
-          <p>Today</p>
-          <div className="task-item"><Check size={11} /> Design review</div>
-          <div className="task-item active"><Bell size={11} /> Nudge Alex</div>
-          <div className="task-item"><Users size={11} /> Team sync</div>
+          <p>{copy.today}</p>
+          <div className="task-item"><Check size={11} /> {copy.designReview}</div>
+          <div className="task-item active"><Bell size={11} /> {copy.nudgeAlex}</div>
+          <div className="task-item"><Users size={11} /> {copy.teamSync}</div>
         </div>
         <div className="sync-core">
           <span className="pulse-ring"><Cloud size={18} /></span>
           <strong>PowerSync</strong>
-          <small>offline queue · 03</small>
+          <small>{copy.offlineQueue}</small>
         </div>
         <div className="database-card">
           <Database size={20} />
           <strong>PostgreSQL</strong>
-          <span>Realtime changes</span>
+          <span>{copy.realtimeChanges}</span>
           <div className="data-bars"><i /><i /><i /></div>
         </div>
       </div>
@@ -67,7 +70,7 @@ function SyncVisual() {
   );
 }
 
-function WebVisual() {
+function WebVisual({ copy }: { copy: UiCopy["projectVisual"]["web"] }) {
   return (
     <div className="browser-frame" aria-hidden="true">
       <div className="browser-bar">
@@ -77,22 +80,22 @@ function WebVisual() {
       </div>
       <div className="browser-body">
         <div className="web-copy">
-          <span className="mini-label">PHILIPS GREENHEART</span>
-          <strong>Multilingual product experience.</strong>
-          <p>Region-ready content on a tested component foundation.</p>
-          <div className="web-button">Explore content</div>
+          <span className="mini-label">{copy.label}</span>
+          <strong>{copy.headline}</strong>
+          <p>{copy.description}</p>
+          <div className="web-button">{copy.button}</div>
         </div>
         <div className="web-orbit">
           <div className="web-orbit-core"><Activity size={23} /></div>
-          <span className="locale-badge"><Languages size={13} /> EN · JP</span>
-          <span className="apm-badge">APM · healthy</span>
+          <span className="locale-badge"><Languages size={13} /> {copy.localeBadge}</span>
+          <span className="apm-badge">{copy.apmBadge}</span>
         </div>
       </div>
     </div>
   );
 }
 
-function OperationsVisual() {
+function OperationsVisual({ copy }: { copy: UiCopy["projectVisual"]["operations"] }) {
   return (
     <div className="ops-frame" aria-hidden="true">
       <aside>
@@ -101,19 +104,19 @@ function OperationsVisual() {
       </aside>
       <div className="ops-main">
         <div className="visual-topline">
-          <span>Workforce overview</span>
-          <span className="status-dot">Live</span>
+          <span>{copy.overview}</span>
+          <span className="status-dot">{copy.live}</span>
         </div>
         <div className="ops-stats">
-          <div><Users size={15} /><strong>1,000+</strong><span>Records</span></div>
-          <div><Check size={15} /><strong>Multi-site</strong><span>Attendance</span></div>
-          <div><FileSpreadsheet size={15} /><strong>Automated</strong><span>Payroll</span></div>
+          <div><Users size={15} /><strong>1,000+</strong><span>{copy.records}</span></div>
+          <div><Check size={15} /><strong>{copy.multiSite}</strong><span>{copy.attendance}</span></div>
+          <div><FileSpreadsheet size={15} /><strong>{copy.automated}</strong><span>{copy.payroll}</span></div>
         </div>
         <div className="ops-table">
-          <div><b>Workflow</b><b>Capability</b><b>Status</b></div>
-          <div><span>Attendance</span><span>Multi-site</span><em>Tracked</em></div>
-          <div><span>Overtime</span><span>Rules</span><em>Configured</em></div>
-          <div><span>Payroll</span><span>Excel</span><em>Exportable</em></div>
+          <div><b>{copy.workflow}</b><b>{copy.capability}</b><b>{copy.status}</b></div>
+          <div><span>{copy.attendance}</span><span>{copy.multiSite}</span><em>{copy.tracked}</em></div>
+          <div><span>{copy.overtime}</span><span>{copy.rules}</span><em>{copy.configured}</em></div>
+          <div><span>{copy.payroll}</span><span>{copy.excel}</span><em>{copy.exportable}</em></div>
         </div>
       </div>
     </div>

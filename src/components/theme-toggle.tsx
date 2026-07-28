@@ -8,11 +8,19 @@ import { useSyncExternalStore } from "react";
 const subscribe = () => () => undefined;
 
 type ThemeToggleProps = {
+  copy?: {
+    switchToDark: string;
+    switchToLight: string;
+  };
   presentation?: "icon" | "menu";
   onThemeChange?: () => void;
 };
 
 export function ThemeToggle({
+  copy = {
+    switchToDark: "Switch to dark theme",
+    switchToLight: "Switch to light theme",
+  },
   presentation = "icon",
   onThemeChange,
 }: ThemeToggleProps = {}) {
@@ -21,7 +29,7 @@ export function ThemeToggle({
 
   const isDark = mounted && resolvedTheme === "dark";
   const nextTheme = isDark ? "light" : "dark";
-  const label = `Switch to ${nextTheme} theme`;
+  const label = isDark ? copy.switchToLight : copy.switchToDark;
 
   const changeTheme = () => {
     setTheme(nextTheme);

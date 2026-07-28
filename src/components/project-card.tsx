@@ -4,9 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { ProjectVisual } from "@/components/project-visual";
+import { getWorkPath, type Locale } from "@/lib/i18n";
 import type { ProjectCaseStudy } from "@/lib/portfolio";
+import { formatCopy, type UiCopy } from "@/lib/ui-copy";
 
-export function ProjectCard({ project, index }: { project: ProjectCaseStudy; index: number }) {
+export function ProjectCard({
+  copy,
+  locale,
+  project,
+  projectVisualCopy,
+  index,
+}: {
+  copy: UiCopy["projectCard"];
+  locale: Locale;
+  project: ProjectCaseStudy;
+  projectVisualCopy: UiCopy["projectVisual"];
+  index: number;
+}) {
   return (
     <Card className="project-card" variant="default">
       <div className="project-card-visual-wrap">
@@ -23,14 +37,22 @@ export function ProjectCard({ project, index }: { project: ProjectCaseStudy; ind
             {project.media.caption ? <span>{project.media.caption}</span> : null}
           </div>
         ) : (
-          <ProjectVisual type={project.visual} label={project.visualLabel} compact />
+          <ProjectVisual
+            copy={projectVisualCopy}
+            type={project.visual}
+            label={project.visualLabel}
+            compact
+          />
         )}
       </div>
       <Card.Content className="project-card-content">
         <p className="project-kicker">{project.kicker}</p>
         <Card.Title className="project-title">{project.cardHeadline}</Card.Title>
         <Card.Description className="project-summary">{project.summary}</Card.Description>
-        <div className="project-tags" aria-label={`${project.title} technologies`}>
+        <div
+          className="project-tags"
+          aria-label={formatCopy(copy.technologiesAria, { title: project.title })}
+        >
           {project.technologies.slice(0, 4).map((technology) => (
             <Chip key={technology} size="sm" variant="secondary">
               {technology}
@@ -39,8 +61,11 @@ export function ProjectCard({ project, index }: { project: ProjectCaseStudy; ind
         </div>
       </Card.Content>
       <Card.Footer className="project-card-footer">
-        <Link href={`/work/${project.slug}`} aria-label={`Read the ${project.title} case study`}>
-          View case study
+        <Link
+          href={getWorkPath(locale, project.slug)}
+          aria-label={formatCopy(copy.readCaseStudyAria, { title: project.title })}
+        >
+          {copy.readCaseStudy}
           <ArrowUpRight aria-hidden="true" size={17} />
         </Link>
       </Card.Footer>

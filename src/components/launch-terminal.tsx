@@ -18,7 +18,6 @@ const outputLines = [
   "",
   "✓ Starting...",
   "✓ Ready in 1387ms",
-  "Website: https://pavanpatil.dev",
 ];
 
 function sleep(duration: number) {
@@ -45,7 +44,20 @@ function markIntroSeen() {
   }
 }
 
-export function LaunchTerminal() {
+export function LaunchTerminal({
+  copy = {
+    title: "pavanpatil.dev launch",
+    skip: "Skip",
+    websiteLine: "Website: https://pavanpatil.dev",
+  },
+}: {
+  copy?: {
+    title: string;
+    skip: string;
+    websiteLine: string;
+  };
+} = {}) {
+  const websiteLine = copy.websiteLine;
   const [isVisible, setIsVisible] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
   const [command, setCommand] = useState("");
@@ -103,10 +115,10 @@ export function LaunchTerminal() {
       if (isCancelled) return;
       setHasSubmitted(true);
 
-      for (let index = 0; index < outputLines.length; index += 1) {
+      for (let index = 0; index < outputLines.length + 1; index += 1) {
         if (isCancelled) return;
         setVisibleOutputCount(index + 1);
-        await sleep(outputLines[index] === "" ? 90 : 190);
+        await sleep((outputLines[index] ?? websiteLine) === "" ? 90 : 190);
       }
 
       await sleep(700);
@@ -118,7 +130,7 @@ export function LaunchTerminal() {
     return () => {
       isCancelled = true;
     };
-  }, []);
+  }, [websiteLine]);
 
   function skipIntro() {
     markIntroSeen();
@@ -139,7 +151,7 @@ export function LaunchTerminal() {
       aria-labelledby="launch-terminal-title"
     >
       <button className="launch-terminal-skip" type="button" onClick={skipIntro}>
-        Skip
+        {copy.skip}
       </button>
 
       <div className="launch-terminal-window">
@@ -149,7 +161,7 @@ export function LaunchTerminal() {
             <span />
             <span />
           </div>
-          <p id="launch-terminal-title">pavanpatil.dev launch</p>
+          <p id="launch-terminal-title">{copy.title}</p>
         </div>
 
         <div className="launch-terminal-body">
@@ -165,7 +177,7 @@ export function LaunchTerminal() {
 
           {hasSubmitted ? (
             <div className="launch-terminal-output" aria-live="polite">
-              {outputLines.slice(0, visibleOutputCount).map((line, index) => (
+              {[...outputLines, websiteLine].slice(0, visibleOutputCount).map((line, index) => (
                 <p
                   className={line.includes("Ready") || line.includes("Website") ? "launch-terminal-success" : undefined}
                   key={`${line}-${index}`}

@@ -2,25 +2,34 @@ import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
-import { profile, socialLinks } from "@/lib/portfolio";
+import { getHashHref, getHomePath, type Locale } from "@/lib/i18n";
+import type { Profile, SocialLink } from "@/lib/portfolio";
+import type { UiCopy } from "@/lib/ui-copy";
 
-export function SiteFooter() {
+type SiteFooterProps = {
+  copy: UiCopy["footer"] & Pick<UiCopy["header"], "brandAria" | "navigation">;
+  locale: Locale;
+  profile: Profile;
+  socialLinks: SocialLink[];
+};
+
+export function SiteFooter({ copy, locale, profile, socialLinks }: SiteFooterProps) {
   return (
     <footer className="site-footer">
       <Container>
         <div className="footer-top">
-          <Link className="brand-link" href="/" aria-label="Pavan Patil, home">
+          <Link className="brand-link" href={getHomePath(locale)} aria-label={copy.brandAria}>
             <span className="brand-mark" aria-hidden="true">P</span>
             <span>Pavan Patil</span>
           </Link>
-          <nav aria-label="Footer navigation">
+          <nav aria-label={copy.navigationAria}>
             <ul>
-              <li><Link href="/#work">Work</Link></li>
-              <li><Link href="/#experience">Experience</Link></li>
-              <li><Link href="/#about">About</Link></li>
+              <li><Link href={getHashHref(locale, "#work")}>{copy.navigation.work}</Link></li>
+              <li><Link href={getHashHref(locale, "#experience")}>{copy.navigation.experience}</Link></li>
+              <li><Link href={getHashHref(locale, "#about")}>{copy.navigation.about}</Link></li>
               <li>
                 <a href={`mailto:${profile.email}`}>
-                  Email<ArrowUpRight aria-hidden="true" size={13} />
+                  {copy.email}<ArrowUpRight aria-hidden="true" size={13} />
                 </a>
               </li>
               {socialLinks.map((link) => (
@@ -34,8 +43,8 @@ export function SiteFooter() {
           </nav>
         </div>
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} {profile.name}. Designed and built with care.</p>
-          <p>Next.js · HeroUI · TypeScript</p>
+          <p>© {new Date().getFullYear()} {profile.name}. {copy.builtWithCare}</p>
+          <p>{copy.stack}</p>
         </div>
         <div className="footer-watermark" aria-hidden="true">
           <p>
