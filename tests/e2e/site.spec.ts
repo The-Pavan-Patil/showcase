@@ -280,6 +280,40 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
     await expect(traveler).toHaveAttribute("data-active-anchor", anchor);
   }
 
+  await page.evaluate(() => {
+    const hero = document.querySelector<HTMLElement>(
+      '[data-scroll-accent-anchor="hero"]',
+    );
+    const work = document.querySelector<HTMLElement>(
+      '[data-scroll-accent-anchor="work"]',
+    );
+    if (!hero || !work) return;
+
+    const heroBounds = hero.getBoundingClientRect();
+    const workBounds = work.getBoundingClientRect();
+    const activationY = Math.min(360, Math.max(180, window.innerHeight * 0.38));
+    const heroY = heroBounds.top + window.scrollY + heroBounds.height / 2;
+    const workY = workBounds.top + window.scrollY + workBounds.height / 2;
+    window.scrollTo(0, (heroY + workY) / 2 - activationY);
+  });
+  await expect(traveler).toHaveAttribute("data-phase", "global-rail");
+
+  const globalRailX = await page
+    .locator(".scroll-accent-global-rail")
+    .evaluate((element) => element.getBoundingClientRect().left);
+  const contentLeft = await page
+    .locator(".site-container")
+    .first()
+    .evaluate((element) => element.getBoundingClientRect().left);
+  await expect
+    .poll(async () => {
+      const box = await traveler.boundingBox();
+      return box ? box.x + box.width / 2 : -1;
+    })
+    .toBeCloseTo(globalRailX, 0);
+  expect(globalRailX).toBeGreaterThanOrEqual(8);
+  expect(globalRailX).toBeLessThan(contentLeft);
+
   await activate("work");
   await expect(traveler).toHaveAttribute("data-phase", "heading");
 
@@ -308,26 +342,40 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
     .poll(async () => traveler.getAttribute("data-active-anchor"))
     .not.toBe("experience-project-0-0");
 
-  await page.locator("#about").evaluate((element) => {
+  await activate("about");
+  await expect(traveler).toHaveAttribute("data-phase", "heading");
+
+  await page.locator('[data-scroll-accent-anchor="about"]').evaluate((element) => {
     const bounds = element.getBoundingClientRect();
-    window.scrollTo(0, bounds.top + window.scrollY + bounds.height * 0.45);
+    const contact = document.querySelector<HTMLElement>(
+      "[data-scroll-accent-contact]",
+    );
+    if (!contact) return;
+
+    const activationY = Math.min(360, Math.max(180, window.innerHeight * 0.38));
+    const aboutY = bounds.top + window.scrollY + bounds.height / 2;
+    const contactY = contact.getBoundingClientRect().top + window.scrollY;
+    const returnTravel = Math.min(
+      140,
+      Math.max(56, (contactY - aboutY) * 0.16),
+    );
+    window.scrollTo(0, Math.floor(aboutY + returnTravel - activationY - 1));
   });
   await expect(traveler).toHaveAttribute("data-phase", "global-rail");
   await expect
     .poll(async () => Number.parseFloat(await traveler.evaluate((element) => getComputedStyle(element).opacity)))
     .toBeGreaterThan(0.9);
 
-  const heroRailX = await page
-    .locator('[data-scroll-accent-anchor="hero"]')
-    .evaluate((element) => element.getBoundingClientRect().left + element.getBoundingClientRect().width / 2);
   await expect
     .poll(async () => {
       const box = await traveler.boundingBox();
       return box ? box.x + box.width / 2 : 0;
     })
-    .toBeCloseTo(heroRailX, 0);
+    .toBeCloseTo(globalRailX, 0);
 
-  await page.locator("#contact").scrollIntoViewIfNeeded();
+  await page.evaluate(() => {
+    window.scrollTo(0, document.documentElement.scrollHeight);
+  });
   await expect
     .poll(async () => Number.parseFloat(await traveler.evaluate((element) => getComputedStyle(element).opacity)))
     .toBeLessThan(0.1);

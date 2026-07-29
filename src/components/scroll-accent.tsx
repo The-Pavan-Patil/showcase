@@ -16,12 +16,14 @@ export type ScrollAccentFrame = ScrollAccentWaypoint;
 type ScrollAccentRoute = {
   waypoints: ScrollAccentWaypoint[];
   globalX: number;
-  experienceExitScroll: number;
+  routeExitScroll: number;
   fadeStartScroll: number;
   fadeEndScroll: number;
 };
 
 const DEFAULT_DOT_SIZE = 8;
+const DEFAULT_MAGNET_HOLD = 0.1;
+const HEADING_MAGNET_HOLD = 0.18;
 
 function clamp(value: number, minimum = 0, maximum = 1) {
   return Math.min(maximum, Math.max(minimum, value));
@@ -30,6 +32,13 @@ function clamp(value: number, minimum = 0, maximum = 1) {
 function smoothstep(value: number) {
   const progress = clamp(value);
   return progress * progress * (3 - 2 * progress);
+}
+
+function magnetHold(waypoint: ScrollAccentWaypoint) {
+  if (!waypoint.magnet) return 0;
+  return waypoint.phase === "heading"
+    ? HEADING_MAGNET_HOLD
+    : DEFAULT_MAGNET_HOLD;
 }
 
 export function resolveScrollAccentFrame(
@@ -58,10 +67,38 @@ export function resolveScrollAccentFrame(
     const rawProgress = clamp((scrollY - start) / (end - start));
     const active = rawProgress < 0.5 ? current : next;
 
-    if (reducedMotion) return active;
+    if (reducedMotion) {
+      let previousMagnetIndex = index;
+      let nextMagnetIndex = index + 1;
 
-    const startHold = current.magnet ? 0.1 : 0;
-    const endHold = next.magnet ? 0.1 : 0;
+      while (
+        previousMagnetIndex > 0 &&
+        !waypoints[previousMagnetIndex].magnet
+      ) {
+        previousMagnetIndex -= 1;
+      }
+      while (
+        nextMagnetIndex < waypoints.length - 1 &&
+        !waypoints[nextMagnetIndex].magnet
+      ) {
+        nextMagnetIndex += 1;
+      }
+
+      const previousMagnet = waypoints[previousMagnetIndex];
+      const nextMagnet = waypoints[nextMagnetIndex];
+      const previousActivation = Math.max(0, previousMagnet.y - activationY);
+      const nextActivation = Math.max(
+        previousActivation + 1,
+        nextMagnet.y - activationY,
+      );
+
+      return scrollY < (previousActivation + nextActivation) / 2
+        ? previousMagnet
+        : nextMagnet;
+    }
+
+    const startHold = magnetHold(current);
+    const endHold = magnetHold(next);
     const travelRange = Math.max(0.01, 1 - startHold - endHold);
     const progress = smoothstep((rawProgress - startHold) / travelRange);
 
@@ -105,6 +142,9 @@ function isVisibleProjectNode(element: HTMLElement) {
 }
 
 function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
+  const globalRail = document.querySelector<HTMLElement>(
+    ".scroll-accent-global-rail",
+  );
   const hero = document.querySelector<HTMLElement>(
     '[data-scroll-accent-anchor="hero"]',
   );
@@ -114,6 +154,9 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
   const experienceHeading = document.querySelector<HTMLElement>(
     '[data-scroll-accent-anchor="experience"]',
   );
+  const aboutHeading = document.querySelector<HTMLElement>(
+    '[data-scroll-accent-anchor="about"]',
+  );
   const experienceSection = document.querySelector<HTMLElement>(
     "[data-scroll-accent-experience]",
   );
@@ -122,21 +165,63 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
   );
 
   if (
+    !globalRail ||
     !hero ||
     !work ||
     !experienceHeading ||
+    !aboutHeading ||
     !experienceSection ||
     !contactSection
   ) {
     return null;
   }
 
-  const globalX = elementCenter(hero).x;
-  const waypoints: ScrollAccentWaypoint[] = [
-    waypointFromElement(hero),
-    waypointFromElement(work),
-    waypointFromElement(experienceHeading),
-  ];
+  const globalX =
+    globalRail.getBoundingClientRect().left + window.scrollX;
+  const waypoints: ScrollAccentWaypoint[] = [];
+
+  function pushWaypoint(point: ScrollAccentWaypoint) {
+    const previous = waypoints[waypoints.length - 1];
+    const minimumY = previous ? previous.y + 1 : point.y;
+
+    waypoints.push({
+      ...point,
+      y: Math.max(point.y, minimumY),
+    });
+  }
+
+  function pushGlobalBridge(
+    current: ScrollAccentWaypoint,
+    next: ScrollAccentWaypoint,
+  ) {
+    const gap = Math.max(1, next.y - current.y);
+    const travel = clamp(gap * 0.16, 56, 140);
+
+    pushWaypoint({
+      id: `${current.id}-global-departure`,
+      phase: "global-rail",
+      x: globalX,
+      y: current.y + travel,
+      size: DEFAULT_DOT_SIZE,
+    });
+    pushWaypoint({
+      id: `${next.id}-global-approach`,
+      phase: "global-rail",
+      x: globalX,
+      y: next.y - travel,
+      size: DEFAULT_DOT_SIZE,
+    });
+    pushWaypoint(next);
+  }
+
+  const heroPoint = waypointFromElement(hero);
+  const workPoint = waypointFromElement(work);
+  const experienceHeadingPoint = waypointFromElement(experienceHeading);
+
+  pushWaypoint(heroPoint);
+  pushGlobalBridge(heroPoint, workPoint);
+  pushGlobalBridge(workPoint, experienceHeadingPoint);
+
   const experienceItems = Array.from(
     experienceSection.querySelectorAll<HTMLElement>(".experience-item"),
   ).map((item) => {
@@ -155,16 +240,6 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
       minors: minorElements.map(waypointFromElement),
     };
   });
-
-  function pushWaypoint(point: ScrollAccentWaypoint) {
-    const previous = waypoints[waypoints.length - 1];
-    const minimumY = previous ? previous.y + 1 : point.y;
-
-    waypoints.push({
-      ...point,
-      y: Math.max(point.y, minimumY),
-    });
-  }
 
   experienceItems.forEach((entry, index) => {
     if (!entry.major) return;
@@ -253,11 +328,40 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
     size: DEFAULT_DOT_SIZE,
   });
 
+  const aboutPoint = waypointFromElement(aboutHeading);
+  const aboutApproachGap = Math.max(1, aboutPoint.y - returnEndY);
+  const aboutApproach = clamp(aboutApproachGap * 0.18, 56, 140);
+
+  pushWaypoint({
+    id: "about-global-approach",
+    phase: "global-rail",
+    x: globalX,
+    y: aboutPoint.y - aboutApproach,
+    size: DEFAULT_DOT_SIZE,
+  });
+  pushWaypoint(aboutPoint);
+
   const contactTop =
     contactSection.getBoundingClientRect().top + window.scrollY;
-  const experienceExitScroll = Math.max(0, experienceBottom - activationY);
+  const aboutReturnTravel = clamp(
+    (contactTop - aboutPoint.y) * 0.16,
+    56,
+    140,
+  );
+  pushWaypoint({
+    id: "about-global-return",
+    phase: "global-rail",
+    x: globalX,
+    y: aboutPoint.y + aboutReturnTravel,
+    size: DEFAULT_DOT_SIZE,
+  });
+
+  const routeExitScroll = Math.max(
+    0,
+    waypoints[waypoints.length - 1].y - activationY,
+  );
   const fadeStartScroll = Math.max(
-    experienceExitScroll,
+    routeExitScroll,
     contactTop - activationY - 96,
   );
   const fadeEndScroll = Math.max(fadeStartScroll + 1, contactTop - activationY + 64);
@@ -265,7 +369,7 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
   return {
     waypoints,
     globalX,
-    experienceExitScroll,
+    routeExitScroll,
     fadeStartScroll,
     fadeEndScroll,
   };
@@ -322,7 +426,7 @@ export function ScrollAccent() {
       const scrollY = window.scrollY;
       const activeLine = activationY();
 
-      if (scrollY >= route.experienceExitScroll) {
+      if (scrollY >= route.routeExitScroll) {
         const fadeProgress = clamp(
           (scrollY - route.fadeStartScroll) /
             (route.fadeEndScroll - route.fadeStartScroll),
@@ -484,5 +588,10 @@ export function ScrollAccent() {
     };
   }, []);
 
-  return <span ref={dotRef} className="scroll-accent-traveler" aria-hidden="true" />;
+  return (
+    <>
+      <span className="scroll-accent-global-rail" aria-hidden="true" />
+      <span ref={dotRef} className="scroll-accent-traveler" aria-hidden="true" />
+    </>
+  );
 }

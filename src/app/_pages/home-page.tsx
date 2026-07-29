@@ -307,30 +307,8 @@ export function HomePage({ locale }: { locale: Locale }) {
                     title={ui.home.aboutTitle}
                     muted={ui.home.aboutMuted}
                     description={profile.about}
+                    accentAnchor="about"
                   />
-                </div>
-
-                <div className="about-beyond">
-                  <div>
-                    <p className="eyebrow">{ui.home.beyondCode}</p>
-                    <h3>{ui.home.beyondHeading}</h3>
-                  </div>
-                  <div className="about-beyond-list" aria-label={ui.home.personalInterestsAria}>
-                    {personalNotes.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <div className="about-beyond-item" key={item.label}>
-                          <span className="about-beyond-icon">
-                            <Icon aria-hidden="true" size={16} />
-                          </span>
-                          <div>
-                            <strong>{item.label}</strong>
-                            <p>{item.text}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
                 </div>
 
                 <a className="resume-capsule" href="/pavan-patil-resume.txt" download>
@@ -348,6 +326,29 @@ export function HomePage({ locale }: { locale: Locale }) {
                   />
                 </div>
               </aside>
+
+              <div className="about-beyond">
+                <div>
+                  <p className="eyebrow">{ui.home.beyondCode}</p>
+                  <h3>{ui.home.beyondHeading}</h3>
+                </div>
+                <div className="about-beyond-list" aria-label={ui.home.personalInterestsAria}>
+                  {personalNotes.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <div className="about-beyond-item" key={item.label}>
+                        <span className="about-beyond-icon">
+                          <Icon aria-hidden="true" size={16} />
+                        </span>
+                        <div>
+                          <strong>{item.label}</strong>
+                          <p>{item.text}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </Container>
         </section>

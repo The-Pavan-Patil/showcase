@@ -15,7 +15,7 @@ export function SectionHeading({
   muted?: string;
   description?: string;
   align?: "left" | "center";
-  accentAnchor?: "work" | "experience";
+  accentAnchor?: "work" | "experience" | "about";
 }) {
   return (
     <div
