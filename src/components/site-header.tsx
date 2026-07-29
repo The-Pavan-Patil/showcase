@@ -1,6 +1,5 @@
 "use client";
 
-import { Popover } from "@heroui/react";
 import {
   ArrowUpRight,
   BriefcaseBusiness,
@@ -76,6 +75,7 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
   const mobileNavRef = useRef<HTMLElement>(null);
   const desktopBubbleRef = useRef<HTMLSpanElement>(null);
   const mobileBubbleRef = useRef<HTMLSpanElement>(null);
+  const utilitiesRef = useRef<HTMLDivElement>(null);
   const pendingNavigationRef = useRef<NavigationId | null>(null);
   const pendingNavigationTimerRef = useRef<number | null>(null);
   const lastBubbleMetrics = useRef<Record<NavigationSurface, BubbleMetrics | null>>({
@@ -274,6 +274,33 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
   );
 
   useEffect(() => {
+    if (!isUtilitiesOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !utilitiesRef.current?.contains(event.target)
+      ) {
+        setIsUtilitiesOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsUtilitiesOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isUtilitiesOpen]);
+
+  useEffect(() => {
     if (!isHomePath(pathname, locale)) return;
 
     const sections = navigation
@@ -450,21 +477,26 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
           </ul>
         </nav>
 
-        <Popover isOpen={isUtilitiesOpen} onOpenChange={setIsUtilitiesOpen}>
-          <Popover.Trigger
+        <div className="mobile-utility-wrap" ref={utilitiesRef}>
+          <button
             aria-label={copy.openUtilities}
+            aria-expanded={isUtilitiesOpen}
+            aria-controls="mobile-utility-menu"
+            aria-haspopup="menu"
             className="mobile-utility-trigger"
-            tabIndex={0}
+            type="button"
+            onClick={() => setIsUtilitiesOpen((isOpen) => !isOpen)}
           >
             <MoreHorizontal aria-hidden="true" size={23} />
-          </Popover.Trigger>
-          <Popover.Content
-            placement="top end"
-            offset={12}
-            className="mobile-utility-popover"
-          >
-            <Popover.Dialog aria-label={copy.utilitiesDialog}>
-              <Popover.Heading className="sr-only">{copy.utilitiesHeading}</Popover.Heading>
+          </button>
+          {isUtilitiesOpen ? (
+            <div
+              aria-label={copy.utilitiesDialog}
+              className="mobile-utility-popover"
+              id="mobile-utility-menu"
+              role="menu"
+            >
+              <h2 className="sr-only">{copy.utilitiesHeading}</h2>
               <div className="mobile-utility-menu">
                 <Link href={homeHref} onClick={() => setIsUtilitiesOpen(false)}>
                   <House aria-hidden="true" size={17} />
@@ -490,9 +522,9 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
                   <span>{copy.downloadResume}</span>
                 </a>
               </div>
-            </Popover.Dialog>
-          </Popover.Content>
-        </Popover>
+            </div>
+          ) : null}
+        </div>
       </div>
     </header>
   );

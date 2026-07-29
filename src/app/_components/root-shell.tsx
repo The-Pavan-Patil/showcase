@@ -10,12 +10,14 @@ const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
 });
 
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
+  preload: false,
 });
 
 const michroma = Michroma({
@@ -23,12 +25,14 @@ const michroma = Michroma({
   subsets: ["latin"],
   weight: "400",
   display: "swap",
+  preload: false,
 });
 
 const notoSansJp = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
   weight: "variable",
   display: "swap",
+  preload: false,
 });
 
 export function RootShell({

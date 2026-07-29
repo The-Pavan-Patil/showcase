@@ -57,6 +57,14 @@ describe("resolveScrollAccentFrame", () => {
     expect(midpoint?.size).toBeCloseTo(8);
   });
 
+  it("holds eyebrow headings for eighteen percent of each transition edge", () => {
+    const departureHold = resolveScrollAccentFrame(waypoints, 64, 100);
+    const arrivalHold = resolveScrollAccentFrame(waypoints, 336, 100);
+
+    expect(departureHold).toMatchObject({ id: "hero", y: 100 });
+    expect(arrivalHold).toMatchObject({ id: "work", y: 500 });
+  });
+
   it("morphs the dot size while moving into a suitcase node", () => {
     const frame = resolveScrollAccentFrame(waypoints, 600, 100);
 
@@ -78,6 +86,36 @@ describe("resolveScrollAccentFrame", () => {
       waypoints[1],
     );
   });
+
+  it("skips non-magnetic rail waypoints when reduced motion is enabled", () => {
+    const routeWithRail: ScrollAccentWaypoint[] = [
+      waypoints[0],
+      {
+        id: "hero-global-departure",
+        phase: "global-rail",
+        x: 8,
+        y: 180,
+        size: 8,
+        magnet: false,
+      },
+      {
+        id: "work-global-approach",
+        phase: "global-rail",
+        x: 8,
+        y: 420,
+        size: 8,
+        magnet: false,
+      },
+      waypoints[1],
+    ];
+
+    expect(resolveScrollAccentFrame(routeWithRail, 180, 100, true)).toBe(
+      waypoints[0],
+    );
+    expect(resolveScrollAccentFrame(routeWithRail, 220, 100, true)).toBe(
+      waypoints[1],
+    );
+  });
 });
 
 describe("ScrollAccent", () => {
@@ -90,7 +128,10 @@ describe("ScrollAccent", () => {
     vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => undefined);
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
       function getBounds(this: HTMLElement) {
-        const x = Number(this.dataset.testX ?? 0);
+        const x = Number(
+          this.dataset.testX ??
+            (this.classList.contains("scroll-accent-global-rail") ? 8 : 0),
+        );
         const y = Number(this.dataset.testY ?? 0);
         const size = Number(this.dataset.testSize ?? 8);
         const height = Number(this.dataset.testHeight ?? size);
@@ -153,6 +194,12 @@ describe("ScrollAccent", () => {
               </details>
             </article>
           </section>
+          <span
+            data-scroll-accent-anchor="about"
+            data-scroll-accent-phase="heading"
+            data-test-x="20"
+            data-test-y="1300"
+          />
           <section
             data-scroll-accent-contact
             data-test-y="1500"

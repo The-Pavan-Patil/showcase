@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, Chip } from "@heroui/react";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";

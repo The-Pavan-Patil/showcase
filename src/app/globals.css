@@ -341,6 +341,22 @@ a {
   background: transparent;
 }
 
+.scroll-accent-global-rail {
+  position: fixed;
+  top: 0;
+  left: max(0.5rem, calc(env(safe-area-inset-left, 0px) + 0.5rem));
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (min-width: 74.5rem) {
+  .scroll-accent-global-rail {
+    left: max(0.5rem, calc(50vw - 37.25rem));
+  }
+}
+
 .scroll-accent-fallback {
   background: var(--accent);
   box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 11%, transparent);
@@ -835,6 +851,10 @@ a {
   display: none;
 }
 
+.mobile-utility-wrap {
+  position: relative;
+}
+
 .mobile-tab-bar,
 .mobile-utility-trigger {
   position: relative;
@@ -937,7 +957,10 @@ a {
 }
 
 .mobile-utility-popover {
-  position: relative;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.75rem);
+  z-index: 4;
   isolation: isolate;
   min-width: 14rem !important;
   overflow: hidden;
@@ -956,10 +979,6 @@ a {
 .mobile-utility-popover::before {
   inset: 0;
   background: linear-gradient(145deg, rgb(255 255 255 / 22%), transparent 42%);
-}
-
-.mobile-utility-popover [data-slot="popover-dialog"] {
-  outline: none;
 }
 
 .mobile-utility-menu {
@@ -2113,13 +2132,17 @@ a {
 
 .about-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.48fr);
-  gap: 1rem 4.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+  gap: 1.6rem 4.5rem;
   align-items: start;
 }
 .about-portrait {
   position: sticky;
   top: 7rem;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  width: min(100%, 18rem);
+  justify-self: end;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   border-radius: 0.5rem;
@@ -2129,7 +2152,7 @@ a {
 .about-photo-frame {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 0.72;
+  aspect-ratio: 0.74;
   border-radius: 0.4rem;
   background: var(--surface-secondary);
 }
@@ -2138,12 +2161,16 @@ a {
   object-position: 50% 46%;
 }
 .about-content {
+  grid-column: 1;
+  grid-row: 1;
   min-width: 0;
 }
 .about-beyond {
   display: grid;
+  grid-column: 1;
+  grid-row: 2;
   gap: 1.25rem;
-  margin-top: 3rem;
+  margin-top: 1.2rem;
   border-top: 1px solid var(--border);
   padding-top: 1.5rem;
 }
@@ -2732,10 +2759,18 @@ a {
   .experience-company-row { align-items: flex-start; }
   .experience-card-meta { flex-direction: column; align-items: flex-end; }
   .about-shell { grid-template-columns: 1fr; gap: 1rem; }
+  .about-content,
+  .about-beyond {
+    grid-column: auto;
+    grid-row: auto;
+  }
   .about-portrait {
     position: relative;
     top: auto;
-    width: min(100%, 27rem);
+    grid-column: auto;
+    grid-row: auto;
+    width: min(100%, 22rem);
+    justify-self: start;
   }
   .about-photo-frame { aspect-ratio: 0.82; }
   .about-content { grid-column: auto; }
@@ -2818,13 +2853,14 @@ a {
   .client-project-logo { width: 2.2rem; height: 2.2rem; }
   .about-portrait {
     display: block;
+    width: min(100%, 20rem);
     padding: 0.65rem;
   }
   .about-photo-frame { aspect-ratio: 0.82; }
   .about-beyond { gap: 1.1rem; }
   .about-beyond-list { grid-template-columns: 1fr; }
   .about-beyond h3 { max-width: 18ch; }
-  .about-content .resume-capsule { margin-bottom: 4.5rem; }
+  .about-content .resume-capsule { margin-bottom: 0; }
   .contact-section { padding-bottom: 4rem; scroll-margin-top: 2rem; }
   .contact-card { grid-template-columns: 1fr; gap: 2rem; border-radius: var(--radius-feature); }
   .contact-email { font-size: 0.66rem; }
