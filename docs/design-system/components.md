@@ -15,6 +15,7 @@
 | ExperienceTimeline | Chronological roles and verified highlights | Article list |
 | SkillsGroup | Categorized skill chips | HeroUI Card and Chip |
 | About | Biography, education evidence, and résumé download | Portfolio-owned section |
+| Quick message | Anonymous one-way message composer backed by a private Discord webhook | Client form, server route, and Aceternity keyboard |
 | Contact CTA | Direct email and approved social destinations | Semantic links |
 | SiteFooter | Home, section, social, copyright, and stack links/text | Semantic footer/nav |
 | CaseStudyHero | Title, summary, technologies, facts, and project visual | Portfolio-owned composition plus HeroUI Chip |

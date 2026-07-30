@@ -31,6 +31,15 @@ Open [http://localhost:3000](http://localhost:3000).
 
 `NEXT_PUBLIC_SITE_URL` must be the canonical production origin, without a trailing slash. Vercel's production URL is used automatically when that variable is absent.
 
+`DISCORD_WEBHOOK_URL` must be set for the anonymous keyboard message section to deliver visitor notes to Discord. The webhook stays server-only and is not exposed to the browser.
+
+Validate the local Discord webhook configuration with:
+
+```bash
+npm run verify:discord
+npm run verify:discord -- --send
+```
+
 ## Quality commands
 
 ```bash
@@ -70,4 +79,4 @@ The target is Vercel. Before production deployment:
 3. Complete the manual accessibility checklist in the design-system documentation.
 4. Review the generated Open Graph card at `public/og.png`.
 
-No CMS, database, backend contact form, authentication, analytics, or unlicensed HeroUI Pro assets are used in version one.
+No CMS, database, authentication, analytics, or unlicensed HeroUI Pro assets are used in version one. The only backend contact path is an anonymous, message-only Discord webhook endpoint with no visitor registration, reply field, or stored message history.

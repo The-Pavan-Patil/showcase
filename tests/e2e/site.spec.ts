@@ -20,7 +20,7 @@ async function expectLanguageOption(
 ) {
   const isMobile = testInfo.project.name.startsWith("mobile");
   const scope = isMobile
-    ? page.getByRole("dialog")
+    ? page.getByRole("menu")
     : page.getByRole("banner");
 
   if (isMobile) {
@@ -72,6 +72,108 @@ test("homepage skips the terminal launch intro after it has played this session"
 
   await expect(page.getByRole("dialog", { name: "pavanpatil.dev launch" })).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
+});
+
+test("anonymous keyboard messaging sends from the homepage", async ({ page }) => {
+  let postedBody = "";
+
+  await page.route("**/api/message", async (route) => {
+    postedBody = route.request().postData() ?? "";
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ ok: true }),
+    });
+  });
+
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  const quickMessage = page.locator("[data-quick-message-section]");
+  await expect(quickMessage).toBeVisible();
+  expect(
+    await page.evaluate(() => {
+      const about = document.querySelector<HTMLElement>("#about");
+      const message = document.querySelector<HTMLElement>("[data-quick-message-section]");
+      const contact = document.querySelector<HTMLElement>("#contact");
+
+      return Boolean(
+        about &&
+          message &&
+          contact &&
+          about.offsetTop < message.offsetTop &&
+          message.offsetTop < contact.offsetTop,
+      );
+    }),
+  ).toBe(true);
+  await quickMessage.scrollIntoViewIfNeeded();
+  await expect(page.getByText("Anonymous message")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /type something here/i })).toBeVisible();
+
+  const textarea = page.getByRole("textbox", { name: "Message" });
+  await textarea.focus();
+  await page.keyboard.type("hello");
+  await expect(textarea).toHaveValue("hello");
+
+  const keyboardShell = page.locator(".quick-message-keyboard > div");
+  const keyboardBeforePress = await keyboardShell.boundingBox();
+  expect(keyboardBeforePress).not.toBeNull();
+
+  await page.keyboard.down("h");
+  await expect(page.locator('[data-key-code="KeyH"]')).toHaveAttribute("data-pressed", "true");
+  await expect(page.locator("[data-key-preview]").last()).toHaveText("H");
+  const keyboardDuringPress = await keyboardShell.boundingBox();
+  const previewLayer = page.locator("[data-key-preview-layer]");
+  const previewLayerBox = await previewLayer.boundingBox();
+  expect(keyboardDuringPress).not.toBeNull();
+  expect(previewLayerBox).not.toBeNull();
+  expect(keyboardDuringPress?.x).toBeCloseTo(keyboardBeforePress?.x ?? 0, 2);
+  expect(keyboardDuringPress?.y).toBeCloseTo(keyboardBeforePress?.y ?? 0, 2);
+  expect(keyboardDuringPress?.width).toBeCloseTo(keyboardBeforePress?.width ?? 0, 2);
+  expect(keyboardDuringPress?.height).toBeCloseTo(keyboardBeforePress?.height ?? 0, 2);
+  const previewSpacing = await page.evaluate(() => {
+    const shell = document.querySelector<HTMLElement>(".quick-message-keyboard > div");
+    const previewLayer = document.querySelector<HTMLElement>("[data-key-preview-layer]");
+    if (!shell || !previewLayer) return null;
+
+    const shellBox = shell.getBoundingClientRect();
+    const previewLayerBox = previewLayer.getBoundingClientRect();
+    return {
+      gap: shellBox.top - previewLayerBox.bottom,
+      zoom: Number.parseFloat(getComputedStyle(shell).zoom || "1"),
+      previewPaddingTop: getComputedStyle(previewLayer).paddingTop,
+    };
+  });
+  expect(previewSpacing).not.toBeNull();
+  expect(previewSpacing?.gap).toBeCloseTo(8 * (previewSpacing?.zoom ?? 1), 1);
+  expect(previewSpacing?.previewPaddingTop).toBe("8px");
+  await page.keyboard.up("h");
+  await expect(page.locator("[data-key-preview]").last()).toHaveCount(0, { timeout: 1800 });
+
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Thanks. Your message was sent.")).toBeVisible();
+  await expect(textarea).toHaveValue("");
+  expect(JSON.parse(postedBody)).toMatchObject({ message: "helloh", website: "" });
+});
+
+test("anonymous keyboard messaging shows delivery errors", async ({ page }) => {
+  await page.route("**/api/message", async (route) => {
+    await route.fulfill({
+      status: 502,
+      contentType: "application/json",
+      body: JSON.stringify({ error: "failed" }),
+    });
+  });
+
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  const textarea = page.getByRole("textbox", { name: "Message" });
+  await textarea.fill("hello");
+  await page.keyboard.press("Enter");
+
+  await expect(page.getByText("I could not send that message. Please try again.")).toBeVisible();
+  await expect(textarea).toHaveValue("hello");
 });
 
 test("localized homepages render natural Japanese and German copy", async ({ page }, testInfo) => {
@@ -211,7 +313,7 @@ test("mobile bottom navigation and utility controls are keyboard-operable", asyn
   const menu = page.getByRole("button", { name: "Open navigation utilities" });
   await menu.focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("dialog", { name: "Navigation utilities" })).toBeVisible();
+  await expect(page.getByRole("menu", { name: "Navigation utilities" })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(menu).toBeFocused();
 

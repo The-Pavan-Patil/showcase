@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -128,6 +128,32 @@ describe("SiteHeader", () => {
     expect(currentLinks).toHaveLength(2);
   });
 
+  it("scrolls an on-page navigation target to the accent activation line", async () => {
+    const user = userEvent.setup();
+    const accentTarget = document.createElement("span");
+    accentTarget.dataset.scrollAccentAnchor = "experience";
+    vi.spyOn(accentTarget, "getBoundingClientRect").mockReturnValue({
+      x: 20,
+      y: 900,
+      top: 900,
+      right: 28,
+      bottom: 908,
+      left: 20,
+      width: 8,
+      height: 8,
+      toJSON: () => undefined,
+    });
+    document.body.append(accentTarget);
+    Object.defineProperty(window, "innerHeight", { configurable: true, value: 1000 });
+    const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
+
+    renderSiteHeader();
+    await user.click(screen.getAllByRole("link", { name: "Experience" })[0]);
+
+    expect(window.location.hash).toBe("#experience");
+    expect(scrollTo).toHaveBeenCalledWith({ top: 544, behavior: "smooth" });
+  });
+
   it("opens the mobile utility popover and exposes its actions", async () => {
     const user = userEvent.setup();
     renderSiteHeader();
@@ -135,16 +161,18 @@ describe("SiteHeader", () => {
     const trigger = screen.getByRole("button", { name: "Open navigation utilities" });
     await user.click(trigger);
 
-    expect(screen.getByRole("dialog", { name: "Navigation utilities" })).toBeVisible();
+    const menu = screen.getByRole("menu", { name: "Navigation utilities" });
+
+    expect(menu).toBeVisible();
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "Download résumé" })).toHaveAttribute(
       "href",
       "/pavan-patil-resume.txt",
     );
 
-    await user.click(screen.getByRole("button", { name: "Switch to dark theme" }));
+    await user.click(within(menu).getByRole("button", { name: "Switch to dark theme" }));
     expect(testState.setTheme).toHaveBeenCalledWith("dark");
-    expect(screen.queryByRole("dialog", { name: "Navigation utilities" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menu", { name: "Navigation utilities" })).not.toBeInTheDocument();
   });
 
   it("shows only English and Japanese language options, even on German routes", () => {

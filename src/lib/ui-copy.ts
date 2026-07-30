@@ -87,6 +87,26 @@ export type UiCopy = {
     downloadResume: string;
     portraitAria: string;
     portraitAlt: string;
+    quickMessage: {
+      eyebrow: string;
+      title: string;
+      muted: string;
+      description: string;
+      textareaLabel: string;
+      placeholder: string;
+      keyboardAria: string;
+      helper: string;
+      send: string;
+      sending: string;
+      sent: string;
+      emptyError: string;
+      tooLongError: string;
+      rateLimitError: string;
+      deliveryError: string;
+      notConfiguredError: string;
+      honeypotLabel: string;
+      characterCount: string;
+    };
     contactEyebrow: string;
     contactTitle: string;
     contactDescription: string;
@@ -277,6 +297,27 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       downloadResume: "Download résumé",
       portraitAria: "Portrait and profile summary",
       portraitAlt: "Pavan Patil smiling outdoors at night",
+      quickMessage: {
+        eyebrow: "Anonymous message",
+        title: "Type something here",
+        muted: "and press return.",
+        description:
+          "A simple one-way note. No email, no registration, no reply field.",
+        textareaLabel: "Message",
+        placeholder: "Type a quick note...",
+        keyboardAria: "Mechanical keyboard message input",
+        helper: "Press Return to send. The keyboard responds to physical keys too.",
+        send: "Send message",
+        sending: "Sending...",
+        sent: "Thanks. Your message was sent.",
+        emptyError: "Write a message before sending.",
+        tooLongError: "Keep the message under 500 characters.",
+        rateLimitError: "Please wait a little before sending another message.",
+        deliveryError: "I could not send that message. Please try again.",
+        notConfiguredError: "Message delivery is not configured yet.",
+        honeypotLabel: "Website",
+        characterCount: "{count}/500",
+      },
       contactEyebrow: "Let’s build something dependable",
       contactTitle: "Looking for an engineer who can own the details?",
       contactDescription:
@@ -467,6 +508,27 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       downloadResume: "履歴書をダウンロード",
       portraitAria: "写真とプロフィール概要",
       portraitAlt: "夜の屋外で笑っているPavan Patil",
+      quickMessage: {
+        eyebrow: "匿名メッセージ",
+        title: "ここに入力して",
+        muted: "Returnで送信。",
+        description:
+          "シンプルな一方向のメッセージです。メール、登録、返信先は不要です。",
+        textareaLabel: "メッセージ",
+        placeholder: "短いメッセージを入力...",
+        keyboardAria: "メカニカルキーボードのメッセージ入力",
+        helper: "Returnで送信できます。物理キーボードにも反応します。",
+        send: "メッセージを送る",
+        sending: "送信中...",
+        sent: "ありがとうございます。メッセージを送信しました。",
+        emptyError: "送信前にメッセージを入力してください。",
+        tooLongError: "メッセージは500文字以内にしてください。",
+        rateLimitError: "少し待ってから、もう一度送信してください。",
+        deliveryError: "送信できませんでした。もう一度お試しください。",
+        notConfiguredError: "メッセージ送信はまだ設定されていません。",
+        honeypotLabel: "Webサイト",
+        characterCount: "{count}/500",
+      },
       contactEyebrow: "信頼できるものを一緒に作りましょう",
       contactTitle: "細部まで責任を持てるエンジニアをお探しですか？",
       contactDescription:
@@ -657,6 +719,27 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       downloadResume: "Lebenslauf herunterladen",
       portraitAria: "Porträt und Profilübersicht",
       portraitAlt: "Pavan Patil lächelt nachts im Freien",
+      quickMessage: {
+        eyebrow: "Anonyme Nachricht",
+        title: "Schreib etwas hier",
+        muted: "und drück Return.",
+        description:
+          "Eine einfache einseitige Nachricht. Keine E-Mail, keine Registrierung, kein Antwortfeld.",
+        textareaLabel: "Nachricht",
+        placeholder: "Kurze Nachricht schreiben...",
+        keyboardAria: "Mechanische Tastatur zur Nachrichteneingabe",
+        helper: "Return sendet. Die Tastatur reagiert auch auf physische Tasten.",
+        send: "Nachricht senden",
+        sending: "Wird gesendet...",
+        sent: "Danke. Deine Nachricht wurde gesendet.",
+        emptyError: "Schreibe vor dem Senden eine Nachricht.",
+        tooLongError: "Bitte halte die Nachricht unter 500 Zeichen.",
+        rateLimitError: "Bitte warte kurz, bevor du noch eine Nachricht sendest.",
+        deliveryError: "Die Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.",
+        notConfiguredError: "Der Nachrichtenversand ist noch nicht eingerichtet.",
+        honeypotLabel: "Website",
+        characterCount: "{count}/500",
+      },
       contactEyebrow: "Lass uns etwas Verlässliches bauen",
       contactTitle: "Suchen Sie einen Entwickler, der Details wirklich übernimmt?",
       contactDescription:

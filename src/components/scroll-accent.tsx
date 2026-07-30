@@ -34,6 +34,10 @@ function smoothstep(value: number) {
   return progress * progress * (3 - 2 * progress);
 }
 
+export function getScrollAccentActivationY(viewportHeight: number) {
+  return clamp(viewportHeight * 0.38, 180, 360);
+}
+
 function magnetHold(waypoint: ScrollAccentWaypoint) {
   if (!waypoint.magnet) return 0;
   return waypoint.phase === "heading"
@@ -195,7 +199,10 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
     next: ScrollAccentWaypoint,
   ) {
     const gap = Math.max(1, next.y - current.y);
-    const travel = clamp(gap * 0.16, 56, 140);
+    const travel = Math.min(
+      clamp(gap * 0.16, 56, 140),
+      Math.max(1, gap / 2 - 1),
+    );
 
     pushWaypoint({
       id: `${current.id}-global-departure`,
@@ -241,10 +248,20 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
     };
   });
 
+  const firstExperienceMajor = experienceItems.find(
+    (entry) => entry.major,
+  )?.major;
+
+  if (firstExperienceMajor) {
+    pushGlobalBridge(experienceHeadingPoint, firstExperienceMajor);
+  }
+
   experienceItems.forEach((entry, index) => {
     if (!entry.major) return;
 
-    pushWaypoint(entry.major);
+    if (entry.major !== firstExperienceMajor) {
+      pushWaypoint(entry.major);
+    }
 
     if (!entry.minors.length) return;
 
@@ -416,7 +433,7 @@ export function ScrollAccent() {
     root.classList.add("scroll-accent-mounted");
 
     function activationY() {
-      return clamp(window.innerHeight * 0.38, 180, 360);
+      return getScrollAccentActivationY(window.innerHeight);
     }
 
     function render() {

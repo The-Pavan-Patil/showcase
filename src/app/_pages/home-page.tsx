@@ -25,6 +25,7 @@ import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
 import { ProjectCard } from "@/components/project-card";
+import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
@@ -352,6 +353,8 @@ export function HomePage({ locale }: { locale: Locale }) {
             </div>
           </Container>
         </section>
+
+        <QuickMessageSection copy={ui.home.quickMessage} />
 
         <section
           className="contact-section"

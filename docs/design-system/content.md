@@ -115,7 +115,7 @@ Do not imply access to confidential client data, internal screenshots, or busine
 
 ### Contact
 
-Keep the conversion direct: open role context, email address, résumé, GitHub, and LinkedIn. Do not imply a contact backend, guaranteed response time, availability calendar, consultancy offer, or newsletter.
+Keep the conversion direct: open role context, anonymous one-way message, email address, résumé, GitHub, and LinkedIn. The quick message path may send message-only text to a private Discord webhook, but do not imply registration, a reply field, stored history, guaranteed response time, availability calendar, consultancy offer, or newsletter.
 
 ## Capitalization and terminology
 

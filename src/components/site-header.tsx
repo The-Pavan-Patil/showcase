@@ -22,6 +22,7 @@ import {
 } from "react";
 
 import { LanguageToggle } from "@/components/language-toggle";
+import { getScrollAccentActivationY } from "@/components/scroll-accent";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   getHashHref,
@@ -262,6 +263,27 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
       pendingNavigationTimerRef.current = null;
     }, 1200);
     setActiveSelection({ id, pathname });
+
+    if (!isHomePath(pathname, locale)) return;
+
+    const accentTarget = document.querySelector<HTMLElement>(
+      `[data-scroll-accent-anchor="${id}"]`,
+    );
+
+    if (!accentTarget) return;
+
+    event.preventDefault();
+    const bounds = accentTarget.getBoundingClientRect();
+    const targetY = bounds.top + window.scrollY + bounds.height / 2;
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    window.history.pushState(null, "", `#${id}`);
+    window.scrollTo({
+      top: Math.max(0, targetY - getScrollAccentActivationY(window.innerHeight)),
+      behavior: reducedMotion ? "auto" : "smooth",
+    });
   };
 
   useEffect(
