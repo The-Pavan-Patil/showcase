@@ -2,26 +2,25 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowUpRight,
-  Bike,
   Briefcase,
   Braces,
   ChevronUp,
   CloudCog,
   Code2,
   Database,
-  Dumbbell,
   GitBranch,
   Mail,
   MapPin,
   Smartphone,
   Trophy,
   Sparkles,
-  Zap,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
+import { AsciiArt } from "@/components/ascii-art";
+import { CometCard } from "@/components/ui/comet-card";
 import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
 import { ProjectCard } from "@/components/project-card";
@@ -46,9 +45,9 @@ export function HomePage({ locale }: { locale: Locale }) {
     socialLinks,
   } = getPortfolioContent(locale);
   const personalNotes = [
-    { ...ui.home.personalNotes[0], icon: Dumbbell },
-    { ...ui.home.personalNotes[1], icon: Zap },
-    { ...ui.home.personalNotes[2], icon: Bike },
+    { ...ui.home.personalNotes[0], image: "/images/beyond-code/calisthenics.avif" },
+    { ...ui.home.personalNotes[1], image: "/images/beyond-code/horse-riding.avif" },
+    { ...ui.home.personalNotes[2], image: "/images/beyond-code/bike-rides.webp" },
   ];
 
   return (
@@ -317,16 +316,26 @@ export function HomePage({ locale }: { locale: Locale }) {
                 </a>
               </div>
 
-              <aside className="about-portrait" aria-label={ui.home.portraitAria}>
-                <div className="about-photo-frame">
-                  <Image
-                    src="/pavan-profile.jpg"
-                    alt={ui.home.portraitAlt}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 32vw"
-                  />
-                </div>
-              </aside>
+              <CometCard
+                className="about-portrait"
+                rotateDepth={4}
+                translateDepth={4}
+              >
+                <aside className="about-portrait-content" aria-label={ui.home.portraitAria}>
+                  <div className="about-photo-frame">
+                    <Image
+                      src="/pavan-profile.jpg"
+                      alt={ui.home.portraitAlt}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 32vw"
+                    />
+                  </div>
+                  <div className="about-portrait-copy">
+                    <strong>{profile.name}</strong>
+                    <span>{profile.role}</span>
+                  </div>
+                </aside>
+              </CometCard>
 
               <div className="about-beyond">
                 <div>
@@ -335,13 +344,12 @@ export function HomePage({ locale }: { locale: Locale }) {
                 </div>
                 <div className="about-beyond-list" aria-label={ui.home.personalInterestsAria}>
                   {personalNotes.map((item) => {
-                    const Icon = item.icon;
                     return (
                       <div className="about-beyond-item" key={item.label}>
-                        <span className="about-beyond-icon">
-                          <Icon aria-hidden="true" size={16} />
-                        </span>
-                        <div>
+                        <div className="about-beyond-image">
+                          <AsciiArt className="about-beyond-ascii" src={item.image} />
+                        </div>
+                        <div className="about-beyond-item-copy">
                           <strong>{item.label}</strong>
                           <p>{item.text}</p>
                         </div>

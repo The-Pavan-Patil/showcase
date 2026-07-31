@@ -2150,17 +2150,29 @@ a {
   align-items: start;
 }
 .about-portrait {
-  position: sticky;
-  top: 7rem;
+  position: relative;
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
   width: min(100%, 18rem);
   justify-self: end;
+}
+.comet-card {
+  perspective: 1200px;
+}
+.comet-card-surface {
+  position: relative;
+  transform-style: preserve-3d;
+}
+.about-portrait .comet-card-surface {
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
   border-radius: 0.5rem;
   background: color-mix(in srgb, var(--surface) 72%, transparent);
   padding: 0.6rem;
+}
+.about-portrait-content {
+  position: relative;
+  z-index: 2;
 }
 .about-photo-frame {
   position: relative;
@@ -2173,6 +2185,20 @@ a {
   object-fit: cover;
   object-position: 50% 46%;
 }
+.about-portrait-copy {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 0.25rem 0.2rem;
+}
+.about-portrait-copy strong {
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+.about-portrait-copy span {
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
 .about-content {
   grid-column: 1;
   grid-row: 1;
@@ -2180,10 +2206,10 @@ a {
 }
 .about-beyond {
   display: grid;
-  grid-column: 1;
+  grid-column: 1 / -1;
   grid-row: 2;
-  gap: 1.25rem;
-  margin-top: 1.2rem;
+  gap: 1.5rem;
+  margin-top: 2rem;
   border-top: 1px solid var(--border);
   padding-top: 1.5rem;
 }
@@ -2199,26 +2225,40 @@ a {
 .about-beyond-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.8rem;
+  gap: 1rem;
 }
 .about-beyond-item {
-  display: grid;
-  gap: 1rem;
-  align-content: start;
-  min-height: 11rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 29rem;
+  overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 0.5rem;
   background: color-mix(in srgb, var(--surface) 78%, transparent);
-  padding: 1rem;
 }
-.about-beyond-icon {
-  display: grid;
-  place-items: center;
-  width: 2.35rem;
-  height: 2.35rem;
-  border-radius: 0.5rem;
-  background: var(--accent-soft);
-  color: var(--accent);
+.about-beyond-image {
+  position: relative;
+  width: 100%;
+  min-height: 21rem;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-secondary);
+}
+.about-beyond-ascii {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.76;
+  transition: opacity var(--motion-slow) ease, transform var(--motion-slow) ease;
+}
+.about-beyond-item:hover .about-beyond-ascii {
+  opacity: 1;
+  transform: scale(1.025);
+}
+.about-beyond-item-copy {
+  width: 100%;
+  padding: 1.25rem;
 }
 .about-beyond-item strong {
   font-size: 0.82rem;
@@ -3019,11 +3059,13 @@ a {
   .about-portrait {
     display: block;
     width: min(100%, 20rem);
-    padding: 0.65rem;
   }
+  .about-portrait .comet-card-surface { padding: 0.65rem; }
   .about-photo-frame { aspect-ratio: 0.82; }
   .about-beyond { gap: 1.1rem; }
   .about-beyond-list { grid-template-columns: 1fr; }
+  .about-beyond-item { min-height: 26rem; }
+  .about-beyond-image { min-height: 18rem; }
   .about-beyond h3 { max-width: 18ch; }
   .about-content .resume-capsule { margin-bottom: 0; }
   .quick-message-section { padding-bottom: 5rem; scroll-margin-top: 2rem; }
@@ -3135,8 +3177,8 @@ a {
   .quick-message-textarea { min-height: 7.5rem; }
   .quick-message-status { align-items: flex-start; }
   .quick-message-keyboard > div { zoom: 0.72 !important; }
-  .about-beyond-item { min-height: auto; }
-  .about-beyond-icon { width: 1.9rem; height: 1.9rem; }
+  .about-beyond-item { min-height: 24rem; }
+  .about-beyond-image { min-height: 16rem; }
   .project-card-media span { font-size: 0.54rem; }
   .case-media figcaption { position: static; border-width: 1px 0 0; border-radius: 0; background: var(--surface); }
   .case-ordered-list li { grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.65rem; }
