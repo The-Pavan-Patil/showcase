@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   Briefcase,
   Braces,
+  CalendarDays,
   ChevronUp,
   CloudCog,
   Code2,
@@ -22,7 +23,6 @@ import { Container } from "@/components/container";
 import { AsciiArt } from "@/components/ascii-art";
 import { CometCard } from "@/components/ui/comet-card";
 import { JsonLd } from "@/components/json-ld";
-import { GoogleCalendarScheduleButton } from "@/components/google-calendar-schedule-button";
 import { LaunchTerminal } from "@/components/launch-terminal";
 import { ProjectCard } from "@/components/project-card";
 import { QuickMessageSection } from "@/components/quick-message-section";
@@ -382,12 +382,22 @@ export function HomePage({ locale }: { locale: Locale }) {
               </div>
               <div className="contact-actions">
                 {googleCalendarBookingUrl ? (
-                  <GoogleCalendarScheduleButton
-                    bookingUrl={googleCalendarBookingUrl}
-                    fallbackAriaLabel={ui.home.contactScheduleFallbackAria}
-                    helper={ui.home.contactScheduleHelper}
-                    label={ui.home.contactScheduleLabel}
-                  />
+                  <div className="schedule-call">
+                    <p className="schedule-call-helper">
+                      {ui.home.contactScheduleHelper}
+                    </p>
+                    <a
+                      className="schedule-call-link"
+                      href={googleCalendarBookingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={ui.home.contactScheduleFallbackAria}
+                    >
+                      <CalendarDays aria-hidden="true" size={18} />
+                      <span>{ui.home.contactScheduleLabel}</span>
+                      <ArrowUpRight aria-hidden="true" size={16} />
+                    </a>
+                  </div>
                 ) : null}
                 <a className="contact-email" href={`mailto:${profile.email}`}>
                   <Mail aria-hidden="true" size={18} />

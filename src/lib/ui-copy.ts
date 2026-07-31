@@ -325,10 +325,10 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       contactTitle: "Looking for an engineer who can own the details?",
       contactDescription:
         "I’m open to software engineering roles across product, platform, web, and mobile teams.",
-      contactScheduleLabel: "Schedule a 20-minute intro",
+      contactScheduleLabel: "Schedule a 30-minute quick chat",
       contactScheduleHelper: "Google Meet · Times shown in your timezone",
       contactScheduleFallbackAria:
-        "Open Google Calendar to schedule a 20-minute intro (opens in a new tab)",
+        "Open Google Calendar to schedule a 30-minute quick chat (opens in a new tab)",
     },
     projectCard: {
       technologiesAria: "{title} technologies",
@@ -540,10 +540,10 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       contactTitle: "細部まで責任を持てるエンジニアをお探しですか？",
       contactDescription:
         "プロダクト、プラットフォーム、Web、モバイルのチームで、ソフトウェアエンジニアの仕事を探しています。",
-      contactScheduleLabel: "20分の面談を予約",
+      contactScheduleLabel: "30分のクイックチャットを予約",
       contactScheduleHelper: "Google Meet · お使いのタイムゾーンで表示",
       contactScheduleFallbackAria:
-        "Google Calendarで20分の面談を予約する（新しいタブで開きます）",
+        "Google Calendarで30分のクイックチャットを予約する（新しいタブで開きます）",
     },
     projectCard: {
       technologiesAria: "{title} の技術",
@@ -755,10 +755,10 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       contactTitle: "Suchen Sie einen Entwickler, der Details wirklich übernimmt?",
       contactDescription:
         "Ich bin offen für Softwareentwickler-Rollen in Produkt-, Plattform-, Web- und Mobile-Teams.",
-      contactScheduleLabel: "20-minütiges Kennenlernen buchen",
+      contactScheduleLabel: "30-minütigen kurzen Austausch buchen",
       contactScheduleHelper: "Google Meet · Zeiten in Ihrer Zeitzone",
       contactScheduleFallbackAria:
-        "Google Calendar öffnen, um ein 20-minütiges Kennenlernen zu buchen (öffnet in einem neuen Tab)",
+        "Google Calendar öffnen, um einen 30-minütigen kurzen Austausch zu buchen (öffnet in einem neuen Tab)",
     },
     projectCard: {
       technologiesAria: "{title} Technologien",
