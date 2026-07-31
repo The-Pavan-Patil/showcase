@@ -22,6 +22,7 @@ import { Container } from "@/components/container";
 import { AsciiArt } from "@/components/ascii-art";
 import { CometCard } from "@/components/ui/comet-card";
 import { JsonLd } from "@/components/json-ld";
+import { GoogleCalendarScheduleButton } from "@/components/google-calendar-schedule-button";
 import { LaunchTerminal } from "@/components/launch-terminal";
 import { ProjectCard } from "@/components/project-card";
 import { QuickMessageSection } from "@/components/quick-message-section";
@@ -31,10 +32,12 @@ import { SiteFooter } from "@/components/site-footer";
 import { getHashHref, type Locale } from "@/lib/i18n";
 import { getPortfolioContent } from "@/lib/portfolio";
 import { getSiteUrl } from "@/lib/site";
+import { getGoogleCalendarBookingUrl } from "@/lib/scheduling";
 import { formatCopy, uiCopyByLocale } from "@/lib/ui-copy";
 
 export function HomePage({ locale }: { locale: Locale }) {
   const siteUrl = getSiteUrl();
+  const googleCalendarBookingUrl = getGoogleCalendarBookingUrl();
   const ui = uiCopyByLocale[locale];
   const {
     experience,
@@ -378,6 +381,14 @@ export function HomePage({ locale }: { locale: Locale }) {
                 <p>{ui.home.contactDescription}</p>
               </div>
               <div className="contact-actions">
+                {googleCalendarBookingUrl ? (
+                  <GoogleCalendarScheduleButton
+                    bookingUrl={googleCalendarBookingUrl}
+                    fallbackAriaLabel={ui.home.contactScheduleFallbackAria}
+                    helper={ui.home.contactScheduleHelper}
+                    label={ui.home.contactScheduleLabel}
+                  />
+                ) : null}
                 <a className="contact-email" href={`mailto:${profile.email}`}>
                   <Mail aria-hidden="true" size={18} />
                   {profile.email}

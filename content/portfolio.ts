@@ -691,7 +691,7 @@ export const portfolioContent: PortfolioContent = {
         {
           client: "Vendaka Pvt. Ltd.",
           project: "Nudge - Social Task Collaboration Platform",
-          logoUrl: "https://ui-avatars.com/api/?name=Nudge&background=0d7377&color=fff&size=256",
+          logoUrl: "/images/companies/nudge.png",
           description:
             "Developed a cross-platform social collaboration app with PowerSync offline-first architecture, Supabase PostgreSQL synchronization, real-time task collaboration, notifications, and end-to-end client communication.",
           technologies: ["React Native", "PowerSync", "Supabase", "PostgreSQL"],
@@ -703,7 +703,7 @@ export const portfolioContent: PortfolioContent = {
       role: "Full Stack Developer",
       period: "Feb 2025 - Oct 2025",
       location: "Pune",
-      logoUrl: "https://ui-avatars.com/api/?name=Sonai&background=18181b&color=fff&size=256",
+      logoUrl: "/images/companies/sonai-engineering.svg",
       description:
         "Built and maintained a workforce management platform for an MEP firm, supporting worker records, attendance, payroll automation, REST APIs, and secure AWS deployment.",
       technologies: ["React.js", "TypeScript", "Node.js", "MongoDB", "AWS"],
@@ -711,7 +711,7 @@ export const portfolioContent: PortfolioContent = {
         {
           client: "Sonai Engineering & Services",
           project: "Workforce Management Platform",
-          logoUrl: "https://ui-avatars.com/api/?name=Sonai&background=18181b&color=fff&size=256",
+          logoUrl: "/images/companies/sonai-engineering.svg",
           description:
             "Enabled tracking of 1,000+ worker records across multiple construction sites, configurable overtime payroll calculations, Excel exports, attendance workflows, authentication middleware, and REST APIs for labor, site, and portfolio management.",
           technologies: ["React.js", "TypeScript", "Node.js", "MongoDB", "AWS"],
@@ -723,7 +723,7 @@ export const portfolioContent: PortfolioContent = {
       role: "Project Intern",
       period: "Feb 2024 - Apr 2024",
       location: "Pune",
-      logoUrl: "https://ui-avatars.com/api/?name=DRDO&background=0d7377&color=fff&size=256",
+      logoUrl: "/images/companies/drdo.png",
       description:
         "Developed backend systems and APIs for real-time LiDAR object-detection workflows, connecting Python data pipelines with Node.js services and WebGL/Three.js visualization systems.",
       technologies: ["Express.js", "Node.js", "Python", "Ouster SDK", "Three.js"],
@@ -731,7 +731,7 @@ export const portfolioContent: PortfolioContent = {
         {
           client: "DRDO",
           project: "LiDAR Object Detection Backend",
-          logoUrl: "https://ui-avatars.com/api/?name=DRDO&background=0d7377&color=fff&size=256",
+          logoUrl: "/images/companies/drdo.png",
           description:
             "Deployed LiDAR object-detection models behind an Express.js service, processed 10GB+ of point-cloud data daily, served detection results to 3D visualization systems, and reduced Python-to-Node data-transfer latency by 30%.",
           technologies: ["Express.js", "Python", "Ouster SDK", "WebGL", "Three.js"],

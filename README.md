@@ -31,6 +31,8 @@ Open [http://localhost:3000](http://localhost:3000).
 
 `NEXT_PUBLIC_SITE_URL` must be the canonical production origin, without a trailing slash. Vercel's production URL is used automatically when that variable is absent.
 
+`NEXT_PUBLIC_GOOGLE_CALENDAR_SCHEDULING_URL` enables the contact card's Google Calendar popup. In Google Calendar, open the appointment schedule's **Sharing options**, choose **Website embed**, **A single booking page**, then **Button with popup**, and copy the generated URL. The scheduling action stays hidden when this variable is missing or invalid, leaving email as the primary contact path.
+
 `DISCORD_WEBHOOK_URL` must be set for the anonymous keyboard message section to deliver visitor notes to Discord. The webhook stays server-only and is not exposed to the browser.
 
 Validate the local Discord webhook configuration with:

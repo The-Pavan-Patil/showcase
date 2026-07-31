@@ -1865,8 +1865,9 @@ a {
 
 .experience-logo img,
 .client-project-logo img {
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
+  padding: 0.15rem;
 }
 
 .experience-role {
@@ -2456,11 +2457,19 @@ a {
 .contact-card h2 { max-width: 16ch; font-size: clamp(2.3rem, 4.8vw, 3.7rem); }
 .contact-card > div:first-child > p:last-child { max-width: 38rem; margin-top: 1.2rem; color: color-mix(in srgb, var(--background) 62%, transparent); font-size: 0.9rem; line-height: 1.65; }
 .contact-actions { display: flex; flex-direction: column; align-items: stretch; gap: 0.75rem; }
+.schedule-call { display: grid; gap: 0.55rem; }
+.schedule-call-helper { margin: 0; color: color-mix(in srgb, var(--background) 64%, transparent); font-size: 0.68rem; font-weight: 650; line-height: 1.45; }
+.google-calendar-schedule { min-height: 3rem; }
+.google-calendar-schedule-target { width: 100%; }
+.google-calendar-schedule-target > * { width: 100% !important; }
+.schedule-call-fallback { display: flex; align-items: center; gap: 0.6rem; min-height: 3rem; border-radius: 999px; background: #0d7377; color: #fff; padding: 0.9rem 1rem; font-size: 0.76rem; font-weight: 750; transition: background var(--motion-fast) ease, transform var(--motion-fast) ease; }
+.schedule-call-fallback span { flex: 1; }
+.schedule-call-fallback:hover { background: #0a5c5f; }
 .contact-email { display: flex; align-items: center; gap: 0.6rem; border-radius: 999px; background: var(--background); color: var(--foreground); padding: 0.9rem 1rem; font-size: 0.76rem; font-weight: 750; }
 .social-row { display: flex; gap: 0.55rem; }
 .social-row a { display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; flex: 1; border: 1px solid color-mix(in srgb, var(--background) 18%, transparent); border-radius: 999px; padding: 0.72rem; color: color-mix(in srgb, var(--background) 72%, transparent); font-size: 0.7rem; font-weight: 700; transition: border-color 150ms ease, color 150ms ease, transform 150ms ease; }
 .social-row a:hover { border-color: color-mix(in srgb, var(--background) 42%, transparent); color: var(--background); }
-.social-row a:active, .contact-email:active { transform: scale(0.98); }
+.social-row a:active, .contact-email:active, .schedule-call-fallback:active { transform: scale(0.98); }
 
 .site-footer {
   border-top: 1px solid var(--border);
@@ -3076,7 +3085,7 @@ a {
   .quick-message-keyboard { margin-inline: 0; }
   .contact-section { padding-bottom: 4rem; scroll-margin-top: 2rem; }
   .contact-card { grid-template-columns: 1fr; gap: 2rem; border-radius: var(--radius-feature); }
-  .contact-email { font-size: 0.66rem; }
+  .contact-email, .schedule-call-fallback { font-size: 0.66rem; }
   .footer-top { align-items: start; }
   .site-footer ul { flex-wrap: wrap; justify-content: flex-end; gap: 0.8rem 1rem; }
   .footer-bottom { display: grid; }
@@ -3173,7 +3182,7 @@ a {
   .ops-main { padding: 0.55rem; }
   .ops-stats > div { padding: 0.4rem; }
   .ops-table > div { font-size: 0.42rem; }
-  .contact-email { overflow-wrap: anywhere; border-radius: 1rem; }
+  .contact-email, .schedule-call-fallback { overflow-wrap: anywhere; border-radius: 1rem; }
   .quick-message-textarea { min-height: 7.5rem; }
   .quick-message-status { align-items: flex-start; }
   .quick-message-keyboard > div { zoom: 0.72 !important; }
