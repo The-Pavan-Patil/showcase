@@ -58,7 +58,7 @@ Playwright browser binaries must be available in the local or CI environment bef
 
 ## Content model
 
-Editable portfolio content lives in `content/portfolio.ts`. Project cards, case-study routes, metadata, and structured data consume the same typed records through `src/lib/portfolio.ts` so verified facts cannot drift between views.
+Editable homepage content lives in `src/app/_pages/home/_data/`; individual case-study records and their translations live in `src/app/_pages/work/_data/case-studies/`. Project cards, case-study routes, metadata, and structured data consume the same typed records through `src/lib/portfolio.ts` so verified facts cannot drift between views.
 
 Use `content/README.md` for the edit checklist and `docs/design-system/content.md` for voice, evidence, and claim rules.
 

@@ -24,7 +24,7 @@ import { AsciiArt } from "@/components/ascii-art";
 import { CometCard } from "@/components/ui/comet-card";
 import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
-import { ProjectCard } from "@/components/project-card";
+import { ProjectCard } from "./_components/project-card";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";

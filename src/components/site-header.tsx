@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   ArrowUpRight,
   BriefcaseBusiness,
   FileDown,
@@ -58,6 +59,8 @@ type BubbleMetrics = {
 export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
   const pathname = usePathname();
   const homeHref = getHomePath(locale);
+  const isCaseStudy = isWorkPath(pathname);
+  const brandHref = isCaseStudy ? getHashHref(locale, "#work") : homeHref;
   const localizedNavigation = navigation.map((item) => ({
     ...item,
     href: getHashHref(locale, `#${item.id}`),
@@ -434,8 +437,14 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
       onFocusCapture={() => setCompactPathname(null)}
     >
       <div className="site-header-shell">
-        <Link className="brand-link" href={homeHref} aria-label={copy.brandAria}>
-          <span className="brand-mark" aria-hidden="true">P</span>
+        <Link
+          className={`brand-link${isCaseStudy ? " is-back" : ""}`}
+          href={brandHref}
+          aria-label={isCaseStudy ? copy.backToSelectedWork : copy.brandAria}
+        >
+          <span className="brand-mark" aria-hidden="true">
+            {isCaseStudy ? <ArrowLeft size={16} strokeWidth={2.2} /> : "P"}
+          </span>
           <span className="brand-name">Pavan Patil</span>
         </Link>
 

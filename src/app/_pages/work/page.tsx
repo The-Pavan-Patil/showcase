@@ -1,5 +1,4 @@
-import { Chip } from "@heroui/react";
-import { ArrowLeft, ArrowRight, CheckCircle2, Quote, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, Quote, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,9 +8,10 @@ import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { ProjectVisual } from "@/components/project-visual";
 import { SiteFooter } from "@/components/site-footer";
+import { ArticleMap } from "./_components/article-map";
+import { WorkTechnologyChip } from "./_components/work-technology-chip";
 import {
   getAlternateLanguages,
-  getHashHref,
   getWorkPath,
   type Locale,
 } from "@/lib/i18n";
@@ -118,11 +118,6 @@ export function WorkPage({
       <main id="main-content" className="case-study-main">
         <section className="case-hero" aria-labelledby="case-title">
           <Container>
-            <Link className="back-link" href={getHashHref(locale, "#work")}>
-              <ArrowLeft aria-hidden="true" size={16} />
-              {ui.work.selectedWork}
-            </Link>
-
             <div className="case-hero-grid">
               <div className="case-hero-copy">
                 <p className="eyebrow">{project.kicker}</p>
@@ -134,9 +129,7 @@ export function WorkPage({
                   aria-label={formatCopy(ui.work.technologiesAria, { title: project.title })}
                 >
                   {project.technologies.map((technology) => (
-                    <Chip key={technology} variant="secondary">
-                      {technology}
-                    </Chip>
+                    <WorkTechnologyChip key={technology} label={technology} />
                   ))}
                 </div>
               </div>
@@ -203,19 +196,6 @@ export function WorkPage({
           aria-label={formatCopy(ui.work.articleAria, { title: project.title })}
         >
           <Container className="case-longform-grid">
-            <aside className="case-toc">
-              <p className="eyebrow">{ui.work.articleMap}</p>
-              <nav aria-label={formatCopy(ui.work.sectionsNavigationAria, { title: project.title })}>
-                <ol>
-                  {article.sections.map((section) => (
-                    <li key={section.id}>
-                      <a href={`#${section.id}`}>{section.title}</a>
-                    </li>
-                  ))}
-                </ol>
-              </nav>
-            </aside>
-
             <article className="case-article">
               {article.sections.map((section, index) => (
                 <CaseArticleSection key={section.id} section={section} index={index} />
@@ -228,6 +208,16 @@ export function WorkPage({
                 </blockquote>
               ) : null}
             </article>
+
+            <ArticleMap
+              heading={ui.work.articleMap}
+              navigationLabel={formatCopy(ui.work.sectionsNavigationAria, { title: project.title })}
+              sections={article.sections.map((section) => ({
+                id: section.id,
+                title: section.title,
+                preview: getArticleMapPreview(section),
+              }))}
+            />
           </Container>
         </section>
 
@@ -300,6 +290,15 @@ function getCaseStudyArticle(
       ],
     }
   );
+}
+
+function getArticleMapPreview(section: CaseStudySection) {
+  const block = section.blocks[0] ?? section.subsections?.[0]?.blocks[0];
+
+  if (!block) return section.title;
+  if (block.type === "paragraph" || block.type === "quote") return block.text;
+  if (block.type === "callout") return block.text;
+  return block.items[0] ?? section.title;
 }
 
 function CaseArticleSection({

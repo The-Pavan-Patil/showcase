@@ -1,17 +1,15 @@
 # Portfolio Content
 
-Most website text and repeatable content lives in `portfolio.ts`.
+Page content is colocated with its page implementation under `src/app/_pages/`.
 
 Edit this folder when you need to change:
 
-- hero/profile copy;
-- email and social links;
-- homepage proof metrics;
-- selected work and case studies;
-- experience entries and client projects;
-- skill groups.
+- homepage content: `src/app/_pages/home/_data/content.ts`;
+- homepage localized content: `src/app/_pages/home/_data/locales.ts`;
+- individual case studies: `src/app/_pages/work/_data/case-studies/`;
+- case-study translations: `src/app/_pages/work/_data/case-studies/locales.ts`.
 
-The app imports this content through `src/lib/portfolio.ts`, so cards, case-study pages, metadata, and structured data stay in sync.
+`portfolio.ts` and `portfolio-locales.ts` are lightweight compatibility entrypoints. The app imports through `src/lib/portfolio.ts`, so cards, case-study pages, metadata, and structured data stay in sync.
 
 After editing content, run:
 

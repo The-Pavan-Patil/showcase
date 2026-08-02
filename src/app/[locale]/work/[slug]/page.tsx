@@ -4,7 +4,7 @@ import {
   WorkPage,
   generateWorkMetadata,
   getWorkStaticParams,
-} from "@/app/_pages/work-page";
+} from "@/app/_pages/work/page";
 import { isPrefixedLocale, prefixedLocales } from "@/lib/i18n";
 
 type LocalizedWorkPageProps = { params: Promise<{ locale: string; slug: string }> };

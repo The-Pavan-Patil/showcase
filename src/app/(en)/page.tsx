@@ -1,4 +1,4 @@
-import { HomePage } from "@/app/_pages/home-page";
+import { HomePage } from "@/app/_pages/home/page";
 import { getHomeMetadata } from "@/lib/metadata";
 
 export const metadata = getHomeMetadata("en");

@@ -15,6 +15,7 @@ export type UiCopy = {
   header: {
     skipToMain: string;
     brandAria: string;
+    backToSelectedWork: string;
     primaryNavigationAria: string;
     navigation: {
       work: string;
@@ -212,6 +213,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     header: {
       skipToMain: "Skip to main content",
       brandAria: "Pavan Patil, home",
+      backToSelectedWork: "Back to selected work",
       primaryNavigationAria: "Primary navigation",
       navigation: {
         work: "Work",
@@ -427,6 +429,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     header: {
       skipToMain: "本文へ移動",
       brandAria: "Pavan Patil、ホーム",
+      backToSelectedWork: "主な実績に戻る",
       primaryNavigationAria: "メインナビゲーション",
       navigation: {
         work: "実績",
@@ -642,6 +645,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     header: {
       skipToMain: "Zum Hauptinhalt springen",
       brandAria: "Pavan Patil, Startseite",
+      backToSelectedWork: "Zurück zu ausgewählten Arbeiten",
       primaryNavigationAria: "Hauptnavigation",
       navigation: {
         work: "Arbeit",

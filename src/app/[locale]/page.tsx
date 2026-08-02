@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { HomePage } from "@/app/_pages/home-page";
+import { HomePage } from "@/app/_pages/home/page";
 import { isPrefixedLocale, prefixedLocales } from "@/lib/i18n";
 import { getHomeMetadata } from "@/lib/metadata";
 

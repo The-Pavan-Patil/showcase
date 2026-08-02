@@ -2,7 +2,7 @@ import {
   WorkPage,
   generateWorkMetadata,
   getWorkStaticParams,
-} from "@/app/_pages/work-page";
+} from "@/app/_pages/work/page";
 
 type WorkPageProps = { params: Promise<{ slug: string }> };
 

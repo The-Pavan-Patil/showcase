@@ -128,6 +128,16 @@ describe("SiteHeader", () => {
     expect(currentLinks).toHaveLength(2);
   });
 
+  it("turns the brand mark into a back control on case-study routes", () => {
+    testState.pathname = "/work/nudge";
+    renderSiteHeader();
+
+    const backLink = screen.getByRole("link", { name: "Back to selected work" });
+    expect(backLink).toHaveAttribute("href", "/#work");
+    expect(backLink).toHaveClass("is-back");
+    expect(within(backLink).getByText("Pavan Patil")).toBeVisible();
+  });
+
   it("scrolls an on-page navigation target to the accent activation line", async () => {
     const user = userEvent.setup();
     const accentTarget = document.createElement("span");

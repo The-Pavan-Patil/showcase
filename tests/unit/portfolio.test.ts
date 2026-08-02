@@ -43,25 +43,22 @@ describe("portfolio content", () => {
     expect(getNextProject("workforce-management-system").slug).toBe("nudge");
   });
 
-  it("publishes the detailed Nudge case study material", () => {
+  it("publishes a concise, evidence-led Nudge case study", () => {
     const nudge = getProjectBySlug("nudge");
     expect(nudge?.media?.src).toBe("/nudge-case-study.png");
     expect(nudge?.caseStudy?.sections.map((section) => section.id)).toEqual([
       "overview",
-      "context",
-      "challenge",
-      "product-surface",
-      "approach",
-      "architectural-adaptation",
+      "problem",
+      "local-first-sync",
+      "relationship-boundary",
       "access-control",
       "collaboration-model",
-      "data-model",
       "role-aware-gestures",
-      "debugging-tooling",
-      "what-shipped",
-      "development-principle",
-      "why-this-work-matters",
+      "debugging-and-delivery",
+      "principle",
     ]);
+    expect(nudge?.caseStudy?.sections.every((section) => section.blocks.length > 0)).toBe(true);
+    expect(JSON.stringify(nudge?.caseStudy)).not.toContain('"type":"list"');
     expect(JSON.stringify(nudge?.caseStudy)).toContain("Row Level Security");
     expect(JSON.stringify(nudge?.caseStudy)).toContain("PowerSync handled local task data and replication");
   });
