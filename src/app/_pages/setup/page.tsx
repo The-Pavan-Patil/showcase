@@ -7,8 +7,6 @@ import {
   Laptop,
   Monitor,
   Network,
-  Quote,
-  ShieldAlert,
   Workflow,
 } from "lucide-react";
 import Link from "next/link";

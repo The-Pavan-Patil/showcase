@@ -1,13 +1,18 @@
 import {
   Activity,
   Bell,
+  BookOpenText,
+  Brain,
+  CalendarCheck2,
   Check,
   Cloud,
   Database,
   FileSpreadsheet,
   Globe2,
   Languages,
+  Layers3,
   Radio,
+  RotateCcw,
   Users,
 } from "lucide-react";
 
@@ -35,6 +40,7 @@ export function ProjectVisual({
       {type === "sync" ? <SyncVisual copy={copy.sync} /> : null}
       {type === "web" ? <WebVisual copy={copy.web} /> : null}
       {type === "operations" ? <OperationsVisual copy={copy.operations} /> : null}
+      {type === "learning" ? <LearningVisual copy={copy.learning} /> : null}
     </div>
   );
 }
@@ -118,6 +124,49 @@ function OperationsVisual({ copy }: { copy: UiCopy["projectVisual"]["operations"
           <div><span>{copy.overtime}</span><span>{copy.rules}</span><em>{copy.configured}</em></div>
           <div><span>{copy.payroll}</span><span>{copy.excel}</span><em>{copy.exportable}</em></div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function LearningVisual({ copy }: { copy: UiCopy["projectVisual"]["learning"] }) {
+  return (
+    <div className="learning-frame" aria-hidden="true">
+      <div className="visual-topline">
+        <span><BookOpenText size={13} /> {copy.deck}</span>
+        <span className="status-dot">{copy.due}</span>
+      </div>
+      <div className="learning-body">
+        <section className="learning-card">
+          <span>{copy.word}</span>
+          <strong>{copy.meaning}</strong>
+          <div className="learning-actions">
+            <em>{copy.remember}</em>
+            <em>{copy.gotIt}</em>
+            <em>{copy.forgot}</em>
+          </div>
+        </section>
+        <section className="learning-stack">
+          <div>
+            <Layers3 size={15} />
+            <span>{copy.smartKanji}</span>
+            <strong>{copy.reading}</strong>
+          </div>
+          <div>
+            <Brain size={15} />
+            <span>SM-2</span>
+            <strong>{copy.protected}</strong>
+          </div>
+          <div>
+            <RotateCcw size={15} />
+            <span>{copy.queue}</span>
+            <strong>FIFO</strong>
+          </div>
+        </section>
+      </div>
+      <div className="learning-timeline">
+        <CalendarCheck2 size={14} />
+        <i /><i /><i /><i />
       </div>
     </div>
   );

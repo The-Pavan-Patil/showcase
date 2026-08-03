@@ -52,6 +52,9 @@ export function HomePage({ locale }: { locale: Locale }) {
     { ...ui.home.personalNotes[1], image: "/images/beyond-code/horse-riding.avif" },
     { ...ui.home.personalNotes[2], image: "/images/beyond-code/bike-rides.webp" },
   ];
+  const homepageProjects = projects.filter(
+    (project) => project.slug !== "workforce-management-system",
+  );
 
   return (
     <>
@@ -167,7 +170,7 @@ export function HomePage({ locale }: { locale: Locale }) {
               <span className="section-count">{ui.home.workCount}</span>
             </div>
             <div className="project-grid">
-              {projects.map((project, index) => (
+              {homepageProjects.map((project, index) => (
                 <ProjectCard
                   copy={ui.projectCard}
                   key={project.slug}

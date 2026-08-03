@@ -157,6 +157,19 @@ export type UiCopy = {
       exportable: string;
       tracked: string;
     };
+    learning: {
+      deck: string;
+      due: string;
+      word: string;
+      meaning: string;
+      smartKanji: string;
+      reading: string;
+      remember: string;
+      gotIt: string;
+      forgot: string;
+      queue: string;
+      protected: string;
+    };
   };
   work: {
     selectedWork: string;
@@ -269,7 +282,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       workTitle: "Built for real constraints.",
       workMuted: "Designed to hold up.",
       workDescription:
-        "Three products that show how I approach synchronization, multilingual experiences, operational workflows, and reliable delivery.",
+        "Three products that show how I approach learning systems, synchronization, multilingual experiences, and reliable delivery.",
       workCount: "03 case studies",
       experienceEyebrow: "Experience",
       experienceTitle: "Product delivery,",
@@ -373,6 +386,19 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         excel: "Excel",
         exportable: "Exportable",
         tracked: "Tracked",
+      },
+      learning: {
+        deck: "Study deck",
+        due: "Due today",
+        word: "食事",
+        meaning: "meal",
+        smartKanji: "Smart Kanji",
+        reading: "食 · しょく",
+        remember: "I remember",
+        gotIt: "Got it",
+        forgot: "Forgot",
+        queue: "Review queue",
+        protected: "schedule preserved",
       },
     },
     work: {
@@ -485,7 +511,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       workTitle: "現場の制約に向き合って作りました。",
       workMuted: "長く使えることを大切に。",
       workDescription:
-        "同期、多言語体験、業務フロー、安定したリリースにどう取り組んだかを示す3つのプロダクトです。",
+        "学習システム、同期、多言語体験、安定したリリースにどう取り組んだかを示す3つのプロダクトです。",
       workCount: "03 ケーススタディ",
       experienceEyebrow: "経験",
       experienceTitle: "プロダクト開発を、",
@@ -589,6 +615,19 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         excel: "Excel",
         exportable: "出力可",
         tracked: "記録中",
+      },
+      learning: {
+        deck: "学習デッキ",
+        due: "今日の復習",
+        word: "食事",
+        meaning: "食事",
+        smartKanji: "Smart Kanji",
+        reading: "食 · しょく",
+        remember: "覚えた",
+        gotIt: "できた",
+        forgot: "忘れた",
+        queue: "復習キュー",
+        protected: "予定を保持",
       },
     },
     work: {
@@ -701,7 +740,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       workTitle: "Gebaut für reale Anforderungen.",
       workMuted: "Entwickelt, um stabil zu bleiben.",
       workDescription:
-        "Drei Produkte, die zeigen, wie ich Synchronisierung, mehrsprachige Erlebnisse, operative Workflows und zuverlässige Lieferung angehe.",
+        "Drei Produkte, die zeigen, wie ich Lernsysteme, Synchronisierung, mehrsprachige Erlebnisse und zuverlässige Lieferung angehe.",
       workCount: "03 Fallstudien",
       experienceEyebrow: "Erfahrung",
       experienceTitle: "Produktlieferung,",
@@ -805,6 +844,19 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         excel: "Excel",
         exportable: "Exportierbar",
         tracked: "Erfasst",
+      },
+      learning: {
+        deck: "Lerndeck",
+        due: "Heute fällig",
+        word: "食事",
+        meaning: "Mahlzeit",
+        smartKanji: "Smart Kanji",
+        reading: "食 · しょく",
+        remember: "Ich weiss es",
+        gotIt: "Verstanden",
+        forgot: "Vergessen",
+        queue: "Review-Queue",
+        protected: "Zeitplan bleibt",
       },
     },
     work: {

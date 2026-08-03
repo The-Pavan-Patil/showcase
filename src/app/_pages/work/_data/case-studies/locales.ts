@@ -22,6 +22,33 @@ type ProjectTranslation = Pick<
 };
 
 export const jaProjectTranslations: Record<string, ProjectTranslation> = {
+  "mainichi-koto": {
+    kicker: "日本語学習プロダクト",
+    cardHeadline: "実際に読む言葉から漢字を学ぶためのプロダクト。",
+    summary:
+      "Mainichi kotoは、学習者自身の日本語語彙を、単語、文脈の中の漢字、間隔反復の複数の練習に変えるプロダクトです。各カードの進捗も保ちます。",
+    role: "個人開発者",
+    experienceContext: "個人プロダクト · 2026年6月 - 7月",
+    challenge:
+      "学習者が自分の読みたい語彙を無料で学べるようにしながら、単語の意味、単語全体の読み、文脈内の漢字読みを別々の記憶として扱う必要がありました。",
+    approach:
+      "単語を情報源にして、そこから複数の学習カードを生成し、それぞれに独立した間隔反復スケジュールを持たせました。楽観的なレビューキューと原子的な保存も組み合わせました。",
+    outcome:
+      "公開済みプロダクトとして、非公開のユーザー語彙、単語、Word Kanji、Smart Kanji、一覧、インポート、進捗を守るカード更新、再試行できるレビュー保存を実装しました。",
+    contributions: [
+      "学習モデルを調査し、単語、Word Kanji、Smart Kanji、All Kanjisの学習単位に整理しました。",
+      "単語編集や漢字選択の変更でも進捗が消えない、文脈内漢字カードの永続的なIDを設計しました。",
+      "Supabase Auth、Postgres、Row Level Security、漢字メタデータ、復習スケジューラー、デプロイまで実装しました。",
+      "FIFOアウトボックス、冪等なレビューID、古い状態の保護、再試行処理を備えた即時グレーディングを実装しました。",
+    ],
+    metrics: [
+      { value: "3 modes", label: "単語、単語漢字、文脈内漢字の復習" },
+      { value: "72 tests", label: "スケジューラーとプロダクトの保証" },
+      { value: "Public", label: "ユーザーごとの非公開語彙つき公開プロダクト" },
+    ],
+    visualLabel:
+      "語彙カード、文脈内漢字、間隔反復、永続的なレビューキューを示すMainichi kotoの学習システム",
+  },
   nudge: {
     kicker: "オフライン優先のソーシャルタスク",
     cardHeadline:
@@ -107,6 +134,33 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
 };
 
 export const deProjectTranslations: Record<string, ProjectTranslation> = {
+  "mainichi-koto": {
+    kicker: "Japanisch-Lernprodukt",
+    cardHeadline: "Kanji über die Wörter lernen, die man wirklich liest.",
+    summary:
+      "Mainichi koto verwandelt den eigenen japanischen Wortschatz in mehrere Arten von Abruftraining: ganze Wörter, Kanji im Kontext und verteilte Wiederholung, ohne den Fortschritt einzelner Karten zu verlieren.",
+    role: "Alleiniger Entwickler",
+    experienceContext: "Eigenes Produkt · Juni-Juli 2026",
+    challenge:
+      "Lernende brauchten eine kostenlose Möglichkeit, die Wörter zu lernen, die sie selbst lesen möchten, während Wortbedeutung, Ganzwort-Lesung und Kanji-im-Kontext als getrennte Erinnerungen geplant werden.",
+    approach:
+      "Ich machte das Wort zur Quelle der Wahrheit, leitete mehrere Lernidentitäten daraus ab und gab jeder Identität einen eigenen langlebigen Wiederholungsplan mit optimistischer Review-Queue und atomarem Speichern.",
+    outcome:
+      "Das Produkt ist öffentlich bereitgestellt, mit privaten Nutzerkonten, Wort-, Word-Kanji-, Smart-Kanji-, Listen- und Import-Flows, haltbarer Kartenabstimmung, wiederholbaren Review-Commits und 72 Tests als Qualitätsbasis.",
+    contributions: [
+      "Das Lernmodell recherchiert und in Wort-, Word-Kanji-, Smart-Kanji- und All-Kanjis-Identitäten übersetzt.",
+      "Eine langlebige Identität für Kanji-im-Wort-Karten entworfen, damit Fortschritt bei Wortänderungen und Auswahländerungen erhalten bleibt.",
+      "Das Full-Stack-Produkt mit Supabase Auth, Postgres, Row Level Security, Kanji-Metadaten, Review-Scheduling und Deployment gebaut.",
+      "Optimistisches Bewerten mit FIFO-Outbox, idempotenten Review-IDs, Schutz vor veraltetem Zustand und Retry-Verhalten implementiert.",
+    ],
+    metrics: [
+      { value: "3 modes", label: "Wort-, Wort-Kanji- und Kontext-Kanji-Abruf" },
+      { value: "72 tests", label: "Produkt- und Scheduler-Garantien" },
+      { value: "Public", label: "bereitgestellt mit privatem Nutzerwortschatz" },
+    ],
+    visualLabel:
+      "Mainichi-koto-Lernsystem mit Vokabelkarten, Kanji im Kontext, Wiederholungsplan und haltbarer Review-Queue",
+  },
   nudge: {
     kicker: "Offline-first Social Tasks",
     cardHeadline:

@@ -18,6 +18,9 @@ describe("metadata routes", () => {
       "https://portfolio.example/setup",
       "https://portfolio.example/ja/setup",
       "https://portfolio.example/de/setup",
+      "https://portfolio.example/work/mainichi-koto",
+      "https://portfolio.example/ja/work/mainichi-koto",
+      "https://portfolio.example/de/work/mainichi-koto",
       "https://portfolio.example/work/nudge",
       "https://portfolio.example/ja/work/nudge",
       "https://portfolio.example/de/work/nudge",
@@ -34,13 +37,13 @@ describe("metadata routes", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example/");
 
     expect(sitemap()[6]).toMatchObject({
-      url: "https://portfolio.example/work/nudge",
+      url: "https://portfolio.example/work/mainichi-koto",
       alternates: {
         languages: {
-          en: "https://portfolio.example/work/nudge",
-          ja: "https://portfolio.example/ja/work/nudge",
-          de: "https://portfolio.example/de/work/nudge",
-          "x-default": "https://portfolio.example/work/nudge",
+          en: "https://portfolio.example/work/mainichi-koto",
+          ja: "https://portfolio.example/ja/work/mainichi-koto",
+          de: "https://portfolio.example/de/work/mainichi-koto",
+          "x-default": "https://portfolio.example/work/mainichi-koto",
         },
       },
     });

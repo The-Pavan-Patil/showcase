@@ -12,10 +12,11 @@ import {
 import { supportedLocales } from "@/lib/i18n";
 
 describe("portfolio content", () => {
-  it("contains exactly three unique case studies", () => {
-    expect(projects).toHaveLength(3);
-    expect(new Set(projects.map((project) => project.slug)).size).toBe(3);
+  it("contains exactly four unique case studies", () => {
+    expect(projects).toHaveLength(4);
+    expect(new Set(projects.map((project) => project.slug)).size).toBe(4);
     expect(projects.map((project) => project.slug)).toEqual([
+      "mainichi-koto",
       "nudge",
       "philips-greenheart",
       "workforce-management-system",
@@ -34,13 +35,37 @@ describe("portfolio content", () => {
   });
 
   it("resolves valid slugs and rejects unknown slugs", () => {
+    expect(getProjectBySlug("mainichi-koto")?.title).toBe("Mainichi koto");
     expect(getProjectBySlug("nudge")?.title).toBe("Nudge");
     expect(getProjectBySlug("not-a-real-project")).toBeUndefined();
   });
 
   it("cycles through next projects", () => {
+    expect(getNextProject("mainichi-koto").slug).toBe("nudge");
     expect(getNextProject("nudge").slug).toBe("philips-greenheart");
-    expect(getNextProject("workforce-management-system").slug).toBe("nudge");
+    expect(getNextProject("workforce-management-system").slug).toBe("mainichi-koto");
+  });
+
+  it("publishes a public Mainichi koto product case study", () => {
+    const mainichiKoto = getProjectBySlug("mainichi-koto");
+    expect(mainichiKoto?.media?.src).toBe("/images/projects/mainichi-koto-kanji.png");
+    expect(mainichiKoto?.visual).toBe("learning");
+    expect(mainichiKoto?.caseStudy?.sections.map((section) => section.id)).toEqual([
+      "context",
+      "challenge",
+      "approach",
+      "word-first-learning",
+      "separate-memories",
+      "honest-grading",
+      "preserve-progress",
+      "method",
+      "outcomes",
+      "closing",
+    ]);
+    expect(JSON.stringify(mainichiKoto?.caseStudy)).toContain("Smart Kanji");
+    expect(JSON.stringify(mainichiKoto?.caseStudy)).toContain("72 tests");
+    expect(JSON.stringify(mainichiKoto?.caseStudy)).not.toContain("Internal Editor Notes");
+    expect(JSON.stringify(mainichiKoto?.caseStudy)).not.toContain("Internal Evidence Notes");
   });
 
   it("publishes a concise, evidence-led Nudge case study", () => {
