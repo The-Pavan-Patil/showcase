@@ -2,7 +2,7 @@ import type { ProjectCaseStudy } from "@/lib/portfolio-types";
 
 export const mainichiKoto = {
   slug: "mainichi-koto",
-  title: "Mainichi koto",
+  title: "Mainichi koto 毎日こと",
   kicker: "Japanese learning product",
   cardHeadline: "Learning kanji through the words you actually read.",
   summary:

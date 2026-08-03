@@ -27,6 +27,11 @@ export const philipsGreenheart = {
     { value: "Multilingual", label: "localized content" },
     { value: "Tested + monitored", label: "quality signals" },
   ],
+  media: {
+    src: "/images/case-studies/philips-greenheart.png",
+    alt: "Philips Greenheart website hero with a calm portrait and heart health scan messaging",
+    caption: "Greenheart hero experience translated from Figma into production UI",
+  },
   visual: "web",
   visualLabel: "Abstract browser composition representing a multilingual, monitored corporate website",
 } satisfies ProjectCaseStudy;
