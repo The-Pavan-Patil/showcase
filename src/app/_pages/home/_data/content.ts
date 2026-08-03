@@ -8,10 +8,10 @@ export const homeContent = {
     role: "Software Engineer",
     email: "thepavanpatil.official@gmail.com",
     heroEyebrow: "Software Engineer · Web, mobile & backend",
-    heroTitle: "I build dependable software",
+    heroTitle: "I build robust software",
     heroAccent: "for complex, real-world workflows.",
     heroDescription:
-      "I’m Pavan Patil, a software engineer working across web, mobile, backend, and data-intensive systems. I’ve built offline-first collaboration products, enterprise documentation workflows, workforce automation, and real-time LiDAR services.",
+      "I’m Pavan Patil, a software engineer working across web, mobile, backend, and data-intensive systems.",
     about:
       "I’m Pavan Patil. My interest in computers started in childhood, when my father brought home a computer and I became curious about what was happening beneath the screen. I wrote my first code in sixth grade, and that curiosity never really left. Today I enjoy building products end to end: shaping the plan, designing the architecture, writing the software, and turning rough ideas into systems people can use. I feel lucky that the thing I kept returning to became my profession.",
     education:
@@ -30,10 +30,10 @@ export const homeContent = {
     },
   ],
   proofMetrics: [
-    { value: "1,000+", label: "worker records supported" },
-    { value: "<100 ms", label: "LiDAR API response time" },
-    { value: "10 GB+", label: "point-cloud data processed daily" },
-    { value: "30%", label: "lower pipeline transfer latency" },
+    { value: "2+ Years", label: "Experience of developing software" },
+    { value: "AI Enabled", label: "Automated workflows" },
+    { value: "DRDO", label: "Worked for Ministry of Defence" },
+    { value: "0-1", label: "Products built from scratch" },
   ],
 
   experience: [
@@ -44,7 +44,7 @@ export const homeContent = {
       location: "Bangalore",
       logoUrl: "https://img.logo.dev/ownpath.com?token=pk_bgxz_gwPQda2OGjDfooXyQ&size=128&retina=true&format=png",
       description:
-        "Software engineer delivering production web and mobile applications for enterprise clients, including design-system documentation, multilingual corporate web, and offline-first collaboration workflows.",
+        "Software engineer delivering production web and mobile applications for enterprise clients such as Hero Vida, Philips, and Vendaka.",
       technologies: ["Next.js", "TypeScript", "React Native", "PostgreSQL", "Supabase"],
       projects: [
         {
@@ -53,7 +53,7 @@ export const homeContent = {
           logoUrl: "https://img.logo.dev/heromotocorp.com?token=pk_bgxz_gwPQda2OGjDfooXyQ&size=128&retina=true&format=png",
           description:
             "Built a Git-backed design-system documentation platform with branch collaboration, pull-request review, RBAC permissions, immutable publishing, TipTap editing, IndexedDB caching, autosave drafts, optimistic concurrency control, and AI-assisted design-compliance analysis.",
-          technologies: ["Next.js", "TypeScript", "PostgreSQL", "GitHub APIs", "TipTap"],
+          technologies: ["Next.js", "TypeScript", "PostgreSQL", "GitHub APIs"],
         },
         {
           client: "Philips",

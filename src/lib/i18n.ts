@@ -35,6 +35,10 @@ export function getWorkPath(locale: Locale, slug: string) {
   return getLocalizedPath(locale, `/work/${slug}`);
 }
 
+export function getSetupPath(locale: Locale) {
+  return getLocalizedPath(locale, "/setup");
+}
+
 export function getHashHref(locale: Locale, hash: string) {
   return `${getHomePath(locale)}${hash}`;
 }

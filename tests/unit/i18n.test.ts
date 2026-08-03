@@ -4,6 +4,7 @@ import {
   getAlternateLanguages,
   getHomePath,
   getPathForLocale,
+  getSetupPath,
   getWorkPath,
   isLocale,
   stripLocaleFromPathname,
@@ -24,6 +25,9 @@ describe("i18n routing helpers", () => {
     expect(getWorkPath("en", "nudge")).toBe("/work/nudge");
     expect(getWorkPath("ja", "nudge")).toBe("/ja/work/nudge");
     expect(getWorkPath("de", "nudge")).toBe("/de/work/nudge");
+    expect(getSetupPath("en")).toBe("/setup");
+    expect(getSetupPath("ja")).toBe("/ja/setup");
+    expect(getSetupPath("de")).toBe("/de/setup");
   });
 
   it("switches equivalent routes across visible navbar locales", () => {

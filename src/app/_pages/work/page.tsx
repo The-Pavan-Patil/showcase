@@ -53,7 +53,7 @@ export async function generateWorkMetadata({
   const pathname = `/work/${project.slug}`;
   const canonical = getWorkPath(locale, project.slug);
   const image = project.media
-    ? { url: project.media.src, width: 1672, height: 941, alt: project.media.alt }
+    ? { url: project.media.src, width: 1800, height: 1300, alt: project.media.alt }
     : {
         url: "/og.png",
         width: 1200,

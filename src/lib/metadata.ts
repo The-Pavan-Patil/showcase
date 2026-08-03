@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import {
   getAlternateLanguages,
   getHomePath,
+  getSetupPath,
   type Locale,
 } from "@/lib/i18n";
 import { getSiteUrl } from "@/lib/site";
@@ -54,6 +55,41 @@ export function getRootMetadata(locale: Locale): Metadata {
 
 export function getHomeMetadata(locale: Locale): Metadata {
   return getRootMetadata(locale);
+}
+
+export function getSetupMetadata(locale: Locale): Metadata {
+  const canonical = getSetupPath(locale);
+  const description =
+    "Pavan Patil's AI-assisted software workflow across planning, implementation, testing, review, automation, and hardware setup.";
+
+  return {
+    title: "Setup and AI Workflow",
+    description,
+    alternates: {
+      canonical,
+      languages: getAlternateLanguages("/setup"),
+    },
+    openGraph: {
+      type: "website",
+      url: canonical,
+      title: "Setup and AI Workflow - Pavan Patil",
+      description,
+      images: [
+        {
+          url: "/og.png",
+          width: 1200,
+          height: 630,
+          alt: "Setup and AI Workflow - Pavan Patil",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Setup and AI Workflow",
+      description,
+      images: ["/og.png"],
+    },
+  };
 }
 
 export const viewport: Viewport = {

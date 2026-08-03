@@ -48,4 +48,21 @@ describe("ThemeToggle", () => {
     expect(themeState.setTheme).toHaveBeenCalledWith("dark");
     expect(onThemeChange).toHaveBeenCalledOnce();
   });
+
+  it("supports a two-option segmented presentation", async () => {
+    const user = userEvent.setup();
+    const onThemeChange = vi.fn();
+    render(<ThemeToggle presentation="segmented" onThemeChange={onThemeChange} />);
+
+    expect(screen.getByRole("button", { name: "Switch to light theme" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    const darkOption = screen.getByRole("button", { name: "Switch to dark theme" });
+    expect(darkOption).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(darkOption);
+    expect(themeState.setTheme).toHaveBeenCalledWith("dark");
+    expect(onThemeChange).toHaveBeenCalledOnce();
+  });
 });

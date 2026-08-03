@@ -1,4 +1,4 @@
-import { act, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -175,13 +175,17 @@ describe("SiteHeader", () => {
 
     expect(menu).toBeVisible();
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
-    expect(screen.getByRole("link", { name: "Download résumé" })).toHaveAttribute(
+    expect(within(menu).getByRole("link", { name: "Résumé" })).toHaveAttribute(
       "href",
       "/pavan-patil-resume.txt",
     );
 
     await user.click(within(menu).getByRole("button", { name: "Switch to dark theme" }));
     expect(testState.setTheme).toHaveBeenCalledWith("dark");
+    expect(menu).toHaveAttribute("data-state", "closed");
+    expect(menu).toHaveAttribute("aria-hidden", "true");
+    fireEvent.transitionEnd(menu, { propertyName: "opacity" });
+    expect(menu).not.toBeInTheDocument();
     expect(screen.queryByRole("menu", { name: "Navigation utilities" })).not.toBeInTheDocument();
   });
 

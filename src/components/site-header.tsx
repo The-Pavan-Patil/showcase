@@ -68,6 +68,7 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
   }));
   const [compactPathname, setCompactPathname] = useState<string | null>(null);
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false);
+  const [isUtilitiesMounted, setIsUtilitiesMounted] = useState(false);
   const [activeSelection, setActiveSelection] = useState<{
     id: NavigationId | null;
     pathname: string;
@@ -93,6 +94,24 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
       : isWorkPath(pathname)
         ? "work"
         : activeSelection.id;
+
+  const openUtilities = () => {
+    setIsUtilitiesMounted(true);
+    setIsUtilitiesOpen(true);
+  };
+
+  const closeUtilities = () => {
+    setIsUtilitiesOpen(false);
+  };
+
+  const toggleUtilities = () => {
+    if (isUtilitiesOpen) {
+      closeUtilities();
+      return;
+    }
+
+    openUtilities();
+  };
 
   const getNavigationElements = useCallback(
     (surface: NavigationSurface): {
@@ -306,13 +325,13 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
         event.target instanceof Node &&
         !utilitiesRef.current?.contains(event.target)
       ) {
-        setIsUtilitiesOpen(false);
+        closeUtilities();
       }
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsUtilitiesOpen(false);
+        closeUtilities();
       }
     };
 
@@ -516,42 +535,55 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
             aria-haspopup="menu"
             className="mobile-utility-trigger"
             type="button"
-            onClick={() => setIsUtilitiesOpen((isOpen) => !isOpen)}
+            onClick={toggleUtilities}
           >
             <MoreHorizontal aria-hidden="true" size={23} />
           </button>
-          {isUtilitiesOpen ? (
+          {isUtilitiesMounted ? (
             <div
+              aria-hidden={!isUtilitiesOpen}
               aria-label={copy.utilitiesDialog}
               className="mobile-utility-popover"
+              data-state={isUtilitiesOpen ? "open" : "closed"}
               id="mobile-utility-menu"
+              inert={!isUtilitiesOpen}
+              onTransitionEnd={(event) => {
+                if (
+                  !isUtilitiesOpen &&
+                  event.currentTarget === event.target &&
+                  event.propertyName === "opacity"
+                ) {
+                  setIsUtilitiesMounted(false);
+                }
+              }}
               role="menu"
             >
               <h2 className="sr-only">{copy.utilitiesHeading}</h2>
               <div className="mobile-utility-menu">
-                <Link href={homeHref} onClick={() => setIsUtilitiesOpen(false)}>
+                <Link href={homeHref} onClick={closeUtilities}>
                   <House aria-hidden="true" size={17} />
                   <span>{copy.home}</span>
                 </Link>
-                <ThemeToggle
-                  copy={themeCopy}
-                  presentation="menu"
-                  onThemeChange={() => setIsUtilitiesOpen(false)}
-                />
-                <LanguageToggle
-                  copy={copy}
-                  locale={locale}
-                  onNavigate={() => setIsUtilitiesOpen(false)}
-                  presentation="menu"
-                />
                 <a
                   href="/pavan-patil-resume.txt"
                   download
-                  onClick={() => setIsUtilitiesOpen(false)}
+                  onClick={closeUtilities}
                 >
                   <FileDown aria-hidden="true" size={17} />
-                  <span>{copy.downloadResume}</span>
+                  <span>{copy.resume}</span>
                 </a>
+                <div className="mobile-utility-toggle-row">
+                  <LanguageToggle
+                    copy={copy}
+                    locale={locale}
+                    onNavigate={closeUtilities}
+                  />
+                  <ThemeToggle
+                    copy={themeCopy}
+                    onThemeChange={closeUtilities}
+                    presentation="segmented"
+                  />
+                </div>
               </div>
             </div>
           ) : null}

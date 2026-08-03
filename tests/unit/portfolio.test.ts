@@ -45,7 +45,7 @@ describe("portfolio content", () => {
 
   it("publishes a concise, evidence-led Nudge case study", () => {
     const nudge = getProjectBySlug("nudge");
-    expect(nudge?.media?.src).toBe("/nudge-case-study.png");
+    expect(nudge?.media?.src).toBe("/nudge-iphone-trio.png");
     expect(nudge?.caseStudy?.sections.map((section) => section.id)).toEqual([
       "overview",
       "problem",

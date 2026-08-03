@@ -15,6 +15,9 @@ describe("metadata routes", () => {
       "https://portfolio.example",
       "https://portfolio.example/ja",
       "https://portfolio.example/de",
+      "https://portfolio.example/setup",
+      "https://portfolio.example/ja/setup",
+      "https://portfolio.example/de/setup",
       "https://portfolio.example/work/nudge",
       "https://portfolio.example/ja/work/nudge",
       "https://portfolio.example/de/work/nudge",
@@ -30,7 +33,7 @@ describe("metadata routes", () => {
   it("adds alternate-language sitemap entries", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example/");
 
-    expect(sitemap()[3]).toMatchObject({
+    expect(sitemap()[6]).toMatchObject({
       url: "https://portfolio.example/work/nudge",
       alternates: {
         languages: {

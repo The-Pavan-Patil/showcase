@@ -12,7 +12,7 @@ type ThemeToggleProps = {
     switchToDark: string;
     switchToLight: string;
   };
-  presentation?: "icon" | "menu";
+  presentation?: "icon" | "menu" | "segmented";
   onThemeChange?: () => void;
 };
 
@@ -35,6 +35,34 @@ export function ThemeToggle({
     setTheme(nextTheme);
     onThemeChange?.();
   };
+
+  const selectTheme = (theme: "light" | "dark") => {
+    setTheme(theme);
+    onThemeChange?.();
+  };
+
+  if (presentation === "segmented") {
+    return (
+      <div className="theme-toggle-segmented">
+        <button
+          aria-label={copy.switchToLight}
+          aria-pressed={mounted && !isDark}
+          type="button"
+          onClick={() => selectTheme("light")}
+        >
+          <Sun aria-hidden="true" size={16} />
+        </button>
+        <button
+          aria-label={copy.switchToDark}
+          aria-pressed={mounted && isDark}
+          type="button"
+          onClick={() => selectTheme("dark")}
+        >
+          <Moon aria-hidden="true" size={16} />
+        </button>
+      </div>
+    );
+  }
 
   return (
     <Button

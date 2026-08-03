@@ -29,9 +29,9 @@ export const nudge = {
     { value: "4 gestures", label: "complete, postpone, nudge, archive" },
   ],
   media: {
-    src: "/nudge-case-study.png",
-    alt: "A Nudge mobile task deck connected to offline sync and collaborator architecture nodes",
-    caption: "Offline-first task UI, sync flow, and collaborator model",
+    src: "/nudge-iphone-trio.png",
+    alt: "Three iPhone screens showing the Nudge social task app interface",
+    caption: "Nudge task deck across owner and collaborator flows",
   },
   visual: "sync",
   visualLabel: "Nudge task deck showing role-aware gestures, offline queue, and Supabase synchronization",
