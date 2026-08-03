@@ -3165,7 +3165,7 @@ a {
   grid-template-columns: minmax(0, 1fr) minmax(21rem, 0.56fr);
   align-items: end;
   gap: clamp(2.5rem, 6vw, 6rem);
-  padding: 4rem 0 3rem;
+  padding: 0 0 3rem;
 }
 
 .setup-hero-copy h1 {
@@ -3282,7 +3282,7 @@ a {
 
 .setup-section-heading h2,
 .setup-chaos-grid h2,
-.setup-closing h2 {
+.setup-closing-quote h2 {
   margin: 1rem 0 0;
   font-family: var(--font-manrope), Manrope, sans-serif;
   font-size: clamp(2.25rem, 4vw, 3rem);
@@ -3409,8 +3409,6 @@ a {
 .setup-chaos-copy {
   display: grid;
   gap: 1rem;
-  border-top: 1px solid color-mix(in srgb, var(--background) 18%, transparent);
-  padding-top: 1rem;
 }
 
 .setup-chaos-copy svg {
@@ -3442,13 +3440,15 @@ a {
 }
 
 .setup-check-list {
+  counter-reset: setup-check-list;
   border-top: 1px solid var(--border);
 }
 
 .setup-check-list li {
+  counter-increment: setup-check-list;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.75rem;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  gap: 0.85rem;
   border-bottom: 1px solid var(--border);
   padding: 1rem 0;
   color: var(--muted);
@@ -3456,7 +3456,21 @@ a {
   line-height: 1.65;
 }
 
-.setup-check-list svg,
+.setup-check-list li::before {
+  display: inline-grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border));
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  content: counter(setup-check-list, decimal-leading-zero);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
 .setup-sync-list svg {
   flex: none;
   margin-top: 0.18rem;
@@ -3579,11 +3593,45 @@ a {
   justify-items: center;
 }
 
-.setup-closing svg {
+.setup-closing-quote {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  max-width: 58rem;
+  margin: 0;
+  padding: clamp(2rem, 5vw, 3.25rem) clamp(1.5rem, 6vw, 5rem);
+}
+
+.setup-closing-quote::before,
+.setup-closing-quote::after {
+  position: absolute;
+  color: color-mix(in srgb, var(--accent) 28%, transparent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(6rem, 13vw, 11rem);
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.setup-closing-quote::before {
+  top: -0.2rem;
+  left: 0;
+  content: "“";
+}
+
+.setup-closing-quote::after {
+  right: 0;
+  bottom: -2.2rem;
+  content: "”";
+}
+
+.setup-closing-quote svg {
   color: var(--accent);
 }
 
-.setup-closing h2 {
+.setup-closing-quote h2 {
+  position: relative;
+  z-index: 1;
   max-width: 18ch;
 }
 
@@ -3823,7 +3871,7 @@ a {
   .setup-hero-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
-    padding: 3rem 0 2rem;
+    padding: 0 0 2rem;
   }
   .setup-hero-copy h1 { font-size: clamp(3rem, 16vw, 4.8rem); }
   .setup-lede { font-size: 1.06rem; }
@@ -3895,7 +3943,7 @@ a {
   .setup-command-body p { grid-template-columns: 1fr; gap: 0.32rem; }
   .setup-section-heading h2,
   .setup-chaos-grid h2,
-  .setup-closing h2 { font-size: clamp(2rem, 11vw, 2.65rem); }
+  .setup-closing-quote h2 { font-size: clamp(2rem, 11vw, 2.65rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {

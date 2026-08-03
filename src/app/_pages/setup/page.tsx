@@ -1,7 +1,5 @@
 import {
   ArrowRight,
-  BrainCircuit,
-  CheckCircle2,
   ClipboardCheck,
   Code2,
   FileText,
@@ -9,6 +7,7 @@ import {
   Laptop,
   Monitor,
   Network,
+  Quote,
   ShieldAlert,
   Workflow,
 } from "lucide-react";
@@ -17,10 +16,22 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { SiteFooter } from "@/components/site-footer";
+import { ScrollAccent } from "@/components/scroll-accent";
 import { getHomePath, getSetupPath, type Locale } from "@/lib/i18n";
 import { getPortfolioContent } from "@/lib/portfolio";
 import { getSiteUrl } from "@/lib/site";
 import { uiCopyByLocale } from "@/lib/ui-copy";
+
+/** Wrap any phrase in **double asterisks** to render it bold. */
+function richText(input: string) {
+  return input.split(/(\*\*[^*]+\*\*)/g).map((part, index) =>
+    part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={index}>{part.slice(2, -2)}</strong>
+    ) : (
+      part
+    ),
+  );
+}
 
 const workflowStats = [
   { value: "01", label: "Master PRD" },
@@ -33,22 +44,22 @@ const workflowSteps = [
   {
     title: "Brainstorm the system",
     text:
-      "I start with Claude Opus for planning and architecture. The first pass is a brainstorming session around the problem, constraints, architecture options, goals, acceptance criteria, and test cases.",
+      "I start with **Claude Opus** for planning and architecture. The first pass is a brainstorming session around the problem, constraints, architecture options, goals, acceptance criteria, and test cases.",
   },
   {
     title: "Shape the Master PRD",
     text:
-      "I use Spec Kit and Beads on top of the brainstorming work to turn the idea into a Master PRD. That document becomes the source of truth for what we are building, why it matters, and how it will be accepted.",
+      "I use **Spec Kit** and **Beads** on top of the brainstorming work to turn the idea into a Master PRD. That document becomes the source of truth for what we are building, why it matters, and how it will be accepted.",
   },
   {
     title: "Break work into tasks",
     text:
-      "For large projects and small features, I use Beads to split the work into clear tasks. It keeps features from turning into one vague brief and makes progress easier to review.",
+      "For large projects and small features, I use **Beads** to split the work into clear tasks. It keeps features from turning into one vague brief and makes progress easier to review.",
   },
   {
     title: "Run agents by role",
     text:
-      "Once the plan is ready, I run multiple agents over the feature. Two agents usually implement, other agents check tests, linting, edge cases, and documentation.",
+      "Once the plan is ready, I run **multiple agents** over the feature. Two agents usually implement, other agents check tests, linting, edge cases, and documentation.",
   },
 ] as const;
 
@@ -58,21 +69,21 @@ const agentRoles = [
     title: "Frontend agent",
     label: "Codex",
     text:
-      "I use Codex especially for frontend work: building interfaces, refining layouts, checking responsive behavior, and keeping implementation close to the existing design system.",
+      "I use **Codex** especially for frontend work: building interfaces, refining layouts, checking responsive behavior, and keeping implementation close to the existing design system.",
   },
   {
     icon: Network,
     title: "Backend agent",
     label: "Opus terminal",
     text:
-      "For backend-heavy work, I use an Opus terminal where the agent can stay focused on architecture, APIs, data models, and service-level tradeoffs.",
+      "For backend-heavy work, I use an **Opus terminal** where the agent can stay focused on architecture, APIs, data models, and service-level tradeoffs.",
   },
   {
     icon: ClipboardCheck,
     title: "Testing agent",
     label: "Sonnet",
     text:
-      "I use Sonnet for testing-focused passes: checking acceptance criteria, test coverage, linting, and edge cases that should be verified before the feature is considered done.",
+      "I use **Sonnet** for testing-focused passes: checking acceptance criteria, test coverage, linting, and edge cases that should be verified before the feature is considered done.",
   },
   {
     icon: FileText,
@@ -133,6 +144,32 @@ const deskSetup = [
   },
 ] as const;
 
+function SetupEyebrow({
+  anchor,
+  children,
+  fallback = false,
+}: {
+  anchor: string;
+  children: string;
+  fallback?: boolean;
+}) {
+  return (
+    <p className="eyebrow scroll-accent-eyebrow">
+      <span
+        className={
+          fallback
+            ? "scroll-accent-heading-target scroll-accent-fallback"
+            : "scroll-accent-heading-target"
+        }
+        data-scroll-accent-anchor={anchor}
+        data-scroll-accent-phase="heading"
+        aria-hidden="true"
+      />
+      {children}
+    </p>
+  );
+}
+
 export function SetupPage({ locale }: { locale: Locale }) {
   const siteUrl = getSiteUrl();
   const ui = uiCopyByLocale[locale];
@@ -156,12 +193,15 @@ export function SetupPage({ locale }: { locale: Locale }) {
           },
         }}
       />
+      <ScrollAccent />
       <main id="main-content" className="setup-main">
         <section className="setup-hero" aria-labelledby="setup-title">
           <Container>
             <div className="setup-hero-grid">
               <div className="setup-hero-copy">
-                <p className="eyebrow">Setup and AI workflow</p>
+                <SetupEyebrow anchor="hero" fallback>
+                  AI workflow and Setup
+                </SetupEyebrow>
                 <h1 id="setup-title">
                   I use AI like an engineering team around me.
                 </h1>
@@ -188,7 +228,7 @@ export function SetupPage({ locale }: { locale: Locale }) {
                   <span />
                   <span />
                   <p>ai-workflow.md</p>
-                  <strong>manual merge</strong>
+                  <strong>merge</strong>
                 </div>
                 <div className="setup-command-body">
                   <p>
@@ -233,7 +273,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
         <section className="setup-section" id="workflow" aria-labelledby="workflow-heading">
           <Container>
             <div className="setup-section-heading">
-              <p className="eyebrow">Planning pipeline</p>
+              <SetupEyebrow anchor="workflow">
+                Planning pipeline
+              </SetupEyebrow>
               <h2 id="workflow-heading">The work starts before code.</h2>
               <p>
                 I use AI most heavily at the beginning of a feature, when the
@@ -251,7 +293,7 @@ export function SetupPage({ locale }: { locale: Locale }) {
                   </span>
                   <div>
                     <h3>{step.title}</h3>
-                    <p>{step.text}</p>
+                    <p>{richText(step.text)}</p>
                   </div>
                 </article>
               ))}
@@ -262,7 +304,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
         <section className="setup-section setup-section-muted" aria-labelledby="agents-heading">
           <Container>
             <div className="setup-section-heading">
-              <p className="eyebrow">Multi-agent setup</p>
+              <SetupEyebrow anchor="agents">
+                Multi-agent setup
+              </SetupEyebrow>
               <h2 id="agents-heading">Agents have roles, not unlimited control.</h2>
               <p>
                 I split agent work by responsibility. That keeps each agent close
@@ -282,7 +326,7 @@ export function SetupPage({ locale }: { locale: Locale }) {
                     </div>
                     <p>{role.label}</p>
                     <h3>{role.title}</h3>
-                    <span>{role.text}</span>
+                    <span>{richText(role.text)}</span>
                   </article>
                 );
               })}
@@ -294,13 +338,15 @@ export function SetupPage({ locale }: { locale: Locale }) {
           <Container>
             <div className="setup-chaos-grid">
               <div>
-                <p className="eyebrow">Chaos engineer</p>
-                <h2 id="chaos-heading">One agent tries to break the happy path.</h2>
+                <SetupEyebrow anchor="chaos">
+                  Chaos engineer
+                </SetupEyebrow>
+                <h2 id="chaos-heading">An agent built to break code.</h2>
               </div>
               <div className="setup-chaos-copy">
-                <ShieldAlert aria-hidden="true" size={24} />
+                {/* <ShieldAlert aria-hidden="true" size={24} /> */}
                 <p>
-                  The chaos engineering agent looks for broken assumptions,
+                  The **chaos engineering agent** breaks the code intentionally and looks for broken assumptions,
                   missing edge cases, weak recovery paths, bad states, race
                   conditions, unclear user flows, and places where the system
                   works only when everything goes perfectly.
@@ -319,7 +365,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
           <Container>
             <div className="setup-two-column">
               <div className="setup-section-heading">
-                <p className="eyebrow">Git and review</p>
+                <SetupEyebrow anchor="control">
+                  Git and review
+                </SetupEyebrow>
                 <h2 id="control-heading">Manual control stays with me.</h2>
                 <p>
                   Agents can move quickly, but the final engineering decision
@@ -328,14 +376,13 @@ export function SetupPage({ locale }: { locale: Locale }) {
                 </p>
               </div>
 
-              <ul className="setup-check-list">
+              <ol className="setup-check-list">
                 {controlPoints.map((point) => (
                   <li key={point}>
-                    <CheckCircle2 aria-hidden="true" size={18} />
-                    <span>{point}</span>
+                    <span>{richText(point)}</span>
                   </li>
                 ))}
-              </ul>
+              </ol>
             </div>
           </Container>
         </section>
@@ -344,7 +391,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
           <Container>
             <div className="setup-two-column">
               <div className="setup-section-heading">
-                <p className="eyebrow">Repo sync</p>
+                <SetupEyebrow anchor="sync">
+                  Repo sync
+                </SetupEyebrow>
                 <h2 id="sync-heading">Handover files keep parallel work aligned.</h2>
               </div>
 
@@ -352,7 +401,7 @@ export function SetupPage({ locale }: { locale: Locale }) {
                 {repoSyncNotes.map((note) => (
                   <p key={note}>
                     <GitBranch aria-hidden="true" size={17} />
-                    <span>{note}</span>
+                    <span>{richText(note)}</span>
                   </p>
                 ))}
               </div>
@@ -363,7 +412,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
         <section className="setup-section" aria-labelledby="tools-heading">
           <Container>
             <div className="setup-section-heading">
-              <p className="eyebrow">Toolchain</p>
+              <SetupEyebrow anchor="tools">
+                Toolchain
+              </SetupEyebrow>
               <h2 id="tools-heading">A small system around planning, building, and review.</h2>
             </div>
 
@@ -373,7 +424,7 @@ export function SetupPage({ locale }: { locale: Locale }) {
                   <h3>{group.title}</h3>
                   <ul>
                     {group.items.map((item) => (
-                      <li key={item}>{item}</li>
+                      <li key={item}>{richText(item)}</li>
                     ))}
                   </ul>
                 </article>
@@ -386,12 +437,14 @@ export function SetupPage({ locale }: { locale: Locale }) {
           <Container>
             <div className="setup-two-column">
               <div className="setup-section-heading">
-                <p className="eyebrow">Automation</p>
+                <SetupEyebrow anchor="automation">
+                  Automation
+                </SetupEyebrow>
                 <h2 id="automation-heading">CI/CD and personal agents handle the background checks.</h2>
                 <p>
-                  GitHub Actions agents tell me whether deployment is in process,
+                  **GitHub Actions agents** tell me whether deployment is in process,
                   failed, merged, or completed. For personal automation, I use a
-                  self-hosted Hermas agent for starting the day, checking emails,
+                  self-hosted **Hermas agent** for starting the day, checking emails,
                   reviewing meetings, and handling small personal tasks.
                 </p>
               </div>
@@ -411,7 +464,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
         <section className="setup-section setup-desk-section" aria-labelledby="desk-heading">
           <Container>
             <div className="setup-section-heading">
-              <p className="eyebrow">Working setup</p>
+              <SetupEyebrow anchor="desk">
+                Working setup
+              </SetupEyebrow>
               <h2 id="desk-heading">The hardware stays simple and reliable.</h2>
             </div>
 
@@ -433,10 +488,12 @@ export function SetupPage({ locale }: { locale: Locale }) {
 
         <section className="setup-closing" aria-labelledby="setup-closing-heading">
           <Container>
-            <BrainCircuit aria-hidden="true" size={28} />
-            <h2 id="setup-closing-heading">
-              The setup keeps changing, but the direction is consistent.
-            </h2>
+            <blockquote className="setup-closing-quote">
+              {/* <Quote aria-hidden="true" size={28} /> */}
+              <h2 id="setup-closing-heading">
+                The setup keeps changing, but the direction is consistent.
+              </h2>
+            </blockquote>
             <p>
               Faster feedback, better thinking, fewer repetitive steps, and more
               time spent on the parts of software that need taste, judgment, and

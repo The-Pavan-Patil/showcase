@@ -145,7 +145,53 @@ function isVisibleProjectNode(element: HTMLElement) {
   return details instanceof HTMLDetailsElement && details.open;
 }
 
-function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
+function pushOrderedWaypoint(
+  waypoints: ScrollAccentWaypoint[],
+  point: ScrollAccentWaypoint,
+) {
+  const previous = waypoints[waypoints.length - 1];
+  const minimumY = previous ? previous.y + 1 : point.y;
+
+  waypoints.push({
+    ...point,
+    y: Math.max(point.y, minimumY),
+  });
+}
+
+function pushGlobalBridge(
+  waypoints: ScrollAccentWaypoint[],
+  globalX: number,
+  current: ScrollAccentWaypoint,
+  next: ScrollAccentWaypoint,
+) {
+  const gap = Math.max(1, next.y - current.y);
+  const travel = Math.min(
+    clamp(gap * 0.16, 56, 140),
+    Math.max(1, gap / 2 - 1),
+  );
+
+  pushOrderedWaypoint(waypoints, {
+    id: `${current.id}-global-departure`,
+    phase: "global-rail",
+    x: globalX,
+    y: current.y + travel,
+    size: DEFAULT_DOT_SIZE,
+  });
+  pushOrderedWaypoint(waypoints, {
+    id: `${next.id}-global-approach`,
+    phase: "global-rail",
+    x: globalX,
+    y: next.y - travel,
+    size: DEFAULT_DOT_SIZE,
+  });
+  pushOrderedWaypoint(waypoints, next);
+}
+
+function getGlobalRailX(globalRail: HTMLElement) {
+  return globalRail.getBoundingClientRect().left + window.scrollX;
+}
+
+function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
   const globalRail = document.querySelector<HTMLElement>(
     ".scroll-accent-global-rail",
   );
@@ -180,54 +226,16 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
     return null;
   }
 
-  const globalX =
-    globalRail.getBoundingClientRect().left + window.scrollX;
+  const globalX = getGlobalRailX(globalRail);
   const waypoints: ScrollAccentWaypoint[] = [];
-
-  function pushWaypoint(point: ScrollAccentWaypoint) {
-    const previous = waypoints[waypoints.length - 1];
-    const minimumY = previous ? previous.y + 1 : point.y;
-
-    waypoints.push({
-      ...point,
-      y: Math.max(point.y, minimumY),
-    });
-  }
-
-  function pushGlobalBridge(
-    current: ScrollAccentWaypoint,
-    next: ScrollAccentWaypoint,
-  ) {
-    const gap = Math.max(1, next.y - current.y);
-    const travel = Math.min(
-      clamp(gap * 0.16, 56, 140),
-      Math.max(1, gap / 2 - 1),
-    );
-
-    pushWaypoint({
-      id: `${current.id}-global-departure`,
-      phase: "global-rail",
-      x: globalX,
-      y: current.y + travel,
-      size: DEFAULT_DOT_SIZE,
-    });
-    pushWaypoint({
-      id: `${next.id}-global-approach`,
-      phase: "global-rail",
-      x: globalX,
-      y: next.y - travel,
-      size: DEFAULT_DOT_SIZE,
-    });
-    pushWaypoint(next);
-  }
 
   const heroPoint = waypointFromElement(hero);
   const workPoint = waypointFromElement(work);
   const experienceHeadingPoint = waypointFromElement(experienceHeading);
 
-  pushWaypoint(heroPoint);
-  pushGlobalBridge(heroPoint, workPoint);
-  pushGlobalBridge(workPoint, experienceHeadingPoint);
+  pushOrderedWaypoint(waypoints, heroPoint);
+  pushGlobalBridge(waypoints, globalX, heroPoint, workPoint);
+  pushGlobalBridge(waypoints, globalX, workPoint, experienceHeadingPoint);
 
   const experienceItems = Array.from(
     experienceSection.querySelectorAll<HTMLElement>(".experience-item"),
@@ -253,14 +261,14 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
   )?.major;
 
   if (firstExperienceMajor) {
-    pushGlobalBridge(experienceHeadingPoint, firstExperienceMajor);
+    pushGlobalBridge(waypoints, globalX, experienceHeadingPoint, firstExperienceMajor);
   }
 
   experienceItems.forEach((entry, index) => {
     if (!entry.major) return;
 
     if (entry.major !== firstExperienceMajor) {
-      pushWaypoint(entry.major);
+      pushOrderedWaypoint(waypoints, entry.major);
     }
 
     if (!entry.minors.length) return;
@@ -273,14 +281,14 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
     const enterStartY = Math.max(entry.major.y + entry.major.size, firstMinor.y - 34);
     const enterEndY = Math.max(enterStartY + 14, firstMinor.y - 16);
 
-    pushWaypoint({
+    pushOrderedWaypoint(waypoints, {
       id: `${entry.major.id}-project-handoff-start`,
       phase: "experience-rail",
       x: entry.major.x,
       y: enterStartY,
       size: DEFAULT_DOT_SIZE,
     });
-    pushWaypoint({
+    pushOrderedWaypoint(waypoints, {
       id: `${entry.major.id}-project-handoff-end`,
       phase: "experience-rail",
       x: firstMinor.x,
@@ -288,7 +296,7 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
       size: DEFAULT_DOT_SIZE,
     });
 
-    entry.minors.forEach(pushWaypoint);
+    entry.minors.forEach((point) => pushOrderedWaypoint(waypoints, point));
 
     const itemBottom =
       entry.item.getBoundingClientRect().bottom + window.scrollY;
@@ -302,14 +310,14 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
     const exitEndY = Math.min(availableExitY, Math.max(exitStartY + 14, exitStartY));
 
     if (exitStartY > lastMinor.y) {
-      pushWaypoint({
+      pushOrderedWaypoint(waypoints, {
         id: `${entry.major.id}-project-return-start`,
         phase: "experience-rail",
         x: lastMinor.x,
         y: exitStartY,
         size: DEFAULT_DOT_SIZE,
       });
-      pushWaypoint({
+      pushOrderedWaypoint(waypoints, {
         id: `${entry.major.id}-project-return-end`,
         phase: "experience-rail",
         x: entry.major.x,
@@ -330,14 +338,14 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
   const returnStartY = Math.max(lastWaypoint.y + 24, experienceBottom - 64);
   const returnEndY = Math.max(returnStartY + 18, experienceBottom - 32);
 
-  pushWaypoint({
+  pushOrderedWaypoint(waypoints, {
     id: "experience-global-return-start",
     phase: "experience-rail",
     x: mainRailX,
     y: returnStartY,
     size: DEFAULT_DOT_SIZE,
   });
-  pushWaypoint({
+  pushOrderedWaypoint(waypoints, {
     id: "experience-global-return-end",
     phase: "global-rail",
     x: globalX,
@@ -349,14 +357,14 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
   const aboutApproachGap = Math.max(1, aboutPoint.y - returnEndY);
   const aboutApproach = clamp(aboutApproachGap * 0.18, 56, 140);
 
-  pushWaypoint({
+  pushOrderedWaypoint(waypoints, {
     id: "about-global-approach",
     phase: "global-rail",
     x: globalX,
     y: aboutPoint.y - aboutApproach,
     size: DEFAULT_DOT_SIZE,
   });
-  pushWaypoint(aboutPoint);
+  pushOrderedWaypoint(waypoints, aboutPoint);
 
   const contactTop =
     contactSection.getBoundingClientRect().top + window.scrollY;
@@ -365,7 +373,7 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
     56,
     140,
   );
-  pushWaypoint({
+  pushOrderedWaypoint(waypoints, {
     id: "about-global-return",
     phase: "global-rail",
     x: globalX,
@@ -390,6 +398,66 @@ function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
     fadeStartScroll,
     fadeEndScroll,
   };
+}
+
+function buildGenericScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
+  const globalRail = document.querySelector<HTMLElement>(
+    ".scroll-accent-global-rail",
+  );
+  const main = document.getElementById("main-content");
+
+  if (!globalRail || !main) return null;
+
+  const anchors = Array.from(
+    main.querySelectorAll<HTMLElement>("[data-scroll-accent-anchor]"),
+  )
+    .filter((element) => element.offsetParent !== null)
+    .map(waypointFromElement)
+    .sort((first, second) => first.y - second.y);
+
+  if (!anchors.length) return null;
+
+  const globalX = getGlobalRailX(globalRail);
+  const waypoints: ScrollAccentWaypoint[] = [];
+  const first = anchors[0];
+
+  pushOrderedWaypoint(waypoints, first);
+  anchors.slice(1).forEach((anchor) => {
+    const previous = waypoints[waypoints.length - 1];
+    pushGlobalBridge(waypoints, globalX, previous, anchor);
+  });
+
+  const last = waypoints[waypoints.length - 1];
+  const mainBottom = main.getBoundingClientRect().bottom + window.scrollY;
+  const returnTravel = clamp((mainBottom - last.y) * 0.14, 56, 140);
+  const returnY = Math.max(last.y + 24, last.y + returnTravel);
+
+  pushOrderedWaypoint(waypoints, {
+    id: `${last.id}-global-return`,
+    phase: "global-rail",
+    x: globalX,
+    y: returnY,
+    size: DEFAULT_DOT_SIZE,
+  });
+
+  const routeExitScroll = Math.max(0, returnY - activationY);
+  const fadeStartScroll = Math.max(routeExitScroll, mainBottom - activationY - 160);
+  const fadeEndScroll = Math.max(fadeStartScroll + 1, mainBottom - activationY);
+
+  return {
+    waypoints,
+    globalX,
+    routeExitScroll,
+    fadeStartScroll,
+    fadeEndScroll,
+  };
+}
+
+function buildScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
+  return (
+    buildHomeScrollAccentRoute(activationY) ??
+    buildGenericScrollAccentRoute(activationY)
+  );
 }
 
 function setDotFrame(
