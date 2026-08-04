@@ -204,6 +204,9 @@ function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | nu
   const experienceHeading = document.querySelector<HTMLElement>(
     '[data-scroll-accent-anchor="experience"]',
   );
+  const workflowHeading = document.querySelector<HTMLElement>(
+    '[data-scroll-accent-anchor="workflow"]',
+  );
   const aboutHeading = document.querySelector<HTMLElement>(
     '[data-scroll-accent-anchor="about"]',
   );
@@ -219,6 +222,7 @@ function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | nu
     !hero ||
     !work ||
     !experienceHeading ||
+    !workflowHeading ||
     !aboutHeading ||
     !experienceSection ||
     !contactSection
@@ -353,18 +357,21 @@ function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | nu
     size: DEFAULT_DOT_SIZE,
   });
 
-  const aboutPoint = waypointFromElement(aboutHeading);
-  const aboutApproachGap = Math.max(1, aboutPoint.y - returnEndY);
-  const aboutApproach = clamp(aboutApproachGap * 0.18, 56, 140);
+  const workflowPoint = waypointFromElement(workflowHeading);
+  const workflowApproachGap = Math.max(1, workflowPoint.y - returnEndY);
+  const workflowApproach = clamp(workflowApproachGap * 0.18, 56, 140);
 
   pushOrderedWaypoint(waypoints, {
-    id: "about-global-approach",
+    id: "workflow-global-approach",
     phase: "global-rail",
     x: globalX,
-    y: aboutPoint.y - aboutApproach,
+    y: workflowPoint.y - workflowApproach,
     size: DEFAULT_DOT_SIZE,
   });
-  pushOrderedWaypoint(waypoints, aboutPoint);
+  pushOrderedWaypoint(waypoints, workflowPoint);
+
+  const aboutPoint = waypointFromElement(aboutHeading);
+  pushGlobalBridge(waypoints, globalX, workflowPoint, aboutPoint);
 
   const contactTop =
     contactSection.getBoundingClientRect().top + window.scrollY;

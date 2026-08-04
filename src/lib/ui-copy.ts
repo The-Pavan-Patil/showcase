@@ -75,7 +75,9 @@ export type UiCopy = {
     aiWorkflow: {
       eyebrow: string;
       title: string;
+      titleMuted: string;
       description: string;
+      descriptionEmphasis: string;
       cta: string;
       pipelineAria: string;
       planning: Array<{
@@ -84,8 +86,10 @@ export type UiCopy = {
       }>;
       branches: Array<{
         task: string;
-        label: string;
-        tool: string;
+        steps: Array<{
+          label: string;
+          tool: string;
+        }>;
       }>;
       merge: string;
       ship: {
@@ -312,20 +316,43 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         "Experience across client products, internal platforms, cloud operations, and real-time research systems.",
       aiWorkflow: {
         eyebrow: "AI workflow",
-        title: "How I plan, build, test, and ship with AI.",
-        description:
-          "I use AI as a structured engineering system, not an autopilot. Planning starts with Claude Opus, Spec Kit, and Beads. Implementation runs through focused agents for frontend, backend, testing, documentation, and chaos review. Git stays manual.",
-        cta: "View my setup",
-        pipelineAria: "AI workflow branching from task planning into build, review, and test before merge and ship",
+        title: "Check how I use AI to speed up",
+        titleMuted: "development.",
+        description: "I use AI like an engineering team around me.",
+        descriptionEmphasis:
+          "One agent helps plan, others implement, others test, one tries to break the system, and I keep final control over review, git, and shipping.",
+        cta: "View my full setup",
+        pipelineAria: "AI workflow from brainstorm to task planning, branching into three tasks that each move through build, review, and test before merge and ship",
         planning: [
           { label: "Brainstorm", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },
           { label: "Tasks", tool: "Beads" },
         ],
         branches: [
-          { task: "t1", label: "Build", tool: "Codex + Opus" },
-          { task: "t2", label: "Review", tool: "Chaos pass" },
-          { task: "t3", label: "Test", tool: "Sonnet" },
+          {
+            task: "t1",
+            steps: [
+              { label: "Build", tool: "Codex + Opus" },
+              { label: "Review", tool: "Chaos pass" },
+              { label: "Test", tool: "Sonnet" },
+            ],
+          },
+          {
+            task: "t2",
+            steps: [
+              { label: "Build", tool: "Codex + Opus" },
+              { label: "Review", tool: "Chaos pass" },
+              { label: "Test", tool: "Sonnet" },
+            ],
+          },
+          {
+            task: "t3",
+            steps: [
+              { label: "Build", tool: "Codex + Opus" },
+              { label: "Review", tool: "Chaos pass" },
+              { label: "Test", tool: "Sonnet" },
+            ],
+          },
         ],
         merge: "Merge",
         ship: { label: "Ship", tool: "Manual git" },
@@ -561,20 +588,43 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         "クライアント向けプロダクト、社内基盤、クラウド運用、リアルタイム研究システムでの経験があります。",
       aiWorkflow: {
         eyebrow: "AIワークフロー",
-        title: "AIで計画し、作り、テストし、届ける方法。",
-        description:
-          "AIは自動操縦ではなく、構造化されたエンジニアリングシステムとして使っています。計画はClaude Opus、Spec Kit、Beadsから始め、実装はフロントエンド、バックエンド、テスト、ドキュメント、カオスレビューに分けたエージェントで進めます。Gitは手動で管理します。",
-        cta: "セットアップを見る",
-        pipelineAria: "タスク計画から実装、レビュー、テストへ分岐し、マージして公開するAIワークフロー",
+        title: "AIで開発をどう",
+        titleMuted: "速くしているか。",
+        description: "AIを、自分を支えるエンジニアリングチームのように使っています。",
+        descriptionEmphasis:
+          "あるエージェントが計画を助け、ほかが実装とテストを担当し、別のエージェントがシステムを壊そうと試みます。レビュー、Git、公開の最終判断は自分で行います。",
+        cta: "セットアップ全体を見る",
+        pipelineAria: "ブレストとタスク計画から3つのタスクへ分岐し、それぞれを実装、レビュー、テストしてからマージし公開するAIワークフロー",
         planning: [
           { label: "ブレスト", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },
           { label: "タスク", tool: "Beads" },
         ],
         branches: [
-          { task: "t1", label: "実装", tool: "Codex + Opus" },
-          { task: "t2", label: "レビュー", tool: "Chaos pass" },
-          { task: "t3", label: "テスト", tool: "Sonnet" },
+          {
+            task: "t1",
+            steps: [
+              { label: "実装", tool: "Codex + Opus" },
+              { label: "レビュー", tool: "Chaos pass" },
+              { label: "テスト", tool: "Sonnet" },
+            ],
+          },
+          {
+            task: "t2",
+            steps: [
+              { label: "実装", tool: "Codex + Opus" },
+              { label: "レビュー", tool: "Chaos pass" },
+              { label: "テスト", tool: "Sonnet" },
+            ],
+          },
+          {
+            task: "t3",
+            steps: [
+              { label: "実装", tool: "Codex + Opus" },
+              { label: "レビュー", tool: "Chaos pass" },
+              { label: "テスト", tool: "Sonnet" },
+            ],
+          },
         ],
         merge: "マージ",
         ship: { label: "公開", tool: "手動Git" },
@@ -810,20 +860,43 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         "Erfahrung mit Kundenprodukten, internen Plattformen, Cloud-Betrieb und Echtzeit-Forschungssystemen.",
       aiWorkflow: {
         eyebrow: "AI-Workflow",
-        title: "Wie ich mit AI plane, baue, teste und ausliefere.",
-        description:
-          "Ich nutze AI als strukturiertes Engineering-System, nicht als Autopilot. Planung beginnt mit Claude Opus, Spec Kit und Beads. Die Umsetzung läuft über fokussierte Agenten für Frontend, Backend, Tests, Dokumentation und Chaos Review. Git bleibt manuell.",
-        cta: "Setup ansehen",
-        pipelineAria: "AI-Workflow, der von Task-Planung in Build, Review und Test verzweigt, dann merged und ausgeliefert wird",
+        title: "So beschleunige ich die",
+        titleMuted: "Entwicklung mit AI.",
+        description: "Ich nutze AI wie ein Engineering-Team um mich herum.",
+        descriptionEmphasis:
+          "Ein Agent hilft bei der Planung, andere implementieren und testen, einer versucht das System zu brechen, und ich behalte die letzte Kontrolle über Review, Git und Auslieferung.",
+        cta: "Mein vollständiges Setup ansehen",
+        pipelineAria: "AI-Workflow vom Brainstorming zur Task-Planung, der in drei Tasks verzweigt, die jeweils Build, Review und Test durchlaufen, bevor sie gemerged und ausgeliefert werden",
         planning: [
           { label: "Brainstorming", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },
           { label: "Tasks", tool: "Beads" },
         ],
         branches: [
-          { task: "t1", label: "Build", tool: "Codex + Opus" },
-          { task: "t2", label: "Review", tool: "Chaos pass" },
-          { task: "t3", label: "Test", tool: "Sonnet" },
+          {
+            task: "t1",
+            steps: [
+              { label: "Build", tool: "Codex + Opus" },
+              { label: "Review", tool: "Chaos pass" },
+              { label: "Test", tool: "Sonnet" },
+            ],
+          },
+          {
+            task: "t2",
+            steps: [
+              { label: "Build", tool: "Codex + Opus" },
+              { label: "Review", tool: "Chaos pass" },
+              { label: "Test", tool: "Sonnet" },
+            ],
+          },
+          {
+            task: "t3",
+            steps: [
+              { label: "Build", tool: "Codex + Opus" },
+              { label: "Review", tool: "Chaos pass" },
+              { label: "Test", tool: "Sonnet" },
+            ],
+          },
         ],
         merge: "Merge",
         ship: { label: "Ship", tool: "Manuelles Git" },

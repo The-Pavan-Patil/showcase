@@ -1262,7 +1262,9 @@ a {
 }
 
 .hero-copy h1,
-.case-hero h1 {
+.case-hero h1,
+.setup-hero-copy h1,
+.not-found-main h1 {
   max-width: 12ch;
   margin: 1.3rem 0 1.55rem;
   font-family: var(--font-manrope), Manrope, sans-serif;
@@ -1277,7 +1279,10 @@ a {
   color: var(--muted);
 }
 
-.hero-description {
+.hero-description,
+.case-lede,
+.setup-lede,
+.not-found-main .site-container > p:not(.eyebrow) {
   max-width: 39rem;
   color: var(--muted);
   font-size: 1.04rem;
@@ -2022,31 +2027,15 @@ a {
 
 .ai-workflow-container {
   display: grid;
-  grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
-  gap: clamp(2rem, 5vw, 4rem);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
+  gap: clamp(2rem, 4vw, 3rem);
 }
 
 .ai-workflow-copy {
+  width: 100%;
   min-width: 0;
-}
-
-.ai-workflow-copy h2 {
-  max-width: 15ch;
-  margin: 1rem 0 0;
-  font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: clamp(2.1rem, 3.5vw, 2.8rem);
-  font-weight: 560;
-  letter-spacing: -0.055em;
-  line-height: 1.03;
-}
-
-.ai-workflow-copy > p:not(.eyebrow) {
-  max-width: 37rem;
-  margin: 1.25rem 0 0;
-  color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.75;
+  text-align: left;
 }
 
 .ai-workflow-cta {
@@ -2055,7 +2044,7 @@ a {
   gap: 0.5rem;
   width: fit-content;
   min-height: 2.9rem;
-  margin-top: 1.7rem;
+  justify-self: end;
   border-radius: var(--radius-pill);
   background: var(--foreground);
   color: var(--background);
@@ -2079,95 +2068,129 @@ a {
 }
 
 .ai-workflow-map {
+  --workflow-wire-muted: color-mix(in srgb, var(--muted) 42%, var(--border));
+  --workflow-plan-one: 0%;
+  --workflow-plan-two: 0%;
+  --workflow-split-progress: 0;
+  --workflow-branch-progress: 0%;
+  --workflow-merge-progress: 0;
+  --workflow-finish-progress: 0%;
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 1.25rem;
+  width: min(100%, 56rem);
   min-width: 0;
-  overflow: hidden;
-  padding: 0.25rem 0;
-}
-
-.ai-workflow-plan-column,
-.ai-workflow-branch-fan {
-  display: grid;
-  min-width: 0;
+  padding: 0.25rem;
 }
 
 .ai-workflow-plan-column {
   position: relative;
+  display: grid;
   gap: 0.75rem;
-  width: min(100%, 16rem);
+  width: min(100%, 17rem);
+  min-width: 0;
 }
 
-.ai-workflow-plan-column::before {
+.ai-workflow-plan-column .ai-workflow-pill {
+  text-align: center;
+}
+
+.ai-workflow-plan-column .ai-workflow-pill:not(:last-child)::after {
   position: absolute;
-  top: 2rem;
-  bottom: 2rem;
+  top: 100%;
   left: 50%;
-  z-index: 0;
-  width: 1px;
+  z-index: -1;
+  width: 2px;
+  height: 0.75rem;
   transform: translateX(-50%);
-  background: color-mix(in srgb, var(--accent) 38%, var(--border));
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0 var(--workflow-plan-one),
+    var(--workflow-wire-muted) var(--workflow-plan-one) 100%
+  );
   content: "";
   pointer-events: none;
 }
 
-.ai-workflow-branch-fan {
-  position: relative;
-  justify-items: center;
-  gap: 1.05rem;
-  width: min(100%, 34rem);
-  padding-top: 1.6rem;
+.ai-workflow-plan-column .ai-workflow-pill:nth-child(2)::after {
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0 var(--workflow-plan-two),
+    var(--workflow-wire-muted) var(--workflow-plan-two) 100%
+  );
 }
 
-.ai-workflow-branch-fan::before {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 1px;
-  height: calc(100% - 2.1rem);
-  transform: translateX(-50%);
-  background: color-mix(in srgb, var(--accent) 38%, var(--border));
-  content: "";
-  pointer-events: none;
+.ai-workflow-wire {
+  display: block;
+  width: 100%;
+  height: 4rem;
+  overflow: visible;
+}
+
+.ai-workflow-wire path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.ai-workflow-wire-base {
+  stroke: var(--workflow-wire-muted);
+}
+
+.ai-workflow-wire-accent {
+  stroke: var(--accent);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.ai-workflow-wire-split .ai-workflow-wire-accent {
+  stroke-dashoffset: calc(1 - var(--workflow-split-progress));
+}
+
+.ai-workflow-wire-merge .ai-workflow-wire-accent {
+  stroke-dashoffset: calc(1 - var(--workflow-merge-progress));
 }
 
 .ai-workflow-branches {
-  position: relative;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.75rem;
+  align-items: stretch;
+  gap: 0;
   width: 100%;
 }
 
-.ai-workflow-branches::before {
-  position: absolute;
-  top: -0.8rem;
-  right: calc(16.666% + 0.4rem);
-  left: calc(16.666% + 0.4rem);
-  height: 1px;
-  background: color-mix(in srgb, var(--accent) 38%, var(--border));
-  content: "";
-  pointer-events: none;
+.ai-workflow-branch {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  justify-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  padding-inline: clamp(0.275rem, 1vw, 0.5rem);
 }
 
-.ai-workflow-branch-pill::before {
+.ai-workflow-branch::before {
   position: absolute;
-  top: -0.8rem;
+  top: 1rem;
+  bottom: 1.85rem;
   left: 50%;
-  width: 1px;
-  height: 0.8rem;
+  width: 2px;
   transform: translateX(-50%);
-  background: color-mix(in srgb, var(--accent) 38%, var(--border));
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0 var(--workflow-branch-progress),
+    var(--workflow-wire-muted) var(--workflow-branch-progress) 100%
+  );
   content: "";
   pointer-events: none;
 }
 
+.ai-workflow-task-pill,
 .ai-workflow-merge-label {
   position: relative;
   z-index: 1;
-  justify-self: center;
   width: fit-content;
   border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
   border-radius: var(--radius-pill);
@@ -2180,6 +2203,18 @@ a {
   text-transform: uppercase;
 }
 
+.ai-workflow-task-pill {
+  min-width: 3.25rem;
+  text-align: center;
+}
+
+.ai-workflow-branch-sequence {
+  display: grid;
+  align-self: stretch;
+  gap: 0.65rem;
+  width: 100%;
+}
+
 .ai-workflow-pill {
   position: relative;
   z-index: 1;
@@ -2189,29 +2224,36 @@ a {
   align-content: center;
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  background: var(--surface);
   box-shadow: var(--shadow-card);
   padding: 0.72rem 1rem;
 }
 
-.ai-workflow-branch-pill {
-  min-height: 5.25rem;
+.ai-workflow-branch-step {
+  width: 100%;
+  min-height: 4.25rem;
   text-align: center;
 }
 
-.ai-workflow-branch-pill > span {
-  display: inline-block;
-  margin-bottom: 0.35rem;
-  color: var(--accent-text);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.58rem;
-  font-weight: 850;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+.ai-workflow-finish {
+  display: grid;
+  justify-items: center;
+  width: min(100%, 17rem);
+}
+
+.ai-workflow-finish-wire {
+  width: 2px;
+  height: 1.5rem;
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0 var(--workflow-finish-progress),
+    var(--workflow-wire-muted) var(--workflow-finish-progress) 100%
+  );
 }
 
 .ai-workflow-ship-pill {
-  width: min(100%, 16rem);
+  width: 100%;
+  text-align: center;
 }
 
 .ai-workflow-pill h3 {
@@ -3000,16 +3042,10 @@ a {
 .case-hero h1 {
   max-width: 13ch;
   margin: 1rem 0 1.25rem;
-  font-size: clamp(3.4rem, 7vw, 5.8rem);
 }
 
 .case-lede {
-  max-width: 50rem;
   margin: 0;
-  color: var(--foreground);
-  font-size: clamp(1.12rem, 2vw, 1.42rem);
-  font-weight: 520;
-  line-height: 1.55;
 }
 
 .case-summary {
@@ -3459,8 +3495,8 @@ a {
 }
 
 .not-found-main .site-container { text-align: center; }
-.not-found-main h1 { max-width: 12ch; margin: 1rem auto 0; font-size: clamp(3rem, 7vw, 5.8rem); }
-.not-found-main .site-container > p:not(.eyebrow) { max-width: 38rem; margin: 1.5rem auto 0; color: var(--muted); font-size: 0.95rem; line-height: 1.75; }
+.not-found-main h1 { max-width: 12ch; margin: 1rem auto 0; }
+.not-found-main .site-container > p:not(.eyebrow) { margin: 1.5rem auto 0; }
 .not-found-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 2rem; }
 .next-project-section a svg { transition: transform 180ms ease; }
 .next-project-section a:hover svg { transform: translateX(5px); }
@@ -3507,23 +3543,12 @@ a {
   padding: 0 0 3rem;
 }
 
-.setup-hero-copy h1 {
-  max-width: 13ch;
-  margin: 1rem 0 1.3rem;
-  font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: clamp(3.4rem, 7vw, 5.75rem);
-  font-weight: 560;
-  letter-spacing: -0.065em;
-  line-height: 0.98;
+.setup-hero-copy h1 .heading-muted {
+  display: block;
 }
 
 .setup-lede {
-  max-width: 49rem;
   margin: 0;
-  color: var(--foreground);
-  font-size: clamp(1.12rem, 2vw, 1.42rem);
-  font-weight: 520;
-  line-height: 1.55;
 }
 
 .setup-hero-actions {
@@ -3636,6 +3661,14 @@ a {
   color: var(--muted);
   font-size: 0.96rem;
   line-height: 1.75;
+}
+
+.setup-workflow-diagram {
+  margin-top: 3.5rem;
+}
+
+.setup-workflow-diagram .ai-workflow-map {
+  margin-inline: auto;
 }
 
 .setup-timeline {
@@ -4013,7 +4046,6 @@ a {
   .case-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .case-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
   .case-longform-grid { grid-template-columns: minmax(0, 1fr) 4rem; gap: 3rem; }
-  .ai-workflow-container { grid-template-columns: 1fr; }
   .ai-workflow-map { max-width: 46rem; }
   .setup-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .setup-command-panel { max-width: 44rem; }
@@ -4047,8 +4079,14 @@ a {
   .hero-section { min-height: auto; padding: 4.5rem 0 calc(3.5rem + 6px); }
   .hero-section::before { background-size: 42px 42px; }
   .hero-copy { padding: 2rem 0 0; }
-  .hero-copy h1 { font-size: clamp(2.8rem, 14vw, 4.1rem); }
-  .hero-description { font-size: 0.94rem; }
+  .hero-copy h1,
+  .case-hero h1,
+  .setup-hero-copy h1,
+  .not-found-main h1 { font-size: clamp(2.8rem, 14vw, 4.1rem); }
+  .hero-description,
+  .case-lede,
+  .setup-lede,
+  .not-found-main .site-container > p:not(.eyebrow) { font-size: 0.94rem; }
   .hero-actions { align-items: stretch; }
   .primary-cta, .secondary-cta { flex: 1; min-width: 10rem; }
   .hero-location { align-items: start; }
@@ -4096,35 +4134,23 @@ a {
   }
   .client-project-logo { width: 2.2rem; height: 2.2rem; }
   .ai-workflow-band { padding: 4rem 0; }
-  .ai-workflow-copy h2 { font-size: clamp(2rem, 10vw, 3rem); }
-  .ai-workflow-map {
-    gap: 1rem;
-    margin-top: 0.5rem;
-  }
-  .ai-workflow-plan-column::before,
-  .ai-workflow-branch-fan::before,
-  .ai-workflow-branches::before,
-  .ai-workflow-branch-pill::before {
-    display: none;
-  }
+  .ai-workflow-container { grid-template-columns: 1fr; }
+  .ai-workflow-cta { justify-self: start; }
+  .ai-workflow-map { width: 100%; }
   .ai-workflow-plan-column {
     width: min(100%, 18rem);
   }
-  .ai-workflow-branch-fan {
-    width: min(100%, 18rem);
-    padding-top: 0;
-  }
   .ai-workflow-branches {
-    grid-template-columns: 1fr;
-    gap: 0.55rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .ai-workflow-branch-pill {
-    min-height: 3.7rem;
-    text-align: left;
+  .ai-workflow-wire { height: 3.25rem; }
+  .ai-workflow-branch { gap: 0.55rem; }
+  .ai-workflow-branch-sequence { gap: 0.45rem; }
+  .ai-workflow-branch-step {
+    min-height: 4rem;
+    padding-inline: 0.45rem;
   }
-  .ai-workflow-ship-pill {
-    width: 100%;
-  }
+  .ai-workflow-ship-pill { width: 100%; }
   .about-portrait {
     display: block;
     width: min(100%, 20rem);
@@ -4153,8 +4179,6 @@ a {
   .case-study-main { padding-top: 0; }
   .case-hero { padding-top: 1.5rem; }
   .case-hero-grid { grid-template-columns: 1fr; gap: 2rem; padding: 3rem 0 2rem; }
-  .case-hero h1 { font-size: clamp(3rem, 16vw, 4.8rem); }
-  .case-lede { font-size: 1.06rem; }
   .case-summary { font-size: 0.9rem; }
   .case-facts { grid-template-columns: 1fr; }
   .case-media { border-radius: 0.85rem; }
@@ -4244,8 +4268,6 @@ a {
     gap: 2rem;
     padding: 0 0 2rem;
   }
-  .setup-hero-copy h1 { font-size: clamp(3rem, 16vw, 4.8rem); }
-  .setup-lede { font-size: 1.06rem; }
   .setup-command-body p { grid-template-columns: 4.25rem minmax(0, 1fr); }
   .setup-stats-grid { grid-template-columns: 1fr; }
   .setup-stats-grid div {
@@ -4303,6 +4325,19 @@ a {
   .learning-stack { grid-template-columns: 1fr; gap: 0.35rem; }
   .learning-stack > div { min-height: 3.1rem; padding: 0.5rem; }
   .learning-timeline { margin-top: 0.5rem; padding: 0.5rem; }
+  .ai-workflow-wire { height: 2.75rem; }
+  .ai-workflow-branches { gap: 0; }
+  .ai-workflow-task-pill {
+    min-width: 2.75rem;
+    padding-inline: 0.55rem;
+  }
+  .ai-workflow-branch-step {
+    min-height: 3.85rem;
+    border-radius: 1.15rem;
+    padding-inline: 0.3rem;
+  }
+  .ai-workflow-branch-step h3 { font-size: 0.72rem; }
+  .ai-workflow-branch-step p { font-size: 0.56rem; }
   .ops-frame { grid-template-columns: 2.1rem 1fr; }
   .ops-main { padding: 0.55rem; }
   .ops-stats > div { padding: 0.4rem; }

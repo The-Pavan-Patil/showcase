@@ -303,49 +303,20 @@ export function HomePage({ locale }: { locale: Locale }) {
         >
           <Container className="ai-workflow-container">
             <div className="ai-workflow-copy">
-              <p className="eyebrow">{ui.home.aiWorkflow.eyebrow}</p>
-              <h2 id="ai-workflow-heading">{ui.home.aiWorkflow.title}</h2>
-              <p>{ui.home.aiWorkflow.description}</p>
-              <Link className="ai-workflow-cta" href={getSetupPath(locale)}>
-                {ui.home.aiWorkflow.cta}
-                <ArrowRight aria-hidden="true" size={16} />
-              </Link>
+              <SectionHeading
+                id="ai-workflow-heading"
+                eyebrow={ui.home.aiWorkflow.eyebrow}
+                title={ui.home.aiWorkflow.title}
+                muted={ui.home.aiWorkflow.titleMuted}
+                description={`${ui.home.aiWorkflow.description} ${ui.home.aiWorkflow.descriptionEmphasis}`}
+                accentAnchor="workflow"
+              />
             </div>
 
-            <div
-              className="ai-workflow-map"
-              aria-label={ui.home.aiWorkflow.pipelineAria}
-            >
-              <div className="ai-workflow-plan-column">
-                {ui.home.aiWorkflow.planning.map((step) => (
-                  <article className="ai-workflow-pill" key={`${step.label}-${step.tool}`}>
-                    <h3>{step.label}</h3>
-                    <p>{step.tool}</p>
-                  </article>
-                ))}
-              </div>
-
-              <div className="ai-workflow-branch-fan">
-                <div className="ai-workflow-branches">
-                  {ui.home.aiWorkflow.branches.map((branch) => (
-                    <article className="ai-workflow-pill ai-workflow-branch-pill" key={branch.task}>
-                      <span>{branch.task}</span>
-                      <div>
-                        <h3>{branch.label}</h3>
-                        <p>{branch.tool}</p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-                <span className="ai-workflow-merge-label">
-                  {ui.home.aiWorkflow.merge}
-                </span>
-                <article className="ai-workflow-pill ai-workflow-ship-pill">
-                  <h3>{ui.home.aiWorkflow.ship.label}</h3>
-                  <p>{ui.home.aiWorkflow.ship.tool}</p>
-                </article>
-              </div>
-            </div>
+            <Link className="ai-workflow-cta" href={getSetupPath(locale)}>
+              {ui.home.aiWorkflow.cta}
+              <ArrowRight aria-hidden="true" size={16} />
+            </Link>
           </Container>
         </section>
 

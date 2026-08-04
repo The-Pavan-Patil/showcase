@@ -195,14 +195,20 @@ describe("ScrollAccent", () => {
             </article>
           </section>
           <span
+            data-scroll-accent-anchor="workflow"
+            data-scroll-accent-phase="heading"
+            data-test-x="20"
+            data-test-y="1250"
+          />
+          <span
             data-scroll-accent-anchor="about"
             data-scroll-accent-phase="heading"
             data-test-x="20"
-            data-test-y="1300"
+            data-test-y="1400"
           />
           <section
             data-scroll-accent-contact
-            data-test-y="1500"
+            data-test-y="1600"
             data-test-height="300"
           />
         </main>

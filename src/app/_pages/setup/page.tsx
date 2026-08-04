@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { AiWorkflowDiagram } from "@/components/ai-workflow-diagram";
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { SiteFooter } from "@/components/site-footer";
@@ -201,7 +202,10 @@ export function SetupPage({ locale }: { locale: Locale }) {
                   AI workflow and Setup
                 </SetupEyebrow>
                 <h1 id="setup-title">
-                  I use AI like an engineering team around me.
+                  I use AI like an{" "}
+                  <span className="heading-muted">
+                    engineering team around me.
+                  </span>
                 </h1>
                 <p className="setup-lede">
                   One agent helps plan, others implement, others test, one tries
@@ -281,6 +285,10 @@ export function SetupPage({ locale }: { locale: Locale }) {
                 clear enough for multiple agents to work without losing the
                 original intent.
               </p>
+            </div>
+
+            <div className="setup-workflow-diagram">
+              <AiWorkflowDiagram workflow={ui.home.aiWorkflow} />
             </div>
 
             <div className="setup-timeline">
