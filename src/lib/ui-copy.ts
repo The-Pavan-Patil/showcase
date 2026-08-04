@@ -72,6 +72,27 @@ export type UiCopy = {
     experienceTitle: string;
     experienceMuted: string;
     experienceDescription: string;
+    aiWorkflow: {
+      eyebrow: string;
+      title: string;
+      description: string;
+      cta: string;
+      pipelineAria: string;
+      planning: Array<{
+        label: string;
+        tool: string;
+      }>;
+      branches: Array<{
+        task: string;
+        label: string;
+        tool: string;
+      }>;
+      merge: string;
+      ship: {
+        label: string;
+        tool: string;
+      };
+    };
     technologyStackAria: string;
     collapseProjects: string;
     showProjects: string;
@@ -289,6 +310,26 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       experienceMuted: "from interface to infrastructure.",
       experienceDescription:
         "Experience across client products, internal platforms, cloud operations, and real-time research systems.",
+      aiWorkflow: {
+        eyebrow: "AI workflow",
+        title: "How I plan, build, test, and ship with AI.",
+        description:
+          "I use AI as a structured engineering system, not an autopilot. Planning starts with Claude Opus, Spec Kit, and Beads. Implementation runs through focused agents for frontend, backend, testing, documentation, and chaos review. Git stays manual.",
+        cta: "View my setup",
+        pipelineAria: "AI workflow branching from task planning into build, review, and test before merge and ship",
+        planning: [
+          { label: "Brainstorm", tool: "Claude Opus" },
+          { label: "Master PRD", tool: "Spec Kit" },
+          { label: "Tasks", tool: "Beads" },
+        ],
+        branches: [
+          { task: "t1", label: "Build", tool: "Codex + Opus" },
+          { task: "t2", label: "Review", tool: "Chaos pass" },
+          { task: "t3", label: "Test", tool: "Sonnet" },
+        ],
+        merge: "Merge",
+        ship: { label: "Ship", tool: "Manual git" },
+      },
       technologyStackAria: "{name} technology stack",
       collapseProjects: "Collapse projects",
       showProjects: "Show projects",
@@ -518,6 +559,26 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       experienceMuted: "画面から基盤まで。",
       experienceDescription:
         "クライアント向けプロダクト、社内基盤、クラウド運用、リアルタイム研究システムでの経験があります。",
+      aiWorkflow: {
+        eyebrow: "AIワークフロー",
+        title: "AIで計画し、作り、テストし、届ける方法。",
+        description:
+          "AIは自動操縦ではなく、構造化されたエンジニアリングシステムとして使っています。計画はClaude Opus、Spec Kit、Beadsから始め、実装はフロントエンド、バックエンド、テスト、ドキュメント、カオスレビューに分けたエージェントで進めます。Gitは手動で管理します。",
+        cta: "セットアップを見る",
+        pipelineAria: "タスク計画から実装、レビュー、テストへ分岐し、マージして公開するAIワークフロー",
+        planning: [
+          { label: "ブレスト", tool: "Claude Opus" },
+          { label: "Master PRD", tool: "Spec Kit" },
+          { label: "タスク", tool: "Beads" },
+        ],
+        branches: [
+          { task: "t1", label: "実装", tool: "Codex + Opus" },
+          { task: "t2", label: "レビュー", tool: "Chaos pass" },
+          { task: "t3", label: "テスト", tool: "Sonnet" },
+        ],
+        merge: "マージ",
+        ship: { label: "公開", tool: "手動Git" },
+      },
       technologyStackAria: "{name} の技術スタック",
       collapseProjects: "プロジェクトを閉じる",
       showProjects: "プロジェクトを見る",
@@ -747,6 +808,26 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       experienceMuted: "von der Oberfläche bis zur Infrastruktur.",
       experienceDescription:
         "Erfahrung mit Kundenprodukten, internen Plattformen, Cloud-Betrieb und Echtzeit-Forschungssystemen.",
+      aiWorkflow: {
+        eyebrow: "AI-Workflow",
+        title: "Wie ich mit AI plane, baue, teste und ausliefere.",
+        description:
+          "Ich nutze AI als strukturiertes Engineering-System, nicht als Autopilot. Planung beginnt mit Claude Opus, Spec Kit und Beads. Die Umsetzung läuft über fokussierte Agenten für Frontend, Backend, Tests, Dokumentation und Chaos Review. Git bleibt manuell.",
+        cta: "Setup ansehen",
+        pipelineAria: "AI-Workflow, der von Task-Planung in Build, Review und Test verzweigt, dann merged und ausgeliefert wird",
+        planning: [
+          { label: "Brainstorming", tool: "Claude Opus" },
+          { label: "Master PRD", tool: "Spec Kit" },
+          { label: "Tasks", tool: "Beads" },
+        ],
+        branches: [
+          { task: "t1", label: "Build", tool: "Codex + Opus" },
+          { task: "t2", label: "Review", tool: "Chaos pass" },
+          { task: "t3", label: "Test", tool: "Sonnet" },
+        ],
+        merge: "Merge",
+        ship: { label: "Ship", tool: "Manuelles Git" },
+      },
       technologyStackAria: "{name} Technologie-Stack",
       collapseProjects: "Projekte einklappen",
       showProjects: "Projekte anzeigen",
