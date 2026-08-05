@@ -322,15 +322,15 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         titleMuted: "development.",
         description: "I use AI like an engineering team around me.",
         descriptionEmphasis:
-          "One agent helps plan, others implement, others test, one tries to break the system, and I keep final control over review, git, and shipping.",
+          "One agent helps plan, others implement, others test, one tries to break the system, and complex work gets an orchestration loop around git and CI.",
         cta: "View my full setup",
-        pipelineAria: "AI workflow from brainstorm to task planning, branching into three tasks. T3 fails its first test, returns through build and review, passes its second test, then all tasks merge and ship",
+        pipelineAria: "AI workflow from brainstorm to task planning with AO coordination, branching into three tasks. T3 fails its first test, returns through build and review, passes its second test, then all tasks merge through git and ship after GitHub Actions verification",
         testFailed: "Test failed",
         testPassed: "Test passed",
         planning: [
           { label: "Brainstorm", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },
-          { label: "Tasks", tool: "Beads" },
+          { label: "Tasks", tool: "Beads + AO" },
         ],
         branches: [
           {
@@ -358,8 +358,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
             ],
           },
         ],
-        merge: "Merge",
-        ship: { label: "Ship", tool: "Manual git" },
+        merge: "Git merge",
+        ship: { label: "Ship", tool: "GitHub Actions" },
       },
       technologyStackAria: "{name} technology stack",
       collapseProjects: "Collapse projects",
@@ -596,15 +596,15 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         titleMuted: "速くしているか。",
         description: "AIを、自分を支えるエンジニアリングチームのように使っています。",
         descriptionEmphasis:
-          "あるエージェントが計画を助け、ほかが実装とテストを担当し、別のエージェントがシステムを壊そうと試みます。レビュー、Git、公開の最終判断は自分で行います。",
+          "あるエージェントが計画を助け、ほかが実装とテストを担当し、別のエージェントがシステムを壊そうと試みます。複雑な作業はGitとCIを中心にしたオーケストレーションループで扱います。",
         cta: "セットアップ全体を見る",
-        pipelineAria: "ブレストとタスク計画から3つのタスクへ分岐するAIワークフロー。T3は最初のテストに失敗し、実装とレビューに戻り、2回目のテストに合格してから、すべてのタスクをマージして公開します",
+        pipelineAria: "ブレストからAOで調整したタスク計画へ進み、3つのタスクへ分岐するAIワークフロー。T3は最初のテストに失敗し、実装とレビューに戻り、2回目のテストに合格してから、すべてのタスクをGitでマージし、GitHub Actionsの検証後に公開します",
         testFailed: "テストに失敗",
         testPassed: "テストに合格",
         planning: [
           { label: "ブレスト", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },
-          { label: "タスク", tool: "Beads" },
+          { label: "タスク", tool: "Beads + AO" },
         ],
         branches: [
           {
@@ -632,8 +632,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
             ],
           },
         ],
-        merge: "マージ",
-        ship: { label: "公開", tool: "手動Git" },
+        merge: "Gitマージ",
+        ship: { label: "公開", tool: "GitHub Actions" },
       },
       technologyStackAria: "{name} の技術スタック",
       collapseProjects: "プロジェクトを閉じる",
@@ -870,15 +870,15 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         titleMuted: "Entwicklung mit AI.",
         description: "Ich nutze AI wie ein Engineering-Team um mich herum.",
         descriptionEmphasis:
-          "Ein Agent hilft bei der Planung, andere implementieren und testen, einer versucht das System zu brechen, und ich behalte die letzte Kontrolle über Review, Git und Auslieferung.",
+          "Ein Agent hilft bei der Planung, andere implementieren und testen, einer versucht das System zu brechen, und komplexe Arbeit bekommt eine Orchestrierungsschleife um Git und CI.",
         cta: "Mein vollständiges Setup ansehen",
-        pipelineAria: "AI-Workflow vom Brainstorming zur Task-Planung, der in drei Tasks verzweigt. T3 scheitert im ersten Test, kehrt zu Build und Review zurück, besteht den zweiten Test und wird dann mit allen Tasks gemerged und ausgeliefert",
+        pipelineAria: "AI-Workflow vom Brainstorming zur Task-Planung mit AO-Koordination, der in drei Tasks verzweigt. T3 scheitert im ersten Test, kehrt zu Build und Review zurück, besteht den zweiten Test und wird dann über Git gemerged und nach GitHub-Actions-Verifikation ausgeliefert",
         testFailed: "Test fehlgeschlagen",
         testPassed: "Test bestanden",
         planning: [
           { label: "Brainstorming", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },
-          { label: "Tasks", tool: "Beads" },
+          { label: "Tasks", tool: "Beads + AO" },
         ],
         branches: [
           {
@@ -906,8 +906,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
             ],
           },
         ],
-        merge: "Merge",
-        ship: { label: "Ship", tool: "Manuelles Git" },
+        merge: "Git-Merge",
+        ship: { label: "Ship", tool: "GitHub Actions" },
       },
       technologyStackAria: "{name} Technologie-Stack",
       collapseProjects: "Projekte einklappen",

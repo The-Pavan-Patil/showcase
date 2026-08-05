@@ -93,6 +93,33 @@ const agentRoles = [
   },
 ] as const;
 
+const orchestrationPoints = [
+  {
+    label: "AO / Python",
+    title: "Orchestrate the loop",
+    text:
+      "For very complex workflows, I use **Agent Orchestrator (AO)** or **Python scripting** when I need tighter control over agent order, retries, handoffs, and checkpoints.",
+  },
+  {
+    label: "wrap",
+    title: "Run and coordinate agents",
+    text:
+      "I use **wrap** to manage agents around the work: starting them, coordinating them, and keeping each role connected to the current plan.",
+  },
+  {
+    label: "Git + Actions",
+    title: "Keep one source of truth",
+    text:
+      "**Git** stays the source of consistency, while **GitHub Actions** handles automated verification after changes move through the workflow.",
+  },
+  {
+    label: "LangGraph / Temporal",
+    title: "Scale beyond simple coordination",
+    text:
+      "When a feature becomes too large for a simple agent loop, I use **LangGraph**. **Temporal** is also a strong option when reliability and durable orchestration matter.",
+  },
+] as const;
+
 const controlPoints = [
   "I do not like agents raising PRs and auto-merging code for me.",
   "I review uncommitted features manually before committing or merging.",
@@ -118,6 +145,10 @@ const tools = [
   {
     title: "Review",
     items: ["Sonnet", "ESLint", "test cases", "chaos engineering agent"],
+  },
+  {
+    title: "Orchestration",
+    items: ["Agent Orchestrator (AO)", "Python scripts", "wrap", "LangGraph", "Temporal"],
   },
   {
     title: "Automation",
@@ -340,6 +371,36 @@ export function SetupPage({ locale }: { locale: Locale }) {
           </Container>
         </section>
 
+        <section className="setup-section" aria-labelledby="orchestration-heading">
+          <Container>
+            <div className="setup-orchestration-grid">
+              <div className="setup-section-heading">
+                <SetupEyebrow anchor="orchestration">
+                  Loop engineering
+                </SetupEyebrow>
+                <h2 id="orchestration-heading">
+                  Complex workflows need orchestration, not just more agents.
+                </h2>
+                <p>
+                  For bigger systems, I add a loop engineering layer so the work
+                  keeps moving through planning, implementation, review, and
+                  verification without losing consistency.
+                </p>
+              </div>
+
+              <div className="setup-orchestration-stack">
+                {orchestrationPoints.map((point) => (
+                  <article key={point.title} className="setup-orchestration-card">
+                    <span>{point.label}</span>
+                    <h3>{point.title}</h3>
+                    <p>{richText(point.text)}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </Container>
+        </section>
+
         <section className="setup-chaos-section" aria-labelledby="chaos-heading">
           <Container>
             <div className="setup-chaos-grid">
@@ -352,10 +413,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
               <div className="setup-chaos-copy">
                 {/* <ShieldAlert aria-hidden="true" size={24} /> */}
                 <p>
-                  The **chaos engineering agent** breaks the code intentionally and looks for broken assumptions,
-                  missing edge cases, weak recovery paths, bad states, race
-                  conditions, unclear user flows, and places where the system
-                  works only when everything goes perfectly.
+                  {richText(
+                    "The **chaos engineering agent** breaks the code intentionally and looks for broken assumptions, missing edge cases, weak recovery paths, bad states, race conditions, unclear user flows, and places where the system works only when everything goes perfectly.",
+                  )}
                 </p>
                 <p>
                   I like this role because it adds pressure to the design before
@@ -448,10 +508,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
                 </SetupEyebrow>
                 <h2 id="automation-heading">CI/CD and personal agents handle the background checks.</h2>
                 <p>
-                  **GitHub Actions agents** tell me whether deployment is in process,
-                  failed, merged, or completed. For personal automation, I use a
-                  self-hosted **Hermas agent** for starting the day, checking emails,
-                  reviewing meetings, and handling small personal tasks.
+                  {richText(
+                    "**GitHub Actions agents** tell me whether deployment is in process, failed, merged, or completed. For personal automation, I use a self-hosted **Hermas agent** for starting the day, checking emails, reviewing meetings, and handling small personal tasks.",
+                  )}
                 </p>
               </div>
 

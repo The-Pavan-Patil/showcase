@@ -3852,6 +3852,7 @@ a {
 
 .setup-timeline-item h3,
 .setup-agent-card h3,
+.setup-orchestration-card h3,
 .setup-tool-card h3,
 .setup-desk-grid h3 {
   margin: 0;
@@ -3877,6 +3878,7 @@ a {
 }
 
 .setup-agent-card,
+.setup-orchestration-card,
 .setup-tool-card,
 .setup-desk-grid article {
   border: 1px solid var(--border);
@@ -3916,6 +3918,48 @@ a {
   color: var(--muted);
   font-size: 0.84rem;
   line-height: 1.7;
+}
+
+.setup-orchestration-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  gap: clamp(2.5rem, 6vw, 6rem);
+  align-items: start;
+}
+
+.setup-orchestration-stack {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.setup-orchestration-card {
+  min-height: 14rem;
+  padding: 1.2rem;
+}
+
+.setup-orchestration-card span {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+  padding: 0.36rem 0.65rem;
+  font-size: 0.62rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.setup-orchestration-card h3 {
+  margin-top: 1rem;
+}
+
+.setup-orchestration-card p {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.72;
 }
 
 .setup-chaos-section {
@@ -4028,7 +4072,7 @@ a {
 
 .setup-tool-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
   gap: 1rem;
   margin-top: 3.5rem;
 }
@@ -4208,8 +4252,10 @@ a {
   .setup-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .setup-command-panel { max-width: 44rem; }
   .setup-agent-grid,
+  .setup-orchestration-stack,
   .setup-tool-grid { grid-template-columns: repeat(2, 1fr); }
   .setup-two-column,
+  .setup-orchestration-grid,
   .setup-chaos-grid { grid-template-columns: 1fr; gap: 2.5rem; }
 }
 
@@ -4441,6 +4487,7 @@ a {
   .setup-agent-grid,
   .setup-tool-grid,
   .setup-desk-grid { grid-template-columns: 1fr; margin-top: 2.5rem; }
+  .setup-orchestration-stack { grid-template-columns: 1fr; }
   .setup-agent-card { min-height: auto; }
   .setup-chaos-grid,
   .setup-two-column { grid-template-columns: 1fr; gap: 2rem; }
