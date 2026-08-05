@@ -80,6 +80,8 @@ export type UiCopy = {
       descriptionEmphasis: string;
       cta: string;
       pipelineAria: string;
+      testFailed: string;
+      testPassed: string;
       planning: Array<{
         label: string;
         tool: string;
@@ -322,7 +324,9 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         descriptionEmphasis:
           "One agent helps plan, others implement, others test, one tries to break the system, and I keep final control over review, git, and shipping.",
         cta: "View my full setup",
-        pipelineAria: "AI workflow from brainstorm to task planning, branching into three tasks that each move through build, review, and test before merge and ship",
+        pipelineAria: "AI workflow from brainstorm to task planning, branching into three tasks. T3 fails its first test, returns through build and review, passes its second test, then all tasks merge and ship",
+        testFailed: "Test failed",
+        testPassed: "Test passed",
         planning: [
           { label: "Brainstorm", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },
@@ -594,7 +598,9 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         descriptionEmphasis:
           "あるエージェントが計画を助け、ほかが実装とテストを担当し、別のエージェントがシステムを壊そうと試みます。レビュー、Git、公開の最終判断は自分で行います。",
         cta: "セットアップ全体を見る",
-        pipelineAria: "ブレストとタスク計画から3つのタスクへ分岐し、それぞれを実装、レビュー、テストしてからマージし公開するAIワークフロー",
+        pipelineAria: "ブレストとタスク計画から3つのタスクへ分岐するAIワークフロー。T3は最初のテストに失敗し、実装とレビューに戻り、2回目のテストに合格してから、すべてのタスクをマージして公開します",
+        testFailed: "テストに失敗",
+        testPassed: "テストに合格",
         planning: [
           { label: "ブレスト", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },
@@ -866,7 +872,9 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         descriptionEmphasis:
           "Ein Agent hilft bei der Planung, andere implementieren und testen, einer versucht das System zu brechen, und ich behalte die letzte Kontrolle über Review, Git und Auslieferung.",
         cta: "Mein vollständiges Setup ansehen",
-        pipelineAria: "AI-Workflow vom Brainstorming zur Task-Planung, der in drei Tasks verzweigt, die jeweils Build, Review und Test durchlaufen, bevor sie gemerged und ausgeliefert werden",
+        pipelineAria: "AI-Workflow vom Brainstorming zur Task-Planung, der in drei Tasks verzweigt. T3 scheitert im ersten Test, kehrt zu Build und Review zurück, besteht den zweiten Test und wird dann mit allen Tasks gemerged und ausgeliefert",
+        testFailed: "Test fehlgeschlagen",
+        testPassed: "Test bestanden",
         planning: [
           { label: "Brainstorming", tool: "Claude Opus" },
           { label: "Master PRD", tool: "Spec Kit" },

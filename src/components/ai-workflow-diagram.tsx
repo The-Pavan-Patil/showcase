@@ -1,10 +1,12 @@
 "use client";
 
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import type { UiCopy } from "@/lib/ui-copy";
 
 type WorkflowCopy = UiCopy["home"]["aiWorkflow"];
+type WorkflowLifecycle = "idle" | "pinned" | "completed" | "collapsed";
 
 function WorkflowWire({ direction }: { direction: "split" | "merge" }) {
   const paths = direction === "split"
@@ -41,105 +43,359 @@ function WorkflowWire({ direction }: { direction: "split" | "merge" }) {
 }
 
 export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
+  const trackRef = useRef<HTMLDivElement>(null);
   const diagramRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const track = trackRef.current;
     const diagram = diagramRef.current;
-    if (!diagram) return;
+    if (!track || !diagram) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let animationFrame = 0;
+    let resizeFrame = 0;
+    let lifecycle: WorkflowLifecycle = "idle";
+    let activationScrollY = 0;
+    let entryScrollY = 0;
+    let furthestScrollY = window.scrollY;
+    let lastScrollY = window.scrollY;
+    let progress = 0;
+    let scrollDistance = 0;
+    let scaledHeight = 0;
+    let stickyTop = 0;
 
-    const segmentProgress = (progress: number, start: number, end: number) =>
-      Math.min(1, Math.max(0, (progress - start) / (end - start)));
+    const stageNodes = (stage: string) =>
+      diagram.querySelectorAll<HTMLElement>(`[data-workflow-stage="${stage}"]`);
 
-    const updateProgress = () => {
-      animationFrame = 0;
-      const bounds = diagram.getBoundingClientRect();
-      const startLine = window.innerHeight * 0.78;
-      const endLine = window.innerHeight * 0.25;
-      const travel = Math.max(1, bounds.height + startLine - endLine);
-      const progress = reducedMotion.matches
-        ? 1
-        : Math.min(1, Math.max(0, (startLine - bounds.top) / travel));
+    const setLifecycle = (nextLifecycle: WorkflowLifecycle) => {
+      lifecycle = nextLifecycle;
+      track.dataset.workflowLifecycle = nextLifecycle;
+      track.classList.toggle("is-workflow-pinned", nextLifecycle === "pinned");
+      track.classList.toggle(
+        "is-workflow-completed",
+        nextLifecycle === "completed",
+      );
+      track.classList.toggle(
+        "is-workflow-collapsed",
+        nextLifecycle === "collapsed",
+      );
+    };
 
+    const segmentProgress = (value: number, start: number, end: number) =>
+      Math.min(1, Math.max(0, (value - start) / (end - start)));
+
+    const setStageComplete = (stage: string, isComplete: boolean) => {
+      stageNodes(stage).forEach((node) => {
+        node.classList.toggle("is-workflow-complete", isComplete);
+      });
+    };
+
+    const updateProgress = (nextProgress: number) => {
       const percentage = (start: number, end: number) =>
-        `${segmentProgress(progress, start, end) * 100}%`;
+        `${segmentProgress(nextProgress, start, end) * 100}%`;
       const number = (start: number, end: number) =>
-        String(segmentProgress(progress, start, end));
+        String(segmentProgress(nextProgress, start, end));
 
-      diagram.style.setProperty("--workflow-plan-one", percentage(0, 0.09));
-      diagram.style.setProperty("--workflow-plan-two", percentage(0.09, 0.18));
-      diagram.style.setProperty("--workflow-split-progress", number(0.18, 0.32));
-      diagram.style.setProperty("--workflow-branch-progress", percentage(0.32, 0.7));
-      diagram.style.setProperty("--workflow-merge-progress", number(0.7, 0.84));
-      diagram.style.setProperty("--workflow-finish-progress", percentage(0.84, 1));
+      diagram.style.setProperty("--workflow-plan-one", percentage(0, 0.08));
+      diagram.style.setProperty("--workflow-plan-two", percentage(0.08, 0.16));
+      diagram.style.setProperty("--workflow-split-progress", number(0.16, 0.28));
+      diagram.style.setProperty("--workflow-branch-progress", percentage(0.28, 0.55));
+      diagram.style.setProperty("--workflow-retry-progress", percentage(0.55, 0.65));
+      diagram.style.setProperty("--workflow-merge-progress", number(0.86, 0.94));
+      diagram.style.setProperty("--workflow-finish-progress", percentage(0.94, 1));
+
+      setStageComplete("start", true);
+      setStageComplete("plan-one", nextProgress >= 0.08);
+      setStageComplete("plan-two", nextProgress >= 0.16);
+      setStageComplete("split", nextProgress >= 0.28);
+      setStageComplete("branch-build", nextProgress >= 0.37);
+      setStageComplete("branch-review", nextProgress >= 0.46);
+      setStageComplete("branch-test", nextProgress >= 0.55);
+      setStageComplete("retry-test", nextProgress >= 0.79);
+      setStageComplete("merge", nextProgress >= 0.94);
+      setStageComplete("finish", nextProgress >= 1);
+
+      const retryBranch = diagram.querySelector<HTMLElement>(
+        '[data-workflow-branch="t3"]',
+      );
+      retryBranch?.classList.toggle(
+        "has-workflow-test-failed",
+        nextProgress >= 0.55 && nextProgress < 0.79,
+      );
+      retryBranch?.classList.toggle(
+        "has-workflow-build-retried",
+        nextProgress >= 0.65,
+      );
+      retryBranch?.classList.toggle(
+        "has-workflow-review-retried",
+        nextProgress >= 0.72,
+      );
+      retryBranch?.classList.toggle(
+        "has-workflow-test-passed",
+        nextProgress >= 0.79,
+      );
+    };
+
+    const configureScrollTrack = () => {
+      const naturalHeight = diagram.offsetHeight;
+      const isMobile = window.innerWidth <= 760;
+      const topClearance = isMobile ? 16 : 88;
+      const bottomClearance = isMobile ? 96 : 16;
+      const usableHeight = Math.max(
+        180,
+        window.innerHeight - topClearance - bottomClearance,
+      );
+      const scale = Math.min(1, usableHeight / naturalHeight);
+      scaledHeight = naturalHeight * scale;
+      stickyTop = topClearance + Math.max(0, (usableHeight - scaledHeight) / 2);
+      scrollDistance = usableHeight * 2;
+
+      track.style.setProperty("--workflow-scale", String(scale));
+      track.style.setProperty("--workflow-scaled-height", `${scaledHeight}px`);
+      track.style.setProperty("--workflow-sticky-top", `${stickyTop}px`);
+      track.style.setProperty("--workflow-scroll-distance", `${scrollDistance}px`);
+      track.style.setProperty(
+        "--workflow-track-height",
+        `${scaledHeight + scrollDistance}px`,
+      );
+      track.classList.add("is-workflow-scroll-ready");
+
+      if (lifecycle === "pinned") {
+        activationScrollY = furthestScrollY - progress * scrollDistance;
+      } else if (lifecycle === "idle") {
+        entryScrollY = track.getBoundingClientRect().top + window.scrollY - stickyTop;
+      }
+    };
+
+    const collapseTrack = (compensateScroll: boolean) => {
+      if (lifecycle === "collapsed") return;
+      const contentAnchor = track.parentElement?.nextElementSibling;
+      const anchorTopBefore = contentAnchor?.getBoundingClientRect().top;
+      setLifecycle("collapsed");
+
+      if (compensateScroll) {
+        const anchorTopAfter = contentAnchor?.getBoundingClientRect().top;
+        const scrollCorrection =
+          anchorTopBefore !== undefined && anchorTopAfter !== undefined
+            ? anchorTopAfter - anchorTopBefore
+            : -scrollDistance;
+
+        window.scrollBy({
+          top: scrollCorrection,
+          left: 0,
+          behavior: "instant",
+        });
+        lastScrollY = window.scrollY;
+        furthestScrollY = window.scrollY;
+      }
+    };
+
+    const finishAnimation = () => {
+      if (lifecycle !== "pinned") return;
+      setLifecycle("completed");
+    };
+
+    const updateFromScroll = () => {
+      animationFrame = 0;
+      const currentScrollY = window.scrollY;
+      const isMovingDown = currentScrollY > lastScrollY;
+
+      if (lifecycle === "completed") {
+        if (isMovingDown && diagram.getBoundingClientRect().bottom <= 0) {
+          collapseTrack(true);
+        }
+        lastScrollY = window.scrollY;
+        return;
+      }
+
+      if (lifecycle === "collapsed") {
+        lastScrollY = currentScrollY;
+        return;
+      }
+
+      if (reducedMotion.matches) {
+        progress = 1;
+        updateProgress(progress);
+        collapseTrack(false);
+        lastScrollY = currentScrollY;
+        return;
+      }
+
+      if (
+        lifecycle === "idle"
+        && isMovingDown
+        && lastScrollY <= entryScrollY
+        && currentScrollY >= entryScrollY
+      ) {
+        setLifecycle("pinned");
+        activationScrollY = entryScrollY;
+        furthestScrollY = currentScrollY;
+      }
+
+      if (lifecycle === "pinned") {
+        furthestScrollY = Math.max(furthestScrollY, currentScrollY);
+        const nextProgress = Math.min(
+          1,
+          Math.max(0, (furthestScrollY - activationScrollY) / scrollDistance),
+        );
+
+        if (nextProgress > progress) {
+          progress = nextProgress;
+          updateProgress(progress);
+        }
+
+        if (progress >= 1) finishAnimation();
+      }
+
+      lastScrollY = currentScrollY;
     };
 
     const scheduleUpdate = () => {
       if (animationFrame) return;
-      animationFrame = window.requestAnimationFrame(updateProgress);
+      animationFrame = window.requestAnimationFrame(updateFromScroll);
     };
 
-    updateProgress();
+    const handleResize = () => {
+      if (resizeFrame) return;
+      resizeFrame = window.requestAnimationFrame(() => {
+        resizeFrame = 0;
+        configureScrollTrack();
+        updateFromScroll();
+      });
+    };
+
+    const handleReducedMotionChange = () => {
+      if (!reducedMotion.matches) return;
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+      progress = 1;
+      updateProgress(progress);
+      collapseTrack(false);
+    };
+
+    setLifecycle("idle");
+    updateProgress(0);
+    configureScrollTrack();
+    updateFromScroll();
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
-    reducedMotion.addEventListener("change", scheduleUpdate);
+    window.addEventListener("resize", handleResize);
+    reducedMotion.addEventListener("change", handleReducedMotionChange);
 
     return () => {
       if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
       window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-      reducedMotion.removeEventListener("change", scheduleUpdate);
+      window.removeEventListener("resize", handleResize);
+      reducedMotion.removeEventListener("change", handleReducedMotionChange);
     };
   }, []);
 
   return (
     <div
-      ref={diagramRef}
-      className="ai-workflow-map"
-      aria-label={workflow.pipelineAria}
-      role="group"
+      ref={trackRef}
+      className="ai-workflow-scroll-track"
+      data-workflow-lifecycle="idle"
     >
-      <div className="ai-workflow-plan-column">
-        {workflow.planning.map((step) => (
-          <article className="ai-workflow-pill" key={`${step.label}-${step.tool}`}>
-            <h3>{step.label}</h3>
-            <p>{step.tool}</p>
-          </article>
-        ))}
-      </div>
+      <div className="ai-workflow-sticky-shell">
+        <div
+          ref={diagramRef}
+          className="ai-workflow-map"
+          aria-label={workflow.pipelineAria}
+          role="group"
+        >
+          <div className="ai-workflow-plan-column">
+            {workflow.planning.map((step, index) => (
+              <article
+                className="ai-workflow-pill"
+                data-workflow-stage={
+                  index === 0 ? "start" : `plan-${index === 1 ? "one" : "two"}`
+                }
+                key={`${step.label}-${step.tool}`}
+              >
+                <h3>{step.label}</h3>
+                <p>{step.tool}</p>
+              </article>
+            ))}
+          </div>
 
-      <WorkflowWire direction="split" />
+          <WorkflowWire direction="split" />
 
-      <div className="ai-workflow-branches">
-        {workflow.branches.map((branch) => (
-          <article className="ai-workflow-branch" key={branch.task}>
-            <span className="ai-workflow-task-pill">{branch.task}</span>
-            <div className="ai-workflow-branch-sequence">
-              {branch.steps.map((step) => (
-                <div
-                  className="ai-workflow-pill ai-workflow-branch-step"
-                  key={`${branch.task}-${step.label}`}
+          <div className="ai-workflow-branches">
+            {workflow.branches.map((branch) => {
+              const isRetryBranch = branch.task === "t3";
+
+              return (
+                <article
+                  className="ai-workflow-branch"
+                  data-workflow-branch={branch.task}
+                  key={branch.task}
                 >
-                  <h3>{step.label}</h3>
-                  <p>{step.tool}</p>
-                </div>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
+                  <span
+                    className="ai-workflow-task-pill"
+                    data-workflow-stage="split"
+                  >
+                    {branch.task}
+                  </span>
+                  <div className="ai-workflow-branch-sequence">
+                    {branch.steps.map((step, index) => {
+                      const stage = (["build", "review", "test"] as const)[index];
+                      const isRetryTest = isRetryBranch && stage === "test";
 
-      <WorkflowWire direction="merge" />
+                      return (
+                        <div
+                          className="ai-workflow-pill ai-workflow-branch-step"
+                          data-workflow-stage={
+                            isRetryTest ? "retry-test" : `branch-${stage}`
+                          }
+                          data-workflow-retry-stage={
+                            isRetryBranch ? stage : undefined
+                          }
+                          key={`${branch.task}-${step.label}`}
+                        >
+                          <h3>
+                            {step.label}
+                            {isRetryTest ? (
+                              <span className="ai-workflow-test-status">
+                                <span className="ai-workflow-test-status-failed">
+                                  <AlertCircle aria-hidden="true" size={14} />
+                                  <span className="sr-only">{workflow.testFailed}</span>
+                                </span>
+                                <span className="ai-workflow-test-status-passed">
+                                  <CheckCircle2 aria-hidden="true" size={14} />
+                                  <span className="sr-only">{workflow.testPassed}</span>
+                                </span>
+                              </span>
+                            ) : null}
+                          </h3>
+                          <p>{step.tool}</p>
+                        </div>
+                      );
+                    })}
+                    {isRetryBranch ? (
+                      <span className="ai-workflow-retry-wire" aria-hidden="true" />
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
 
-      <div className="ai-workflow-finish">
-        <span className="ai-workflow-merge-label">{workflow.merge}</span>
-        <span className="ai-workflow-finish-wire" aria-hidden="true" />
-        <article className="ai-workflow-pill ai-workflow-ship-pill">
-          <h3>{workflow.ship.label}</h3>
-          <p>{workflow.ship.tool}</p>
-        </article>
+          <WorkflowWire direction="merge" />
+
+          <div className="ai-workflow-finish">
+            <span className="ai-workflow-merge-label" data-workflow-stage="merge">
+              {workflow.merge}
+            </span>
+            <span className="ai-workflow-finish-wire" aria-hidden="true" />
+            <article
+              className="ai-workflow-pill ai-workflow-ship-pill"
+              data-workflow-stage="finish"
+            >
+              <h3>{workflow.ship.label}</h3>
+              <p>{workflow.ship.tool}</p>
+            </article>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -2067,12 +2067,70 @@ a {
   opacity: 0.82;
 }
 
+.ai-workflow-scroll-track {
+  --workflow-scale: 1;
+  --workflow-scaled-height: auto;
+  --workflow-sticky-top: 0px;
+  --workflow-scroll-distance: 0px;
+  --workflow-track-height: auto;
+  position: relative;
+  width: 100%;
+  overflow-anchor: none;
+}
+
+.ai-workflow-sticky-shell {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: 100%;
+}
+
+.ai-workflow-scroll-track.is-workflow-scroll-ready {
+  height: var(--workflow-track-height);
+}
+
+.ai-workflow-scroll-track.is-workflow-scroll-ready .ai-workflow-sticky-shell {
+  height: var(--workflow-scaled-height);
+}
+
+.ai-workflow-scroll-track.is-workflow-pinned .ai-workflow-sticky-shell {
+  position: sticky;
+  top: var(--workflow-sticky-top);
+}
+
+.ai-workflow-scroll-track.is-workflow-completed .ai-workflow-sticky-shell {
+  position: absolute;
+  top: auto;
+  bottom: 0;
+}
+
+.ai-workflow-scroll-track.is-workflow-collapsed {
+  height: var(--workflow-scaled-height);
+}
+
+.ai-workflow-scroll-track.is-workflow-collapsed .ai-workflow-sticky-shell {
+  position: relative;
+  top: auto;
+  bottom: auto;
+}
+
+.ai-workflow-scroll-track.is-workflow-scroll-ready .ai-workflow-map {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) scale(var(--workflow-scale));
+  transform-origin: top center;
+}
+
 .ai-workflow-map {
   --workflow-wire-muted: color-mix(in srgb, var(--muted) 42%, var(--border));
+  --workflow-success: #15995b;
+  --workflow-failure: #d44747;
   --workflow-plan-one: 0%;
   --workflow-plan-two: 0%;
   --workflow-split-progress: 0;
   --workflow-branch-progress: 0%;
+  --workflow-retry-progress: 0%;
   --workflow-merge-progress: 0;
   --workflow-finish-progress: 0%;
   position: relative;
@@ -2201,6 +2259,7 @@ a {
   font-weight: 850;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  transition: border-color var(--motion-fast) ease;
 }
 
 .ai-workflow-task-pill {
@@ -2209,10 +2268,41 @@ a {
 }
 
 .ai-workflow-branch-sequence {
+  position: relative;
   display: grid;
   align-self: stretch;
   gap: 0.65rem;
   width: 100%;
+}
+
+.ai-workflow-branch[data-workflow-branch="t3"] .ai-workflow-branch-sequence {
+  padding-inline-end: 0.6rem;
+}
+
+.ai-workflow-retry-wire {
+  position: absolute;
+  top: 1.15rem;
+  right: 0;
+  bottom: 1.15rem;
+  z-index: 2;
+  width: 0.7rem;
+  border-block: 2px solid var(--accent);
+  border-right: 2px solid var(--accent);
+  border-radius: 0 0.65rem 0.65rem 0;
+  clip-path: inset(calc(100% - var(--workflow-retry-progress)) 0 0 0);
+  pointer-events: none;
+}
+
+.ai-workflow-retry-wire::before {
+  position: absolute;
+  top: -0.3rem;
+  left: -0.12rem;
+  width: 0;
+  height: 0;
+  border-top: 0.28rem solid transparent;
+  border-right: 0.4rem solid var(--accent);
+  border-bottom: 0.28rem solid transparent;
+  content: "";
 }
 
 .ai-workflow-pill {
@@ -2227,6 +2317,74 @@ a {
   background: var(--surface);
   box-shadow: var(--shadow-card);
   padding: 0.72rem 1rem;
+  transition: border-color var(--motion-fast) ease;
+}
+
+.ai-workflow-pill.is-workflow-complete,
+.ai-workflow-task-pill.is-workflow-complete,
+.ai-workflow-merge-label.is-workflow-complete {
+  border-color: var(--workflow-success);
+}
+
+.ai-workflow-branch.has-workflow-test-failed
+  [data-workflow-retry-stage="test"] {
+  border-color: var(--workflow-failure);
+}
+
+.ai-workflow-test-status {
+  display: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  margin-inline-start: 0.28rem;
+  vertical-align: -0.12em;
+}
+
+.ai-workflow-branch.has-workflow-test-failed .ai-workflow-test-status,
+.ai-workflow-branch.has-workflow-test-passed .ai-workflow-test-status {
+  display: inline-grid;
+}
+
+.ai-workflow-test-status-failed,
+.ai-workflow-test-status-passed {
+  display: none;
+  grid-area: 1 / 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-workflow-test-status-failed {
+  color: var(--workflow-failure);
+}
+
+.ai-workflow-test-status-passed {
+  color: var(--workflow-success);
+}
+
+.ai-workflow-branch.has-workflow-test-failed .ai-workflow-test-status-failed,
+.ai-workflow-branch.has-workflow-test-passed .ai-workflow-test-status-passed {
+  display: inline-grid;
+}
+
+.ai-workflow-branch.has-workflow-build-retried
+  [data-workflow-retry-stage="build"],
+.ai-workflow-branch.has-workflow-review-retried
+  [data-workflow-retry-stage="review"],
+.ai-workflow-branch.has-workflow-test-passed
+  [data-workflow-retry-stage="test"] {
+  animation: workflow-retry-pill-pulse 680ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+
+@keyframes workflow-retry-pill-pulse {
+  0%, 100% {
+    border-color: var(--workflow-success);
+    box-shadow: var(--shadow-card);
+  }
+  45% {
+    border-color: var(--workflow-success);
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--workflow-success) 22%, transparent),
+      var(--shadow-card);
+  }
 }
 
 .ai-workflow-branch-step {
