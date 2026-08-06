@@ -339,6 +339,7 @@ export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
                   <div className="ai-workflow-branch-sequence">
                     {branch.steps.map((step, index) => {
                       const stage = (["build", "review", "test"] as const)[index];
+                      const isTestStep = stage === "test";
                       const isRetryTest = isRetryBranch && stage === "test";
 
                       return (
@@ -354,15 +355,21 @@ export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
                         >
                           <h3>
                             {step.label}
-                            {isRetryTest ? (
+                            {isTestStep ? (
                               <span className="ai-workflow-test-status">
-                                <span className="ai-workflow-test-status-failed">
-                                  <AlertCircle aria-hidden="true" size={14} />
-                                  <span className="sr-only">{workflow.testFailed}</span>
-                                </span>
+                                {isRetryTest ? (
+                                  <span className="ai-workflow-test-status-failed">
+                                    <AlertCircle aria-hidden="true" size={14} />
+                                    <span className="sr-only">
+                                      {workflow.testFailed}
+                                    </span>
+                                  </span>
+                                ) : null}
                                 <span className="ai-workflow-test-status-passed">
                                   <CheckCircle2 aria-hidden="true" size={14} />
-                                  <span className="sr-only">{workflow.testPassed}</span>
+                                  <span className="sr-only">
+                                    {workflow.testPassed}
+                                  </span>
                                 </span>
                               </span>
                             ) : null}

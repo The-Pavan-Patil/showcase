@@ -2124,7 +2124,7 @@ a {
 
 .ai-workflow-map {
   --workflow-wire-muted: color-mix(in srgb, var(--muted) 42%, var(--border));
-  --workflow-success: #15995b;
+  --workflow-success: var(--accent);
   --workflow-failure: #d44747;
   --workflow-plan-one: 0%;
   --workflow-plan-two: 0%;
@@ -2340,7 +2340,7 @@ a {
 }
 
 .ai-workflow-branch.has-workflow-test-failed .ai-workflow-test-status,
-.ai-workflow-branch.has-workflow-test-passed .ai-workflow-test-status {
+.ai-workflow-pill.is-workflow-complete .ai-workflow-test-status {
   display: inline-grid;
 }
 
@@ -2361,7 +2361,7 @@ a {
 }
 
 .ai-workflow-branch.has-workflow-test-failed .ai-workflow-test-status-failed,
-.ai-workflow-branch.has-workflow-test-passed .ai-workflow-test-status-passed {
+.ai-workflow-pill.is-workflow-complete .ai-workflow-test-status-passed {
   display: inline-grid;
 }
 
