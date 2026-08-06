@@ -2954,13 +2954,22 @@ a {
   scroll-margin-top: 7rem;
 }
 
+.quick-message-scroll-track {
+  position: relative;
+  min-height: 165svh;
+}
+
 .quick-message-band {
+  position: sticky;
+  top: clamp(5.75rem, 11svh, 7.5rem);
   display: grid;
   grid-template-columns: minmax(0, 0.82fr) minmax(20rem, 1fr);
   gap: clamp(1.5rem, 4vw, 3rem);
   align-items: start;
   justify-items: stretch;
   min-width: 0;
+  perspective: 1200px;
+  perspective-origin: 50% 58%;
 }
 
 .quick-message-copy {
@@ -3083,21 +3092,51 @@ a {
   font-size: 0.62rem;
 }
 
-.quick-message-keyboard {
-  display: flex;
+.quick-message-keyboard-camera {
   grid-column: 1 / -1;
-  justify-content: center;
   width: 100%;
   min-width: 0;
   margin-top: 0.85rem;
+  transform-origin: 50% 0%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.quick-message-keyboard {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
   overflow-x: visible;
   overflow-y: visible;
   padding: 0.2rem 0 0.22rem;
+  transform-style: preserve-3d;
 }
 
 .quick-message-keyboard > div {
   max-width: 100%;
   margin-inline: auto;
+  transform-style: preserve-3d;
+}
+
+.keyboard-3d-deck {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.keyboard-3d-deck::after {
+  position: absolute;
+  z-index: -1;
+  inset: 2px;
+  border-radius: inherit;
+  background: rgb(229 229 229);
+  content: "";
+  transform: translateZ(-7px);
+}
+
+.keyboard-3d-key {
+  transform: translateZ(3px);
+  transform-style: preserve-3d;
 }
 
 .contact-section { padding: 0 0 6rem; scroll-margin-top: 7rem; }
@@ -4373,6 +4412,8 @@ a {
   .quick-message-composer { margin-top: 0; }
   .quick-message-copy h2 { font-size: clamp(2rem, 10vw, 3rem); }
   .quick-message-meta { display: grid; gap: 0.45rem; }
+  .quick-message-scroll-track { min-height: 158svh; }
+  .quick-message-band { top: max(5.25rem, 10svh); }
   .quick-message-keyboard { margin-inline: 0; }
   .contact-section { padding-bottom: 4rem; scroll-margin-top: 2rem; }
   .contact-card { grid-template-columns: 1fr; gap: 2rem; border-radius: var(--radius-feature); }
@@ -4566,6 +4607,9 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .quick-message-scroll-track { min-height: auto; }
+  .quick-message-band { position: static; }
+  .quick-message-keyboard-camera { transform: none !important; }
   *, *::before, *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;

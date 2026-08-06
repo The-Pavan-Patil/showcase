@@ -529,7 +529,7 @@ export const Keyboard = ({
 
 export const Keypad = () => {
   return (
-    <div className="h-full w-fit rounded-xl bg-neutral-200 p-1 shadow-sm ring-1 shadow-black/5 ring-black/5">
+    <div className="keyboard-3d-deck h-full w-fit rounded-xl bg-neutral-200 p-1 shadow-sm ring-1 shadow-black/5 ring-black/5">
       {/* Function Row */}
       <Row>
         <Key
@@ -859,7 +859,7 @@ const Key = ({
   };
 
   return (
-    <div className={cn("rounded-[4px] p-[0.5px]", containerClassName)}>
+    <div className={cn("keyboard-3d-key rounded-[4px] p-[0.5px]", containerClassName)}>
       <button
         type="button"
         data-key-code={keyCode}
@@ -931,7 +931,7 @@ const ModifierKey = ({
   };
 
   return (
-    <div className={cn("rounded-[4px] p-[0.5px]", containerClassName)}>
+    <div className={cn("keyboard-3d-key rounded-[4px] p-[0.5px]", containerClassName)}>
       <button
         type="button"
         data-key-code={keyCode}

@@ -1,7 +1,16 @@
 "use client";
 
 import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { type FormEvent, type KeyboardEvent, useCallback, useRef, useState } from "react";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import {
+  type FormEvent,
+  type KeyboardEvent,
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { Keyboard } from "@/components/ui/keyboard";
 import { Container } from "@/components/container";
@@ -20,6 +29,7 @@ export function QuickMessageSection({ copy }: { copy: QuickMessageCopy }) {
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [statusMessage, setStatusMessage] = useState(copy.helper);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const scrollTrackRef = useRef<HTMLDivElement>(null);
 
   const submitMessage = useCallback(
     async (messageToSend = message) => {
@@ -102,7 +112,8 @@ export function QuickMessageSection({ copy }: { copy: QuickMessageCopy }) {
       data-quick-message-section
     >
       <Container>
-        <form className="quick-message-band" onSubmit={handleSubmit}>
+        <div ref={scrollTrackRef} className="quick-message-scroll-track">
+          <form className="quick-message-band" onSubmit={handleSubmit}>
           <div className="quick-message-copy">
             <p className="eyebrow">{copy.eyebrow}</p>
             <h2 id="quick-message-heading">
@@ -159,20 +170,100 @@ export function QuickMessageSection({ copy }: { copy: QuickMessageCopy }) {
             </div>
           </div>
 
-          <div
-            className="quick-message-keyboard"
-            role="group"
-            aria-label={copy.keyboardAria}
-          >
-            <Keyboard
-              enableSound
-              showPreview
-              onVirtualKeyPress={handleVirtualKeyPress}
-            />
-          </div>
-        </form>
+          <ScrollKeyboard
+            ariaLabel={copy.keyboardAria}
+            scrollTrackRef={scrollTrackRef}
+            onVirtualKeyPress={handleVirtualKeyPress}
+          />
+          </form>
+        </div>
       </Container>
     </section>
+  );
+}
+
+function ScrollKeyboard({
+  ariaLabel,
+  scrollTrackRef,
+  onVirtualKeyPress,
+}: {
+  ariaLabel: string;
+  scrollTrackRef: RefObject<HTMLDivElement | null>;
+  onVirtualKeyPress: (keyCode: string) => void;
+}) {
+  const keyboardShellRef = useRef<HTMLDivElement>(null);
+  const [entryScale, setEntryScale] = useState(1.4);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: scrollTrackRef,
+    offset: ["start end", "end start"],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 150,
+    damping: 30,
+    mass: 0.18,
+  });
+
+  useEffect(() => {
+    const shell = keyboardShellRef.current;
+    const keyboardRoot = shell?.querySelector<HTMLElement>(":scope > div");
+    if (!shell || !keyboardRoot) return;
+
+    const measureEntryScale = () => {
+      const zoom = Number.parseFloat(getComputedStyle(keyboardRoot).zoom || "1");
+      const finalWidth = keyboardRoot.offsetWidth * zoom;
+      if (!finalWidth) return;
+
+      setEntryScale(Math.min(1.6, Math.max(1, shell.clientWidth / finalWidth)));
+    };
+
+    measureEntryScale();
+    const resizeObserver = new ResizeObserver(measureEntryScale);
+    resizeObserver.observe(shell);
+    resizeObserver.observe(keyboardRoot);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  const transitionStart = entryScale < 1.25 ? 0.27 : 0.2;
+  const rotateX = useTransform(
+    smoothProgress,
+    [0, transitionStart, 0.6],
+    [48, 48, 0],
+  );
+  const scale = useTransform(
+    smoothProgress,
+    [0, transitionStart, 0.6],
+    [entryScale, entryScale, 1],
+  );
+  const cameraY = useTransform(
+    smoothProgress,
+    [0, transitionStart, 0.6],
+    [18, 18, 0],
+  );
+
+  return (
+    <motion.div
+      className="quick-message-keyboard-camera"
+      style={
+        reduceMotion
+          ? { rotateX: 0, scale: 1, y: 0 }
+          : { rotateX, scale, y: cameraY }
+      }
+    >
+      <div
+        ref={keyboardShellRef}
+        className="quick-message-keyboard"
+        role="group"
+        aria-label={ariaLabel}
+      >
+        <Keyboard
+          enableSound
+          showPreview
+          onVirtualKeyPress={onVirtualKeyPress}
+        />
+      </div>
+    </motion.div>
   );
 }
 
