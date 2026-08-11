@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import type { UiCopy } from "@/lib/ui-copy";
 
 type WorkflowCopy = UiCopy["home"]["aiWorkflow"];
-type WorkflowLifecycle = "idle" | "pinned" | "completed" | "collapsed";
+type WorkflowLifecycle = "idle" | "pinned" | "collapsed";
 
 function WorkflowWire({ direction }: { direction: "split" | "merge" }) {
   const paths = direction === "split"
@@ -71,10 +71,6 @@ export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
       lifecycle = nextLifecycle;
       track.dataset.workflowLifecycle = nextLifecycle;
       track.classList.toggle("is-workflow-pinned", nextLifecycle === "pinned");
-      track.classList.toggle(
-        "is-workflow-completed",
-        nextLifecycle === "completed",
-      );
       track.classList.toggle(
         "is-workflow-collapsed",
         nextLifecycle === "collapsed",
@@ -190,23 +186,10 @@ export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
       }
     };
 
-    const finishAnimation = () => {
-      if (lifecycle !== "pinned") return;
-      setLifecycle("completed");
-    };
-
     const updateFromScroll = () => {
       animationFrame = 0;
       const currentScrollY = window.scrollY;
       const isMovingDown = currentScrollY > lastScrollY;
-
-      if (lifecycle === "completed") {
-        if (isMovingDown && diagram.getBoundingClientRect().bottom <= 0) {
-          collapseTrack(true);
-        }
-        lastScrollY = window.scrollY;
-        return;
-      }
 
       if (lifecycle === "collapsed") {
         lastScrollY = currentScrollY;
@@ -244,7 +227,10 @@ export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
           updateProgress(progress);
         }
 
-        if (progress >= 1) finishAnimation();
+        if (progress >= 1) {
+          collapseTrack(true);
+          return;
+        }
       }
 
       lastScrollY = currentScrollY;

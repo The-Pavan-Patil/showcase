@@ -268,6 +268,94 @@ test("localized pages avoid horizontal overflow on narrow screens", async ({ pag
   }
 });
 
+test("completed setup workflow removes its scroll runway without a reverse-scroll gap", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await page.goto("/setup");
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior = "auto";
+  });
+
+  const track = page.locator(".ai-workflow-scroll-track");
+  const diagram = page.locator(".ai-workflow-map");
+  const timeline = page.locator(".setup-timeline");
+  await expect(track).toHaveClass(/is-workflow-scroll-ready/);
+
+  const scrollTarget = await track.evaluate((element) => {
+    const styles = getComputedStyle(element);
+    const stickyTop = Number.parseFloat(
+      styles.getPropertyValue("--workflow-sticky-top"),
+    );
+    const scrollDistance = Number.parseFloat(
+      styles.getPropertyValue("--workflow-scroll-distance"),
+    );
+    const entryScrollY =
+      element.getBoundingClientRect().top + window.scrollY - stickyTop;
+
+    return entryScrollY + scrollDistance;
+  });
+
+  await page.evaluate((target) => window.scrollTo(0, target - 1), scrollTarget);
+  await expect(track).toHaveAttribute("data-workflow-lifecycle", "pinned");
+  const timelineTopBeforeCompletion = await timeline.evaluate(
+    (element) => element.getBoundingClientRect().top,
+  );
+
+  await page.evaluate((target) => window.scrollTo(0, target + 1), scrollTarget);
+  await expect(track).toHaveAttribute("data-workflow-lifecycle", "collapsed");
+
+  const completedLayout = await page.evaluate(() => {
+    const trackElement = document.querySelector<HTMLElement>(
+      ".ai-workflow-scroll-track",
+    );
+    const diagramElement = document.querySelector<HTMLElement>(
+      ".ai-workflow-map",
+    );
+    const timelineElement = document.querySelector<HTMLElement>(
+      ".setup-timeline",
+    );
+    if (!trackElement || !diagramElement || !timelineElement) return null;
+
+    const trackBounds = trackElement.getBoundingClientRect();
+    const diagramBounds = diagramElement.getBoundingClientRect();
+    const timelineBounds = timelineElement.getBoundingClientRect();
+
+    return {
+      trackHeight: trackBounds.height,
+      scaledHeight: Number.parseFloat(
+        getComputedStyle(trackElement).getPropertyValue(
+          "--workflow-scaled-height",
+        ),
+      ),
+      timelineTop: timelineBounds.top,
+      diagramTimelineGap: timelineBounds.top - diagramBounds.bottom,
+    };
+  });
+
+  expect(completedLayout).not.toBeNull();
+  expect(completedLayout!.trackHeight).toBeCloseTo(
+    completedLayout!.scaledHeight,
+    0,
+  );
+  expect(completedLayout!.timelineTop).toBeCloseTo(
+    timelineTopBeforeCompletion - 2,
+    0,
+  );
+  expect(completedLayout!.diagramTimelineGap).toBeLessThan(100);
+
+  await page.evaluate(() => window.scrollBy(0, -window.innerHeight * 0.75));
+  await expect(track).toHaveAttribute("data-workflow-lifecycle", "collapsed");
+  await expect
+    .poll(async () => {
+      const trackBox = await track.boundingBox();
+      const diagramBox = await diagram.boundingBox();
+      return trackBox && diagramBox
+        ? Math.abs(trackBox.height - diagramBox.height)
+        : Number.POSITIVE_INFINITY;
+    })
+    .toBeLessThan(1);
+});
+
 test("desktop navigation shrinks down and expands up without losing destinations", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name.startsWith("mobile"));
 
