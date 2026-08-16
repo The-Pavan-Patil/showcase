@@ -268,6 +268,67 @@ test("localized pages avoid horizontal overflow on narrow screens", async ({ pag
   }
 });
 
+test("setup workflow wires reveal as continuous strokes", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await page.goto("/setup");
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior = "auto";
+  });
+
+  const track = page.locator(".ai-workflow-scroll-track");
+  const splitWires = page.locator(
+    ".ai-workflow-wire-split .ai-workflow-wire-accent",
+  );
+  await expect(track).toHaveClass(/is-workflow-scroll-ready/);
+  await expect(splitWires).toHaveCount(3);
+
+  const halfwayThroughSplit = await track.evaluate((element) => {
+    const styles = getComputedStyle(element);
+    const stickyTop = Number.parseFloat(
+      styles.getPropertyValue("--workflow-sticky-top"),
+    );
+    const scrollDistance = Number.parseFloat(
+      styles.getPropertyValue("--workflow-scroll-distance"),
+    );
+    const entryScrollY =
+      element.getBoundingClientRect().top + window.scrollY - stickyTop;
+
+    return entryScrollY + scrollDistance * 0.22;
+  });
+
+  await page.evaluate((target) => window.scrollTo(0, target), halfwayThroughSplit);
+  await expect(track).toHaveAttribute("data-workflow-lifecycle", "pinned");
+  await expect
+    .poll(() =>
+      page.locator(".ai-workflow-map").evaluate((element) =>
+        Number.parseFloat(
+          getComputedStyle(element).getPropertyValue(
+            "--workflow-split-progress",
+          ),
+        ),
+      ),
+    )
+    .toBeCloseTo(0.5, 1);
+
+  const wireStyles = await splitWires.evaluateAll((elements) =>
+    elements.map((element) => {
+      const styles = getComputedStyle(element);
+      return {
+        bottomInset: Number.parseFloat(
+          styles.clipPath.split(" ").at(-1) ?? "",
+        ),
+        dashArray: styles.strokeDasharray,
+      };
+    }),
+  );
+
+  for (const style of wireStyles) {
+    expect(style.dashArray).toBe("none");
+    expect(style.bottomInset).toBeCloseTo(50, 1);
+  }
+});
+
 test("completed setup workflow removes its scroll runway without a reverse-scroll gap", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
@@ -592,4 +653,203 @@ test("the accent dot snaps between anchors with reduced motion", async ({ page }
       element.getAnimations().some((animation) => animation.playState === "running"),
     ),
   ).toBe(false);
+});
+
+test("loop engineering cards reveal once with responsive entrance directions", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await page.goto("/setup");
+
+  const grid = page.locator(".setup-orchestration-stack");
+  const cards = page.locator(".setup-orchestration-card");
+  await expect(grid).toHaveAttribute("data-loop-revealed", "false");
+
+  const entranceStyles = await cards.evaluateAll((elements) =>
+    elements.map((element) => {
+      const styles = getComputedStyle(element);
+      const rawDelay = styles.getPropertyValue("--loop-reveal-delay").trim();
+      return {
+        x: styles.getPropertyValue("--loop-enter-x").trim(),
+        y: styles.getPropertyValue("--loop-enter-y").trim(),
+        delayMs: rawDelay.endsWith("ms")
+          ? Number.parseFloat(rawDelay)
+          : Number.parseFloat(rawDelay) * 1000,
+      };
+    }),
+  );
+
+  expect(entranceStyles).toEqual([
+    { x: "0px", y: "40px", delayMs: 0 },
+    { x: "-40px", y: "0px", delayMs: 160 },
+    { x: "40px", y: "0px", delayMs: 480 },
+    { x: "0px", y: "-40px", delayMs: 320 },
+  ]);
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    if ((await grid.getAttribute("data-loop-revealed")) === "true") break;
+
+    await grid.evaluate((element) => element.scrollIntoView({ block: "center" }));
+    await page.waitForTimeout(250);
+  }
+  await expect(grid).toHaveAttribute("data-loop-revealed", "true");
+  await expect(cards.last()).toHaveCSS("opacity", "1");
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(grid).toHaveAttribute("data-loop-revealed", "true");
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+    .toBe(true);
+});
+
+test("mobile loop engineering cards stack and release into the next section", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+
+  await page.goto("/setup");
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior = "auto";
+  });
+
+  const stack = page.locator(".setup-orchestration-stack");
+  const cards = page.locator(".setup-orchestration-card");
+  const chaosSection = page.locator(".setup-chaos-section");
+  await expect(stack).toHaveClass(/is-loop-stack-ready/);
+  await expect(stack).toHaveAttribute("data-loop-revealed", "true");
+  await expect(cards).toHaveCount(4);
+
+  await stack.evaluate((element) => element.scrollIntoView({ block: "start" }));
+  await page.waitForTimeout(300);
+
+  const stackTarget = await stack.evaluate((element) => {
+    const styles = getComputedStyle(element);
+    const stickyTop = Number.parseFloat(
+      styles.getPropertyValue("--loop-sticky-top"),
+    );
+    const scrollDistance = Number.parseFloat(
+      styles.getPropertyValue("--loop-scroll-distance"),
+    );
+    const entryScrollY =
+      element.getBoundingClientRect().top + window.scrollY - stickyTop;
+
+    return entryScrollY + scrollDistance * 0.92;
+  });
+
+  await page.evaluate((target) => window.scrollTo(0, target), stackTarget);
+  await expect(stack).toHaveAttribute("data-loop-stack-lifecycle", "stacking");
+  await expect
+    .poll(() =>
+      cards.last().evaluate((element) =>
+        Number.parseFloat(
+          getComputedStyle(element).getPropertyValue("--loop-card-translate"),
+        ),
+      ),
+    )
+    .toBeLessThan(-200);
+
+  const stackedLayout = await cards.evaluateAll((elements) =>
+    elements.map((element) => {
+      const bounds = element.getBoundingClientRect();
+      const heading = element.querySelector("h3")?.getBoundingClientRect();
+
+      return {
+        top: bounds.top,
+        height: bounds.height,
+        headingBottom: heading?.bottom ?? bounds.top,
+      };
+    }),
+  );
+
+  expect(stackedLayout).toHaveLength(4);
+  for (let index = 1; index < stackedLayout.length; index += 1) {
+    expect(stackedLayout[index].top).toBeGreaterThan(
+      stackedLayout[index - 1].top,
+    );
+    expect(stackedLayout[index].top).toBeGreaterThanOrEqual(
+      stackedLayout[index - 1].headingBottom - 1,
+    );
+    expect(stackedLayout[index].top - stackedLayout[index - 1].top).toBeLessThan(
+      stackedLayout[index - 1].height * 0.7,
+    );
+  }
+
+  const completionTarget = await stack.evaluate((element) => {
+    const styles = getComputedStyle(element);
+    const stickyTop = Number.parseFloat(
+      styles.getPropertyValue("--loop-sticky-top"),
+    );
+    const scrollDistance = Number.parseFloat(
+      styles.getPropertyValue("--loop-scroll-distance"),
+    );
+    const entryScrollY =
+      element.getBoundingClientRect().top + window.scrollY - stickyTop;
+
+    return entryScrollY + scrollDistance + 2;
+  });
+
+  const chaosTopBeforeCompletion = await chaosSection.evaluate(
+    (element) => element.getBoundingClientRect().top,
+  );
+  await page.evaluate((target) => window.scrollTo(0, target), completionTarget);
+  await expect(stack).toHaveAttribute("data-loop-stack-lifecycle", "collapsed");
+
+  const completedLayout = await page.evaluate(() => {
+    const stackElement = document.querySelector<HTMLElement>(
+      ".setup-orchestration-stack",
+    );
+    const lastCard = document.querySelector<HTMLElement>(
+      ".setup-orchestration-card:last-child",
+    );
+    const chaosElement = document.querySelector<HTMLElement>(
+      ".setup-chaos-section",
+    );
+    if (!stackElement || !lastCard || !chaosElement) return null;
+
+    const stackBounds = stackElement.getBoundingClientRect();
+    const lastCardBounds = lastCard.getBoundingClientRect();
+    const chaosBounds = chaosElement.getBoundingClientRect();
+
+    return {
+      stackHeight: stackBounds.height,
+      collapsedHeight: Number.parseFloat(
+        getComputedStyle(stackElement).getPropertyValue(
+          "--loop-collapsed-height",
+        ),
+      ),
+      chaosTop: chaosBounds.top,
+      lastCardBottom: lastCardBounds.bottom,
+    };
+  });
+
+  expect(completedLayout).not.toBeNull();
+  expect(completedLayout!.stackHeight).toBeCloseTo(
+    completedLayout!.collapsedHeight,
+    0,
+  );
+  expect(completedLayout!.chaosTop).toBeLessThanOrEqual(
+    chaosTopBeforeCompletion + 2,
+  );
+  expect(completedLayout!.chaosTop - completedLayout!.lastCardBottom).toBeLessThan(
+    180,
+  );
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+    .toBe(true);
+});
+
+test("loop engineering cards remain visible with reduced motion", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/setup");
+
+  const cards = page.locator(".setup-orchestration-card");
+  const stack = page.locator(".setup-orchestration-stack");
+  await expect(cards.first()).toHaveCSS("opacity", "1");
+  await expect(stack).toHaveAttribute("data-loop-stack-lifecycle", "static");
+  await expect(stack).not.toHaveClass(/is-loop-stack-ready/);
+  const reducedTransform = await cards.first().evaluate((element) => {
+    const transform = getComputedStyle(element).transform;
+    const matrix = transform === "none" ? new DOMMatrix() : new DOMMatrix(transform);
+    return { x: matrix.m41, y: matrix.m42 };
+  });
+  expect(reducedTransform).toEqual({ x: 0, y: 0 });
 });

@@ -2118,6 +2118,7 @@ a {
 
 .ai-workflow-map {
   --workflow-wire-muted: color-mix(in srgb, var(--muted) 42%, var(--border));
+  --workflow-wire-width: 3px;
   --workflow-success: var(--accent);
   --workflow-failure: #d44747;
   --workflow-plan-one: 0%;
@@ -2152,7 +2153,7 @@ a {
   top: 100%;
   left: 50%;
   z-index: -1;
-  width: 2px;
+  width: var(--workflow-wire-width);
   height: 0.75rem;
   transform: translateX(-50%);
   background: linear-gradient(
@@ -2183,7 +2184,7 @@ a {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 2;
+  stroke-width: var(--workflow-wire-width);
   vector-effect: non-scaling-stroke;
 }
 
@@ -2193,16 +2194,19 @@ a {
 
 .ai-workflow-wire-accent {
   stroke: var(--accent);
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+  clip-path: inset(0 0 100% 0);
 }
 
 .ai-workflow-wire-split .ai-workflow-wire-accent {
-  stroke-dashoffset: calc(1 - var(--workflow-split-progress));
+  clip-path: inset(
+    0 0 calc((1 - var(--workflow-split-progress)) * 100%) 0
+  );
 }
 
 .ai-workflow-wire-merge .ai-workflow-wire-accent {
-  stroke-dashoffset: calc(1 - var(--workflow-merge-progress));
+  clip-path: inset(
+    0 0 calc((1 - var(--workflow-merge-progress)) * 100%) 0
+  );
 }
 
 .ai-workflow-branches {
@@ -2228,7 +2232,7 @@ a {
   top: 1rem;
   bottom: 1.85rem;
   left: 50%;
-  width: 2px;
+  width: var(--workflow-wire-width);
   transform: translateX(-50%);
   background: linear-gradient(
     to bottom,
@@ -2280,8 +2284,8 @@ a {
   bottom: 1.15rem;
   z-index: 2;
   width: 0.7rem;
-  border-block: 2px solid var(--accent);
-  border-right: 2px solid var(--accent);
+  border-block: var(--workflow-wire-width) solid var(--accent);
+  border-right: var(--workflow-wire-width) solid var(--accent);
   border-radius: 0 0.65rem 0.65rem 0;
   clip-path: inset(calc(100% - var(--workflow-retry-progress)) 0 0 0);
   pointer-events: none;
@@ -2394,7 +2398,7 @@ a {
 }
 
 .ai-workflow-finish-wire {
-  width: 2px;
+  width: var(--workflow-wire-width);
   height: 1.5rem;
   background: linear-gradient(
     to bottom,
@@ -3162,6 +3166,7 @@ a {
 .footer-bottom { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.2rem; }
 .footer-bottom p { margin: 0; color: var(--muted); font-size: 0.64rem; }
 .footer-watermark {
+  position: relative;
   container-type: inline-size;
   overflow: hidden;
   width: 100%;
@@ -3171,6 +3176,17 @@ a {
   pointer-events: none;
   user-select: none;
 }
+
+.footer-watermark::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: color-mix(in srgb, var(--foreground) 18%, transparent);
+  content: "";
+}
+
 .footer-watermark p {
   display: flex;
   justify-content: space-between;
@@ -3886,7 +3902,6 @@ a {
 .setup-timeline-item h3,
 .setup-agent-card h3,
 .setup-orchestration-card h3,
-.setup-tool-card h3,
 .setup-desk-grid h3 {
   margin: 0;
   font-family: var(--font-manrope), Manrope, sans-serif;
@@ -3905,14 +3920,11 @@ a {
 
 .setup-agent-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 3.5rem;
 }
 
-.setup-agent-card,
 .setup-orchestration-card,
-.setup-tool-card,
 .setup-desk-grid article {
   border: 1px solid var(--border);
   border-radius: 1rem;
@@ -3921,8 +3933,16 @@ a {
 }
 
 .setup-agent-card {
-  min-height: 20rem;
-  padding: 1.2rem;
+  min-height: 18rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.setup-agent-card:nth-child(odd) {
+  border-right: 1px solid var(--border);
+}
+
+.setup-agent-card:nth-child(-n + 2) {
+  border-bottom: 1px solid var(--border);
 }
 
 .setup-agent-icon {
@@ -3960,15 +3980,59 @@ a {
   align-items: start;
 }
 
+.setup-orchestration-section {
+  overflow: clip;
+}
+
 .setup-orchestration-stack {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
 
+.setup-orchestration-sticky-shell {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: inherit;
+  gap: inherit;
+  width: 100%;
+}
+
 .setup-orchestration-card {
+  --loop-enter-x: 0px;
+  --loop-enter-y: 40px;
+  --loop-reveal-delay: 0ms;
+  --loop-card-top: 0px;
+  --loop-card-translate: 0px;
   min-height: 14rem;
   padding: 1.2rem;
+  opacity: 0;
+  transform: translate3d(var(--loop-enter-x), var(--loop-enter-y), 0);
+  transition:
+    opacity 700ms cubic-bezier(0.16, 1, 0.3, 1) var(--loop-reveal-delay),
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1) var(--loop-reveal-delay);
+}
+
+.setup-orchestration-card:nth-child(2) {
+  --loop-enter-x: -40px;
+  --loop-enter-y: 0px;
+  --loop-reveal-delay: 160ms;
+}
+
+.setup-orchestration-card:nth-child(3) {
+  --loop-enter-x: 40px;
+  --loop-enter-y: 0px;
+  --loop-reveal-delay: 480ms;
+}
+
+.setup-orchestration-card:nth-child(4) {
+  --loop-enter-y: -40px;
+  --loop-reveal-delay: 320ms;
+}
+
+.setup-orchestration-stack.is-loop-revealed .setup-orchestration-card {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
 }
 
 .setup-orchestration-card span {
@@ -4037,8 +4101,7 @@ a {
   align-items: start;
 }
 
-.setup-check-list,
-.setup-tool-card ul {
+.setup-check-list {
   display: grid;
   gap: 0;
   margin: 0;
@@ -4101,29 +4164,6 @@ a {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.65;
-}
-
-.setup-tool-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
-  gap: 1rem;
-  margin-top: 3.5rem;
-}
-
-.setup-tool-card {
-  padding: 1.2rem;
-}
-
-.setup-tool-card ul {
-  margin-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.setup-tool-card li {
-  border-bottom: 1px solid var(--border);
-  padding: 0.72rem 0;
-  color: var(--muted);
-  font-size: 0.82rem;
 }
 
 .setup-automation-panel {
@@ -4284,16 +4324,17 @@ a {
   .ai-workflow-map { max-width: 46rem; }
   .setup-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .setup-command-panel { max-width: 44rem; }
-  .setup-agent-grid,
-  .setup-orchestration-stack,
-  .setup-tool-grid { grid-template-columns: repeat(2, 1fr); }
+  .setup-orchestration-stack { grid-template-columns: repeat(2, 1fr); }
   .setup-two-column,
   .setup-orchestration-grid,
   .setup-chaos-grid { grid-template-columns: 1fr; gap: 2.5rem; }
 }
 
 @media (max-width: 760px) {
-  html { scroll-padding-top: 2rem; }
+  html {
+    overflow-x: clip;
+    scroll-padding-top: 2rem;
+  }
   .site-container { width: min(100% - 2rem, var(--container-page)); }
   .site-header {
     top: auto;
@@ -4409,6 +4450,7 @@ a {
   .quick-message-scroll-track { min-height: 158svh; }
   .quick-message-band { top: max(5.25rem, 10svh); }
   .quick-message-keyboard { margin-inline: 0; }
+  .quick-message-keyboard > div { zoom: calc(90vw / 400px) !important; }
   .contact-section { padding-bottom: 4rem; scroll-margin-top: 2rem; }
   .contact-card { grid-template-columns: 1fr; gap: 2rem; border-radius: var(--radius-feature); }
   .contact-email, .schedule-call-link { font-size: 0.66rem; }
@@ -4520,10 +4562,59 @@ a {
   .setup-timeline { margin-top: 2.5rem; }
   .setup-timeline-item { grid-template-columns: 1fr; gap: 0.7rem; padding: 2.2rem 0; }
   .setup-agent-grid,
-  .setup-tool-grid,
-  .setup-desk-grid { grid-template-columns: 1fr; margin-top: 2.5rem; }
+  .setup-desk-grid { margin-top: 2.5rem; }
+  .setup-agent-grid { grid-template-columns: 1fr; }
+  .setup-desk-grid { grid-template-columns: 1fr; }
   .setup-orchestration-stack { grid-template-columns: 1fr; }
-  .setup-agent-card { min-height: auto; }
+  .setup-orchestration-stack.is-loop-stack-ready {
+    display: block;
+    height: var(--loop-track-height);
+    overflow-anchor: none;
+    position: relative;
+  }
+  .setup-orchestration-stack.is-loop-stack-ready .setup-orchestration-sticky-shell {
+    display: block;
+    height: var(--loop-stack-height);
+    position: relative;
+  }
+  .setup-orchestration-stack.is-loop-stacking .setup-orchestration-sticky-shell {
+    position: sticky;
+    top: var(--loop-sticky-top);
+  }
+  .setup-orchestration-stack.is-loop-stack-collapsed {
+    height: var(--loop-collapsed-height);
+  }
+  .setup-orchestration-stack.is-loop-stack-collapsed .setup-orchestration-sticky-shell {
+    height: var(--loop-collapsed-height);
+    position: relative;
+    top: auto;
+  }
+  .setup-orchestration-stack.is-loop-stack-ready .setup-orchestration-card {
+    left: 0;
+    opacity: 1;
+    position: absolute;
+    right: 0;
+    top: var(--loop-card-top);
+    transform: translate3d(0, var(--loop-card-translate), 0);
+    transition: none;
+    width: 100%;
+  }
+  .setup-orchestration-card:nth-child(n) {
+    --loop-enter-x: 0px;
+    --loop-enter-y: 40px;
+  }
+  .setup-orchestration-card:nth-child(1) { --loop-reveal-delay: 0ms; }
+  .setup-orchestration-card:nth-child(2) { --loop-reveal-delay: 160ms; }
+  .setup-orchestration-card:nth-child(3) { --loop-reveal-delay: 320ms; }
+  .setup-orchestration-card:nth-child(4) { --loop-reveal-delay: 480ms; }
+  .setup-agent-card {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    padding-inline: 0;
+  }
+  .setup-agent-card:nth-child(odd) { border-right: 0; }
+  .setup-agent-card:last-child { border-bottom: 0; }
   .setup-chaos-grid,
   .setup-two-column { grid-template-columns: 1fr; gap: 2rem; }
   .setup-desk-section { padding-bottom: 5rem; }
@@ -4585,7 +4676,6 @@ a {
   .contact-email, .schedule-call-link { overflow-wrap: anywhere; border-radius: 1rem; }
   .quick-message-textarea { min-height: 7.5rem; }
   .quick-message-status { align-items: flex-start; }
-  .quick-message-keyboard > div { zoom: 0.792 !important; }
   .about-beyond-item { min-height: 24rem; }
   .about-beyond-image { min-height: 16rem; }
   .project-card-media span { font-size: 0.54rem; }
@@ -4604,10 +4694,34 @@ a {
   .quick-message-scroll-track { min-height: auto; }
   .quick-message-band { position: static; }
   .quick-message-keyboard-camera { transform: none !important; }
+  .setup-orchestration-stack.is-loop-stack-ready {
+    height: auto;
+  }
+  .setup-orchestration-stack.is-loop-stack-ready .setup-orchestration-sticky-shell {
+    display: grid;
+    height: auto;
+    position: static;
+  }
+  .setup-orchestration-stack.is-loop-stack-ready .setup-orchestration-card {
+    position: static;
+    width: auto;
+  }
+  .setup-orchestration-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
   *, *::before, *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+@media (scripting: none) {
+  .setup-orchestration-card {
+    opacity: 1;
+    transform: none;
   }
 }

@@ -34,7 +34,6 @@ function WorkflowWire({ direction }: { direction: "split" | "merge" }) {
           <path
             className="ai-workflow-wire-accent"
             d={path}
-            pathLength={1}
           />
         </g>
       ))}

@@ -210,6 +210,12 @@ function ScrollKeyboard({
     if (!shell || !keyboardRoot) return;
 
     const measureEntryScale = () => {
+      const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+      if (viewportWidth <= 760) {
+        setEntryScale(1.4);
+        return;
+      }
+
       const zoom = Number.parseFloat(getComputedStyle(keyboardRoot).zoom || "1");
       const finalWidth = keyboardRoot.offsetWidth * zoom;
       if (!finalWidth) return;

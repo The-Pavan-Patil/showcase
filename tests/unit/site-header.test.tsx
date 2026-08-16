@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
+import { resumeUrl } from "@/lib/site";
 import { uiCopyByLocale } from "@/lib/ui-copy";
 
 const testState = vi.hoisted(() => ({
@@ -175,10 +176,10 @@ describe("SiteHeader", () => {
 
     expect(menu).toBeVisible();
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute("href", "/");
-    expect(within(menu).getByRole("link", { name: "Résumé" })).toHaveAttribute(
-      "href",
-      "/pavan-patil-resume.txt",
-    );
+    const resumeLink = within(menu).getByRole("link", { name: "Résumé" });
+    expect(resumeLink).toHaveAttribute("href", resumeUrl);
+    expect(resumeLink).toHaveAttribute("target", "_blank");
+    expect(resumeLink).toHaveAttribute("rel", "noopener noreferrer");
 
     await user.click(within(menu).getByRole("button", { name: "Switch to dark theme" }));
     expect(testState.setTheme).toHaveBeenCalledWith("dark");

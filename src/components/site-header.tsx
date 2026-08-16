@@ -32,6 +32,7 @@ import {
   isWorkPath,
   type Locale,
 } from "@/lib/i18n";
+import { resumeUrl } from "@/lib/site";
 import type { UiCopy } from "@/lib/ui-copy";
 
 const navigation = [
@@ -492,7 +493,12 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
         <div className="header-actions">
           <LanguageToggle copy={copy} locale={locale} />
           <ThemeToggle copy={themeCopy} />
-          <a className="resume-link desktop-resume" href="/pavan-patil-resume.txt" download>
+          <a
+            className="resume-link desktop-resume"
+            href={resumeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <span>{copy.resume}</span>
             <ArrowUpRight aria-hidden="true" size={15} />
           </a>
@@ -565,8 +571,9 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
                   <span>{copy.home}</span>
                 </Link>
                 <a
-                  href="/pavan-patil-resume.txt"
-                  download
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={closeUtilities}
                 >
                   <FileDown aria-hidden="true" size={17} />

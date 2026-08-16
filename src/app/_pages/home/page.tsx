@@ -31,7 +31,7 @@ import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
 import { getHashHref, getSetupPath, type Locale } from "@/lib/i18n";
 import { getPortfolioContent } from "@/lib/portfolio";
-import { getSiteUrl } from "@/lib/site";
+import { getSiteUrl, resumeUrl } from "@/lib/site";
 import { getGoogleCalendarBookingUrl } from "@/lib/scheduling";
 import { formatCopy, uiCopyByLocale } from "@/lib/ui-copy";
 
@@ -340,7 +340,12 @@ export function HomePage({ locale }: { locale: Locale }) {
                   />
                 </div>
 
-                <a className="resume-capsule" href="/pavan-patil-resume.txt" download>
+                <a
+                  className="resume-capsule"
+                  href={resumeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {ui.home.downloadResume} <ArrowRight aria-hidden="true" size={16} />
                 </a>
               </div>

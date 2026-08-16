@@ -105,13 +105,9 @@ export function LaunchTerminal({
       await sleep(260);
       if (isCancelled) return;
       setCommand(FINAL_COMMAND);
-      setCursorIndex(CORRECTION_INDEX + 1);
-
-      await sleep(300);
-      if (isCancelled) return;
       setCursorIndex(FINAL_COMMAND.length);
 
-      await sleep(240);
+      await sleep(520);
       if (isCancelled) return;
       setHasSubmitted(true);
 

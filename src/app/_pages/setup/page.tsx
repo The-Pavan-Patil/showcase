@@ -14,6 +14,7 @@ import Link from "next/link";
 import { AiWorkflowDiagram } from "@/components/ai-workflow-diagram";
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
+import { LoopEngineeringCards } from "@/components/loop-engineering-cards";
 import { SiteFooter } from "@/components/site-footer";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { getHomePath, getSetupPath, type Locale } from "@/lib/i18n";
@@ -131,29 +132,6 @@ const repoSyncNotes = [
   "When a project spans multiple directories or repositories, I create handover markdown files.",
   "The handover files explain what changed, what still needs to be done, and which assumptions are shared.",
   "This keeps frontend, backend, tests, documentation, and parallel repo work from drifting apart.",
-] as const;
-
-const tools = [
-  {
-    title: "Planning",
-    items: ["Claude Opus", "Spec Kit", "Beads", "Master PRD"],
-  },
-  {
-    title: "Implementation",
-    items: ["Codex", "Opus terminal", "Cursor Auto Agent", "manual coding"],
-  },
-  {
-    title: "Review",
-    items: ["Sonnet", "ESLint", "test cases", "chaos engineering agent"],
-  },
-  {
-    title: "Orchestration",
-    items: ["Agent Orchestrator (AO)", "Python scripts", "wrap", "LangGraph", "Temporal"],
-  },
-  {
-    title: "Automation",
-    items: ["GitHub Actions", "CI/CD agents", "Hermas agent", "handover markdown"],
-  },
 ] as const;
 
 const deskSetup = [
@@ -371,7 +349,10 @@ export function SetupPage({ locale }: { locale: Locale }) {
           </Container>
         </section>
 
-        <section className="setup-section" aria-labelledby="orchestration-heading">
+        <section
+          className="setup-section setup-orchestration-section"
+          aria-labelledby="orchestration-heading"
+        >
           <Container>
             <div className="setup-orchestration-grid">
               <div className="setup-section-heading">
@@ -388,15 +369,7 @@ export function SetupPage({ locale }: { locale: Locale }) {
                 </p>
               </div>
 
-              <div className="setup-orchestration-stack">
-                {orchestrationPoints.map((point) => (
-                  <article key={point.title} className="setup-orchestration-card">
-                    <span>{point.label}</span>
-                    <h3>{point.title}</h3>
-                    <p>{richText(point.text)}</p>
-                  </article>
-                ))}
-              </div>
+              <LoopEngineeringCards points={orchestrationPoints} />
             </div>
           </Container>
         </section>
@@ -471,30 +444,6 @@ export function SetupPage({ locale }: { locale: Locale }) {
                   </p>
                 ))}
               </div>
-            </div>
-          </Container>
-        </section>
-
-        <section className="setup-section" aria-labelledby="tools-heading">
-          <Container>
-            <div className="setup-section-heading">
-              <SetupEyebrow anchor="tools">
-                Toolchain
-              </SetupEyebrow>
-              <h2 id="tools-heading">A small system around planning, building, and review.</h2>
-            </div>
-
-            <div className="setup-tool-grid">
-              {tools.map((group) => (
-                <article key={group.title} className="setup-tool-card">
-                  <h3>{group.title}</h3>
-                  <ul>
-                    {group.items.map((item) => (
-                      <li key={item}>{richText(item)}</li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
             </div>
           </Container>
         </section>
