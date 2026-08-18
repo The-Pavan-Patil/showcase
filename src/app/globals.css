@@ -1344,7 +1344,10 @@ a {
   font-size: 0.78rem;
 }
 
-.hero-stage {
+/* Sized, empty box that anchors the resting pose of the case-study deck. The
+   cards themselves live in .project-grid and are transformed up to here — they
+   cannot be children, because .hero-section clips its overflow. */
+.hero-deck {
   position: relative;
   min-height: 33rem;
   isolation: isolate;
@@ -1357,23 +1360,6 @@ a {
   border-radius: 50%;
   background: color-mix(in srgb, var(--accent-bright) 20%, transparent);
   filter: blur(65px);
-}
-
-.hero-window {
-  position: absolute;
-  border: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  box-shadow: var(--shadow-float);
-  backdrop-filter: blur(16px);
-}
-
-.hero-window-main {
-  top: 2.5rem;
-  right: 0;
-  width: 94%;
-  overflow: hidden;
-  border-radius: 1.6rem;
-  transform: rotate(1.5deg);
 }
 
 .window-bar {
@@ -1407,104 +1393,6 @@ a {
   font-size: 0.65rem;
 }
 
-.code-panel {
-  display: grid;
-  gap: 0.6rem;
-  padding: 2rem 1.65rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.8rem;
-}
-
-.code-panel p {
-  margin: 0;
-}
-
-.code-panel i {
-  margin-right: 1.2rem;
-  color: var(--muted);
-  font-style: normal;
-  opacity: 0.52;
-}
-
-.code-blue { color: var(--accent-text); font-weight: 700; }
-.code-green { color: #15995b; }
-
-.pipeline-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto 1fr auto;
-  align-items: center;
-  gap: 0.75rem;
-  border-top: 1px solid var(--border);
-  padding: 1rem 1.25rem;
-}
-
-.pipeline-row span {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-}
-
-.pipeline-row i {
-  height: 1px;
-  background: var(--border);
-}
-
-.hero-window-stack {
-  right: -1.5rem;
-  bottom: 1.25rem;
-  z-index: 2;
-  width: 15rem;
-  border-radius: 1.25rem;
-  padding: 1rem;
-  transform: rotate(-2.5deg);
-}
-
-.hero-window-stack > p {
-  margin: 0 0 0.7rem;
-  color: var(--muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.hero-window-stack div {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.55rem;
-  border-top: 1px solid var(--border);
-  padding: 0.65rem 0;
-  font-size: 0.72rem;
-}
-
-.hero-window-stack div span { color: var(--muted); }
-.hero-window-stack div strong { font-size: 0.68rem; }
-
-.hero-signal {
-  position: absolute;
-  bottom: 3.5rem;
-  left: -1rem;
-  z-index: 3;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 0.2rem 0.55rem;
-  min-width: 10rem;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  padding: 0.8rem;
-  transform: rotate(2deg);
-}
-
-.hero-signal svg { grid-row: span 2; color: var(--accent); }
-.hero-signal span { color: var(--muted); font-size: 0.62rem; }
-.hero-signal strong { font-size: 0.75rem; }
 
 .proof-section {
   border-bottom: 1px solid var(--border);
@@ -1591,8 +1479,37 @@ a {
   margin-top: 3.5rem;
 }
 
-.project-card {
+.project-flight {
+  --flight-x: 0px;
+  --flight-y: 0px;
+  --flight-scale: 1;
+  --flight-rotate: 0deg;
+  --flight-z: 40;
+  display: grid;
   grid-column: span 6;
+}
+
+.project-flight:first-child {
+  grid-column: span 12;
+}
+
+/* Only carry a transform while travelling, so a landed card is a plain grid
+   item again — no stray stacking context or containing block. Lifted above the
+   hero and proof strip, but kept under the fixed site header (z-index 50).
+   Cards stay clickable throughout: they hit-test where they are drawn, so the
+   resting deck in the hero is a working set of case-study links. */
+.project-flight[data-flying="true"] {
+  position: relative;
+  z-index: var(--flight-z);
+  will-change: transform;
+  transform:
+    translate3d(var(--flight-x), var(--flight-y), 0)
+    scale(var(--flight-scale))
+    rotate(var(--flight-rotate));
+  transform-origin: center;
+}
+
+.project-card {
   overflow: hidden;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-feature) !important;
@@ -1601,8 +1518,7 @@ a {
   transition: transform var(--motion-base) cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow var(--motion-base) ease !important;
 }
 
-.project-card:first-child {
-  grid-column: span 12;
+.project-flight:first-child .project-card {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
 }
@@ -1619,7 +1535,7 @@ a {
   padding: 0.75rem;
 }
 
-.project-card:first-child .project-card-visual-wrap {
+.project-flight:first-child .project-card .project-card-visual-wrap {
   grid-row: span 3;
   min-height: 31rem;
 }
@@ -1649,7 +1565,7 @@ a {
   padding: 1.25rem 1.4rem 0 !important;
 }
 
-.project-card:first-child .project-card-content {
+.project-flight:first-child .project-card .project-card-content {
   align-self: end;
   padding: 3rem 2rem 0 !important;
 }
@@ -1673,7 +1589,7 @@ a {
   line-height: 1.12 !important;
 }
 
-.project-card:first-child .project-title { font-size: 2rem !important; }
+.project-flight:first-child .project-card .project-title { font-size: 2rem !important; }
 
 .project-summary {
   margin-top: 0.85rem !important;
@@ -1704,7 +1620,7 @@ a {
   padding: 1rem 1.4rem 1.4rem !important;
 }
 
-.project-card:first-child .project-card-footer { padding: 1.3rem 2rem 2rem !important; }
+.project-flight:first-child .project-card .project-card-footer { padding: 1.3rem 2rem 2rem !important; }
 
 .project-card-footer a {
   display: inline-flex;
@@ -4294,11 +4210,11 @@ a {
   .hero-container { grid-template-columns: 1fr; gap: 1rem; }
   .hero-copy { max-width: 47rem; padding-bottom: 0; }
   .hero-copy h1 { max-width: 13ch; }
-  .hero-stage { min-height: 31rem; width: min(100%, 44rem); margin-inline: auto; }
-  .project-card:first-child { display: block; }
-  .project-card:first-child .project-card-visual-wrap { min-height: 25rem; }
-  .project-card:first-child .project-card-content { padding: 1.25rem 1.4rem 0 !important; }
-  .project-card:first-child .project-card-footer { padding: 1rem 1.4rem 1.4rem !important; }
+  .hero-deck { min-height: 31rem; width: min(100%, 44rem); margin-inline: auto; }
+  .project-flight:first-child .project-card { display: block; }
+  .project-flight:first-child .project-card .project-card-visual-wrap { min-height: 25rem; }
+  .project-flight:first-child .project-card .project-card-content { padding: 1.25rem 1.4rem 0 !important; }
+  .project-flight:first-child .project-card .project-card-footer { padding: 1rem 1.4rem 1.4rem !important; }
   .experience-company-row { align-items: flex-start; }
   .experience-card-meta { flex-direction: column; align-items: flex-end; }
   .about-shell { grid-template-columns: 1fr; gap: 1rem; }
@@ -4368,12 +4284,8 @@ a {
   .hero-actions { align-items: stretch; }
   .primary-cta, .secondary-cta { flex: 1; min-width: 10rem; }
   .hero-location { align-items: start; }
-  .hero-stage { min-height: 26rem; margin-top: 1rem; }
-  .hero-window-main { top: 2rem; width: 100%; transform: none; }
-  .hero-window-stack { right: -0.5rem; bottom: 0; width: 12.5rem; }
-  .hero-signal { bottom: 1.8rem; left: -0.35rem; }
-  .code-panel { padding: 1.4rem 1rem; font-size: 0.66rem; }
-  .pipeline-row { gap: 0.4rem; padding-inline: 0.8rem; }
+  /* The deck flight is disabled below this width, so the hero is copy only. */
+  .hero-deck { display: none; }
   .proof-grid { grid-template-columns: repeat(2, 1fr); }
   .proof-item { min-height: 6.5rem; border-bottom: 1px solid var(--border); padding: 1.25rem; }
   .proof-item:nth-child(2) { border-right: 1px solid var(--border); }
@@ -4383,9 +4295,9 @@ a {
   .section-header-row { display: block; }
   .section-count { display: block; margin-top: 1rem; }
   .project-grid { display: grid; grid-template-columns: 1fr; }
-  .project-card, .project-card:first-child { grid-column: auto; }
-  .project-card-visual-wrap, .project-card:first-child .project-card-visual-wrap { min-height: 21rem; }
-  .project-card:first-child .project-title { font-size: 1.55rem !important; }
+  .project-flight, .project-flight:first-child { grid-column: auto; }
+  .project-card-visual-wrap, .project-flight:first-child .project-card .project-card-visual-wrap { min-height: 21rem; }
+  .project-flight:first-child .project-card .project-title { font-size: 1.55rem !important; }
   .device-row { grid-template-columns: 1fr 0.65fr 1fr; gap: 0.45rem; }
   .sync-diagram, .browser-frame, .ops-frame, .learning-frame { width: 94%; }
   .phone-frame { min-height: 11rem; }
@@ -4643,7 +4555,7 @@ a {
   .hero-stage { min-height: 23rem; }
   .hero-window-stack { display: none; }
   .hero-signal { bottom: 0.2rem; }
-  .project-card-visual-wrap, .project-card:first-child .project-card-visual-wrap { min-height: 18rem; }
+  .project-card-visual-wrap, .project-flight:first-child .project-card .project-card-visual-wrap { min-height: 18rem; }
   .project-visual { min-height: 20rem; }
   .sync-diagram { padding: 0.65rem; }
   .device-row { grid-template-columns: 1fr 0.55fr 1fr; }
@@ -4691,6 +4603,14 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  .hero-deck { display: none; }
+  .hero-container { grid-template-columns: 1fr; }
+  .project-flight[data-flying="true"] {
+    transform: none !important;
+    position: static;
+    z-index: auto;
+    will-change: auto;
+  }
   .quick-message-scroll-track { min-height: auto; }
   .quick-message-band { position: static; }
   .quick-message-keyboard-camera { transform: none !important; }
@@ -4724,4 +4644,8 @@ a {
     opacity: 1;
     transform: none;
   }
+  /* Without JS the deck never flies, so hide the empty hero box and leave the
+     cards in their grid slots. */
+  .hero-deck { display: none; }
+  .hero-container { grid-template-columns: 1fr; }
 }

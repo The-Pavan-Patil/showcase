@@ -33,11 +33,11 @@ The semantic range is 150–300ms, with current visible interactions concentrate
 | About résumé arrow hover | Moves 3px right |
 | Contact email/social press | Scales to 0.98 |
 | Next-project arrow hover | Moves 5px right |
-| Hero composition | Static rotations only; no animation |
+| Hero case-study deck | Rests as a fanned, rotated stack; scroll carries the same three cards into the Selected work grid |
 | Desktop header density | Width, height, padding, gaps, and utility labels compress over 280ms |
 | Mobile utility Popover | HeroUI bounded enter/exit transition; destination bar remains stationary |
 
-Static rotations on hero windows communicate layered workspaces. They are not animated and are removed from the main window at the mobile breakpoint.
+The hero deck is a single set of cards, not a copy. The cards live in the Selected work grid and are transformed up into the hero, so scrolling returns them to the position layout already gave them; at rest in the hero they remain real, clickable case-study links. Scroll maps directly to position with no easing on the vertical travel, so the page never moves at a rate the user did not ask for. The effect is disabled below 760px and under reduced motion, where the hero is copy only and the cards stay in the grid.
 
 ## Reduced motion
 
@@ -54,7 +54,7 @@ CSS inspection verifies the reduced-motion contract: smooth scrolling is removed
 ## Motion contract
 
 - Trigger motion only after direct user interaction.
-- Keep movement within the component’s local area.
+- Keep movement within the component’s local area, except where an element is travelling between two real positions it occupies (the hero case-study deck).
 - Pause or avoid any future auto-running animation.
 - Never animate résumé evidence, metric values, or body copy into delayed visibility.
 - Do not use parallax, scroll-jacking, cursor-following effects, looping glows, rotating borders, or heavy 3D.

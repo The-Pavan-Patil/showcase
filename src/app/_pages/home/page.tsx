@@ -3,18 +3,11 @@ import {
   ArrowRight,
   ArrowUpRight,
   Briefcase,
-  Braces,
   CalendarDays,
   ChevronUp,
-  CloudCog,
-  Code2,
-  Database,
-  GitBranch,
   Mail,
   MapPin,
-  Smartphone,
   Trophy,
-  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,7 +17,7 @@ import { AsciiArt } from "@/components/ascii-art";
 import { CometCard } from "@/components/ui/comet-card";
 import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
-import { ProjectCard } from "./_components/project-card";
+import { ProjectDeckFlight } from "./_components/project-deck-flight";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
@@ -105,40 +98,8 @@ export function HomePage({ locale }: { locale: Locale }) {
               </p>
             </div>
 
-            <div className="hero-stage" role="img" aria-label={ui.home.heroStageAria}>
+            <div className="hero-deck" aria-hidden="true">
               <div className="hero-stage-glow" />
-              <div className="hero-window hero-window-main">
-                <div className="window-bar">
-                  <span /><span /><span />
-                  <p>delivery.pipeline.ts</p>
-                  <strong>main</strong>
-                </div>
-                <div className="code-panel" aria-hidden="true">
-                  <p><i>01</i><span className="code-blue">type</span> Product = &#123;</p>
-                  <p><i>02</i>&nbsp;&nbsp;problem: <span className="code-green">&quot;understood&quot;</span>;</p>
-                  <p><i>03</i>&nbsp;&nbsp;system: <span className="code-green">&quot;designed&quot;</span>;</p>
-                  <p><i>04</i>&nbsp;&nbsp;quality: <span className="code-green">&quot;verified&quot;</span>;</p>
-                  <p><i>05</i>&#125;;</p>
-                </div>
-                <div className="pipeline-row" aria-hidden="true">
-                  <span><GitBranch size={14} /> {ui.home.plan}</span>
-                  <i />
-                  <span><Braces size={14} /> {ui.home.build}</span>
-                  <i />
-                  <span><CloudCog size={14} /> {ui.home.ship}</span>
-                </div>
-              </div>
-              <div className="hero-window hero-window-stack" aria-hidden="true">
-                <p>{ui.home.productStack}</p>
-                <div><Code2 size={16} /><span>{ui.home.web}</span><strong>Next.js</strong></div>
-                <div><Smartphone size={16} /><span>{ui.home.mobile}</span><strong>React Native</strong></div>
-                <div><Database size={16} /><span>{ui.home.data}</span><strong>PostgreSQL</strong></div>
-              </div>
-              <div className="hero-signal" aria-hidden="true">
-                <Sparkles size={15} />
-                <span>{ui.home.buildSignal}</span>
-                <strong>{ui.home.healthy}</strong>
-              </div>
             </div>
           </Container>
         </section>
@@ -169,18 +130,12 @@ export function HomePage({ locale }: { locale: Locale }) {
               />
               <span className="section-count">{ui.home.workCount}</span>
             </div>
-            <div className="project-grid">
-              {homepageProjects.map((project, index) => (
-                <ProjectCard
-                  copy={ui.projectCard}
-                  key={project.slug}
-                  locale={locale}
-                  project={project}
-                  projectVisualCopy={ui.projectVisual}
-                  index={index}
-                />
-              ))}
-            </div>
+            <ProjectDeckFlight
+              copy={ui.projectCard}
+              locale={locale}
+              projects={homepageProjects}
+              projectVisualCopy={ui.projectVisual}
+            />
           </Container>
         </section>
 

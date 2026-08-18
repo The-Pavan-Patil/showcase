@@ -52,16 +52,6 @@ export type UiCopy = {
     heroPrimaryCta: string;
     heroSecondaryCta: string;
     heroLocation: string;
-    heroStageAria: string;
-    productStack: string;
-    plan: string;
-    build: string;
-    ship: string;
-    web: string;
-    mobile: string;
-    data: string;
-    buildSignal: string;
-    healthy: string;
     proofAria: string;
     workEyebrow: string;
     workTitle: string;
@@ -293,17 +283,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       heroPrimaryCta: "View selected work",
       heroSecondaryCta: "Email me",
       heroLocation: "India · Open to software engineering roles",
-      heroStageAria:
-        "A software delivery system connecting product requirements, typed code, data, and reliable releases",
-      productStack: "Product stack",
-      plan: "Plan",
-      build: "Build",
-      ship: "Ship",
-      web: "Web",
-      mobile: "Mobile",
-      data: "Data",
-      buildSignal: "Build signal",
-      healthy: "Healthy",
       proofAria: "Selected engineering metrics",
       workEyebrow: "Selected work",
       workTitle: "Built for real constraints.",
@@ -567,17 +546,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       heroPrimaryCta: "主な実績を見る",
       heroSecondaryCta: "メールする",
       heroLocation: "インド · ソフトウェアエンジニアの仕事を探しています",
-      heroStageAria:
-        "プロダクト要件、型付きコード、データ、安定したリリースをつなぐソフトウェア開発システム",
-      productStack: "プロダクト構成",
-      plan: "計画",
-      build: "実装",
-      ship: "公開",
-      web: "Web",
-      mobile: "モバイル",
-      data: "データ",
-      buildSignal: "ビルド状態",
-      healthy: "良好",
       proofAria: "主なエンジニアリング指標",
       workEyebrow: "主な実績",
       workTitle: "現場の制約に向き合って作りました。",
@@ -841,17 +809,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       heroPrimaryCta: "Ausgewählte Arbeit ansehen",
       heroSecondaryCta: "E-Mail senden",
       heroLocation: "Indien · Offen für Softwareentwickler-Rollen",
-      heroStageAria:
-        "Ein Software-Delivery-System, das Produktanforderungen, typisierten Code, Daten und verlässliche Releases verbindet",
-      productStack: "Produkt-Stack",
-      plan: "Planen",
-      build: "Bauen",
-      ship: "Ausliefern",
-      web: "Web",
-      mobile: "Mobile",
-      data: "Daten",
-      buildSignal: "Build-Signal",
-      healthy: "Stabil",
       proofAria: "Ausgewählte Engineering-Kennzahlen",
       workEyebrow: "Ausgewählte Arbeit",
       workTitle: "Gebaut für reale Anforderungen.",

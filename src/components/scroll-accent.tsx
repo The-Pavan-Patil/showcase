@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { clamp, smoothstep } from "@/lib/utils";
+
 export type ScrollAccentWaypoint = {
   id: string;
   phase: string;
@@ -24,15 +26,6 @@ type ScrollAccentRoute = {
 const DEFAULT_DOT_SIZE = 8;
 const DEFAULT_MAGNET_HOLD = 0.1;
 const HEADING_MAGNET_HOLD = 0.18;
-
-function clamp(value: number, minimum = 0, maximum = 1) {
-  return Math.min(maximum, Math.max(minimum, value));
-}
-
-function smoothstep(value: number) {
-  const progress = clamp(value);
-  return progress * progress * (3 - 2 * progress);
-}
 
 export function getScrollAccentActivationY(viewportHeight: number) {
   return clamp(viewportHeight * 0.38, 180, 360);
