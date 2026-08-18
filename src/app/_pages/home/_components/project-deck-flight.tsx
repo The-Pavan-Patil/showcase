@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 
 import { ProjectCard } from "./project-card";
+import { getScrollAccentActivationY } from "@/components/scroll-accent";
 import type { Locale } from "@/lib/i18n";
 import type { ProjectCaseStudy } from "@/lib/portfolio";
 import type { UiCopy } from "@/lib/ui-copy";
@@ -58,16 +59,28 @@ export function easeDeckRelease(progress: number) {
 }
 
 /**
- * A single progress for the whole deck, so all three cards lock into the grid
- * together instead of trailing each other by hundreds of pixels of scroll.
- * The flight completes as the grid settles near the top of the viewport.
+ * The scroll position at which the deck must be fully landed: the moment the
+ * scroll-accent dot arrives on the "Selected work" eyebrow. The dot rests on a
+ * waypoint when the page has scrolled that waypoint up to the activation line,
+ * so this mirrors how site-header scrolls the dot onto an anchor.
  */
-export function resolveFlightProgress(
-  scrollY: number,
-  gridTopDoc: number,
+export function resolveReleaseScroll(
+  anchorDocY: number,
   viewportHeight: number,
 ) {
-  const releaseScroll = gridTopDoc - viewportHeight * 0.13;
+  // Floored so an integer scroll position that puts the dot on the eyebrow
+  // reads as progress 1 exactly, rather than 0.9999 from a fractional anchor.
+  return Math.max(
+    1,
+    Math.floor(anchorDocY - getScrollAccentActivationY(viewportHeight)),
+  );
+}
+
+/**
+ * A single progress for the whole deck, so all three cards lock into the grid
+ * together instead of trailing each other by hundreds of pixels of scroll.
+ */
+export function resolveFlightProgress(scrollY: number, releaseScroll: number) {
   if (releaseScroll <= 0) return 1;
 
   return clamp(scrollY / releaseScroll);
@@ -170,7 +183,7 @@ export function ProjectDeckFlight({
       let setupFrame = 0;
       let deckRect: DeckRect = { left: 0, docTop: 0, width: 0, height: 0 };
       let naturalRects: DeckRect[] = [];
-      let gridTopDoc = 0;
+      let anchorDocY = 0;
 
       const measure = () => {
         const scrollY = window.scrollY;
@@ -194,7 +207,17 @@ export function ProjectDeckFlight({
           };
         });
 
-        gridTopDoc = grid.getBoundingClientRect().top + scrollY;
+        // The eyebrow anchor the accent dot travels to; the deck must be
+        // landed by the time the dot arrives there.
+        const anchor = document.querySelector<HTMLElement>(
+          '[data-scroll-accent-anchor="work"]',
+        );
+        if (anchor) {
+          const anchorRect = anchor.getBoundingClientRect();
+          anchorDocY = anchorRect.top + scrollY + anchorRect.height / 2;
+        } else {
+          anchorDocY = grid.getBoundingClientRect().top + scrollY;
+        }
 
         // The deck sits in the hero at the very top of the document, so its
         // document position doubles as the viewport line the fan rests on.
@@ -220,8 +243,7 @@ export function ProjectDeckFlight({
         const scrollY = window.scrollY;
         const progress = resolveFlightProgress(
           scrollY,
-          gridTopDoc,
-          window.innerHeight,
+          resolveReleaseScroll(anchorDocY, window.innerHeight),
         );
         const settled = progress >= 1;
 

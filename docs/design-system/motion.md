@@ -33,11 +33,11 @@ The semantic range is 150–300ms, with current visible interactions concentrate
 | About résumé arrow hover | Moves 3px right |
 | Contact email/social press | Scales to 0.98 |
 | Next-project arrow hover | Moves 5px right |
-| Hero case-study deck | Rests as a fanned, rotated stack; scroll carries the same three cards into the Selected work grid |
+| Hero case-study deck | Rests as a fanned, rotated stack; scroll carries the same three cards into the Selected work grid, landing as the accent dot reaches the Selected work eyebrow |
 | Desktop header density | Width, height, padding, gaps, and utility labels compress over 280ms |
 | Mobile utility Popover | HeroUI bounded enter/exit transition; destination bar remains stationary |
 
-The hero deck is a single set of cards, not a copy. The cards live in the Selected work grid and are transformed up into the hero, so scrolling returns them to the position layout already gave them; at rest in the hero they remain real, clickable case-study links. Scroll maps directly to position with no easing on the vertical travel, so the page never moves at a rate the user did not ask for. The effect is disabled below 760px and under reduced motion, where the hero is copy only and the cards stay in the grid.
+The hero deck is a single set of cards, not a copy. The cards live in the Selected work grid and are transformed up into the hero, so scrolling returns them to the position layout already gave them; at rest in the hero they remain real, clickable case-study links. Scroll maps directly to position with no easing on the vertical travel, so the page never moves at a rate the user did not ask for. The flight is timed against the scroll-accent rail rather than a magic number: it completes at `workAnchorDocY - getScrollAccentActivationY(viewportHeight)`, the scroll position where the dot comes to rest on the Selected work eyebrow, so the cards are always in place below the heading by that frame. The effect is disabled below 760px and under reduced motion, where the hero is copy only and the cards stay in the grid.
 
 ## Reduced motion
 

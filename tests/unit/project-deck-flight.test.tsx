@@ -4,10 +4,12 @@ import {
   easeDeckRelease,
   resolveCardFlight,
   resolveFlightProgress,
+  resolveReleaseScroll,
   resolveRestScale,
   type DeckPose,
   type DeckRect,
 } from "@/app/_pages/home/_components/project-deck-flight";
+import { getScrollAccentActivationY } from "@/components/scroll-accent";
 
 // A featured card whose grid slot sits 1500px down the document.
 const natural: DeckRect = {
@@ -24,6 +26,13 @@ const deck: DeckRect = {
   width: 440,
   height: 530,
 };
+
+/** -0 is numerically identity (-0 === 0) but toEqual treats it as distinct. */
+function normalizeZeros(flight: Record<string, number>) {
+  return Object.fromEntries(
+    Object.entries(flight).map(([key, value]) => [key, value === 0 ? 0 : value]),
+  );
+}
 
 const pose: DeckPose = {
   centerX: 0.5,
@@ -52,28 +61,69 @@ describe("easeDeckRelease", () => {
   });
 });
 
+describe("resolveReleaseScroll", () => {
+  it("lands the deck exactly when the accent dot reaches the eyebrow", () => {
+    // The dot rests on a waypoint once the page has scrolled it up to the
+    // activation line, so release must be anchorDocY - activationY.
+    const anchorDocY = 1150;
+    const viewportHeight = 900;
+    const activationY = getScrollAccentActivationY(viewportHeight);
+
+    expect(resolveReleaseScroll(anchorDocY, viewportHeight)).toBe(
+      anchorDocY - activationY,
+    );
+    // Mirrors site-header's own scroll target for the same anchor.
+    expect(activationY).toBeCloseTo(342, 5);
+  });
+
+  it("is fully landed by the time the dot arrives, never after", () => {
+    const anchorDocY = 1150;
+    const viewportHeight = 900;
+    const dotArrivesAt =
+      anchorDocY - getScrollAccentActivationY(viewportHeight);
+    const releaseScroll = resolveReleaseScroll(anchorDocY, viewportHeight);
+
+    expect(resolveFlightProgress(dotArrivesAt, releaseScroll)).toBe(1);
+  });
+
+  it("stays positive for anchors near the top of the document", () => {
+    expect(resolveReleaseScroll(10, 900)).toBe(1);
+  });
+
+  it("floors, so a fractional anchor still settles by the dot's arrival", () => {
+    const viewportHeight = 900;
+    const anchorDocY = 1113.5;
+    const releaseScroll = resolveReleaseScroll(anchorDocY, viewportHeight);
+    const dotArrivesAt = Math.floor(
+      anchorDocY - getScrollAccentActivationY(viewportHeight),
+    );
+
+    expect(releaseScroll).toBe(771);
+    expect(resolveFlightProgress(dotArrivesAt, releaseScroll)).toBe(1);
+  });
+});
+
 describe("resolveFlightProgress", () => {
-  it("runs from the top of the page to the grid settling near the viewport top", () => {
-    // releaseScroll = 1500 - 900 * 0.13 = 1383
-    expect(resolveFlightProgress(0, 1500, 900)).toBe(0);
-    expect(resolveFlightProgress(1383, 1500, 900)).toBeCloseTo(1, 10);
-    expect(resolveFlightProgress(691.5, 1500, 900)).toBeCloseTo(0.5, 10);
+  it("runs from the top of the page to the release point", () => {
+    expect(resolveFlightProgress(0, 808)).toBe(0);
+    expect(resolveFlightProgress(808, 808)).toBe(1);
+    expect(resolveFlightProgress(404, 808)).toBeCloseTo(0.5, 10);
   });
 
   it("clamps outside the flight", () => {
-    expect(resolveFlightProgress(-200, 1500, 900)).toBe(0);
-    expect(resolveFlightProgress(99999, 1500, 900)).toBe(1);
+    expect(resolveFlightProgress(-200, 808)).toBe(0);
+    expect(resolveFlightProgress(99999, 808)).toBe(1);
   });
 
-  it("reports a completed flight when the grid is already above the fold", () => {
-    expect(resolveFlightProgress(0, 50, 900)).toBe(1);
+  it("reports a completed flight when there is no runway", () => {
+    expect(resolveFlightProgress(0, 0)).toBe(1);
   });
 
   it("is shared by every card, so the deck lands together", () => {
-    // Same scroll position must yield one progress regardless of which card
-    // is being placed — this is what keeps the three cards in sync.
-    const progress = resolveFlightProgress(700, 1500, 900);
-    expect(resolveFlightProgress(700, 1500, 900)).toBe(progress);
+    // One scroll position yields one progress regardless of which card is
+    // being placed — this is what keeps the three cards in sync.
+    const progress = resolveFlightProgress(700, 808);
+    expect(resolveFlightProgress(700, 808)).toBe(progress);
   });
 });
 
@@ -117,14 +167,16 @@ describe("resolveCardFlight", () => {
   });
 
   it("lands on exact identity at progress 1", () => {
-    const flight = resolveCardFlight(natural, deck, pose, 1383, 1);
+    const flight = resolveCardFlight(natural, deck, pose, 808, 1);
 
-    expect(flight).toEqual({ x: 0, y: 0, scale: 1, rotate: 0 });
+    expect(normalizeZeros(flight)).toEqual({ x: 0, y: 0, scale: 1, rotate: 0 });
   });
 
   it("stays at identity once landed, at any scroll position", () => {
-    for (const scrollY of [1383, 2000, 100000]) {
-      expect(resolveCardFlight(natural, deck, pose, scrollY, 1)).toEqual({
+    for (const scrollY of [808, 2000, 100000]) {
+      expect(
+        normalizeZeros(resolveCardFlight(natural, deck, pose, scrollY, 1)),
+      ).toEqual({
         x: 0,
         y: 0,
         scale: 1,
