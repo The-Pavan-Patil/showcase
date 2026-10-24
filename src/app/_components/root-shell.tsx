@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Inter, Manrope, Michroma, Noto_Sans_JP } from "next/font/google";
 
+import { GoogleAnalytics } from "@/components/google-analytics";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
@@ -61,6 +62,7 @@ export function RootShell({
           />
           {children}
         </Providers>
+        <GoogleAnalytics />
       </body>
     </html>
   );

@@ -24,6 +24,7 @@ export function AsciiArt({
 
     const image = new window.Image();
     let animationFrame = 0;
+    let hasStartedLoading = false;
 
     const render = () => {
       if (!image.complete || !image.naturalWidth) return;
@@ -95,10 +96,34 @@ export function AsciiArt({
     });
 
     image.addEventListener("load", scheduleRender);
-    image.src = src;
+
+    const startLoading = () => {
+      if (hasStartedLoading) return;
+      hasStartedLoading = true;
+      image.src = src;
+    };
+
+    const visibilityObserver =
+      typeof IntersectionObserver === "undefined"
+        ? null
+        : new IntersectionObserver(
+            ([entry]) => {
+              if (!entry.isIntersecting) return;
+              startLoading();
+              visibilityObserver?.disconnect();
+            },
+            { rootMargin: "300px 0px" },
+          );
+
+    if (visibilityObserver) {
+      visibilityObserver.observe(canvas);
+    } else {
+      startLoading();
+    }
 
     return () => {
       window.cancelAnimationFrame(animationFrame);
+      visibilityObserver?.disconnect();
       resizeObserver.disconnect();
       themeObserver.disconnect();
       image.removeEventListener("load", scheduleRender);

@@ -74,9 +74,11 @@ the specification, not the finished website.
   Spec §FR-022, §FR-023, §SC-009]
 - [ ] CHK025 Are the performance and quality targets quantified for every indexable route rather than
   only the homepage? [Measurability, Spec §SC-008, §SC-011]
-- [ ] CHK026 Are version-one exclusions explicit enough to prevent accidental CMS, backend, form,
-  analytics, cookie, blog, sales-funnel, or heavy-motion scope? [Completeness, Spec §FR-027,
-  §Out of Scope]
+- [ ] CHK026 Are scope exclusions explicit enough to prevent accidental CMS, backend, form, cookie,
+  blog, sales-funnel, or heavy-motion scope? [Completeness, Spec §FR-027, §Out of Scope]
+- [ ] CHK027 Does analytics stay within its constitutional limits — disabled when unconfigured, no
+  person profiles, no product-analytics cookies, no advertising signals, visitor free-text masked
+  in recordings, and free-tier only with billing limits set? [Completeness, Constitution §VII]
 
 ## Notes
 

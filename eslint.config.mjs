@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "coverage/**",
+      ".agents/**",
+      ".taste-skill/**",
     ".lighthouseci/**",
     "playwright-report/**",
     "test-results/**",

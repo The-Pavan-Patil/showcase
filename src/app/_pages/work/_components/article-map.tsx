@@ -1,7 +1,9 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { trackEvent } from "@/lib/analytics";
 
 type ArticleMapSection = {
   id: string;
@@ -20,15 +22,18 @@ export function ArticleMap({
   heading,
   navigationLabel,
   sections,
+  slug,
 }: {
   heading: string;
   navigationLabel: string;
   sections: ArticleMapSection[];
+  slug: string;
 }) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState(sections[0]?.id);
   const interactionIndex = hoveredIndex ?? focusedIndex;
+  const readSectionsRef = useRef(new Set<string>());
 
   useEffect(() => {
     const sectionElements = sections
@@ -76,6 +81,21 @@ export function ArticleMap({
       window.removeEventListener("hashchange", updateFromHash);
     };
   }, [sections]);
+
+  useEffect(() => {
+    if (!activeSection) return;
+
+    const readSections = readSectionsRef.current;
+    if (readSections.has(activeSection)) return;
+
+    readSections.add(activeSection);
+    trackEvent("case_study_section_read", {
+      slug,
+      section: activeSection,
+      depth: sections.findIndex((section) => section.id === activeSection) + 1,
+      total: sections.length,
+    });
+  }, [activeSection, sections, slug]);
 
   return (
     <aside className="article-map">

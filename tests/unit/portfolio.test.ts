@@ -35,7 +35,7 @@ describe("portfolio content", () => {
   });
 
   it("resolves valid slugs and rejects unknown slugs", () => {
-    expect(getProjectBySlug("mainichi-koto")?.title).toBe("Mainichi koto");
+    expect(getProjectBySlug("mainichi-koto")?.title).toBe("Mainichi koto 毎日こと");
     expect(getProjectBySlug("nudge")?.title).toBe("Nudge");
     expect(getProjectBySlug("not-a-real-project")).toBeUndefined();
   });

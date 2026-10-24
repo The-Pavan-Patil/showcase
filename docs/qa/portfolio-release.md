@@ -29,6 +29,22 @@ This file records evidence rather than intent. A configured test is not marked a
 | Visual regression | Pass | Light/dark desktop and mobile route baselines, compact desktop navigation, and open mobile utility baselines were generated and passed. |
 | Case-study rendered review | Pass | Nudge rendered at mobile width with correct title, headings, canonical URL, JSON-LD, no overflow, and no console warnings or errors. |
 
+## Analytics gate (added 2026-09-09)
+
+Analytics is disabled unless `NEXT_PUBLIC_POSTHOG_KEY` / `NEXT_PUBLIC_POSTHOG_HOST` / `NEXT_PUBLIC_GA_MEASUREMENT_ID` are configured, so the gates above were re-run in the unconfigured state and are unaffected.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Unconfigured build is inert | Pass | `npm run build` with no analytics variables emits no analytics script, no `/ingest` rewrite, and no trailing-slash redirect override. |
+| Trailing-slash routing | Pass | With keys set, the compiled `routes-manifest.json` redirects `/work/nudge/`, `/setup/`, and `/ja/work/nudge/` to their canonical paths while `/ingest/e/`, `/ingest/i/v0/e/`, and `/ingest/decide/` bypass the redirect and reach the PostHog rewrite. |
+| Coverage with the new module | Pass | `src/lib/analytics.ts` at 96.4% statements, 89.7% branches, 100% functions, 100% lines; global 90.4/88.7/84.6/92.0 against 80/75/80/80. |
+
+| Gate | Current status | Follow-up |
+| --- | --- | --- |
+| Production analytics verification | Awaiting deployment | With production keys, confirm one pageview per route change with the correct URL, no pageview on in-page anchor navigation, `/ingest` responses returning 200 rather than 308, and that the message textarea is masked in a session replay. |
+| Free-tier cost guard | Awaiting account setup | Confirm no payment method is attached to the PostHog organisation and that a $0 billing limit is set for every product. |
+| Lighthouse with analytics enabled | Awaiting deployment | The local Lighthouse run measures a build without analytics keys; re-run against the deployed production URL and require performance ≥90 and best practices ≥95. |
+
 ## Remaining release checks
 
 | Gate | Current status | Follow-up |

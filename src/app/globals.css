@@ -727,6 +727,7 @@ a {
   padding: 0 !important;
   border-radius: var(--radius-pill) !important;
   color: var(--muted) !important;
+  cursor: pointer;
   transition:
     width var(--motion-base) cubic-bezier(0.2, 0.8, 0.2, 1),
     min-width var(--motion-base) cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -1510,6 +1511,8 @@ a {
 }
 
 .project-card {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-feature) !important;
@@ -1607,13 +1610,19 @@ a {
   margin-top: 1.1rem;
 }
 
-.project-tags [data-slot="chip-root"],
-.case-tags [data-slot="chip-root"],
-.skill-chips [data-slot="chip-root"] {
-  border: 1px solid var(--border) !important;
-  background: var(--surface-secondary) !important;
-  color: var(--muted) !important;
-  font-size: 0.65rem !important;
+.portfolio-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--surface-secondary);
+  color: var(--muted);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .project-card-footer {
@@ -3179,7 +3188,7 @@ a {
   line-height: 1.78;
 }
 
-.case-tags [data-slot="chip-root"] { font-size: 0.7rem !important; }
+.case-tags .portfolio-chip { font-size: 0.7rem; }
 
 .case-facts {
   display: grid;

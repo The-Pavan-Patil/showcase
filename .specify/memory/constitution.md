@@ -1,5 +1,26 @@
 <!--
-Sync Impact Report
+Sync Impact Report (1.1.0)
+- Version change: 1.0.0 -> 1.1.0
+- Amended principle: VII. Minimal Data and Scope
+  - Rationale: the owner approved adding privacy-conservative product analytics
+    (PostHog) and acquisition analytics (Google Analytics 4). Without measurement
+    there is no way to tell which case studies are read or where visitors drop
+    out of the contact funnel, which the site exists to support.
+  - Scope of the exception: anonymous, cookieless-by-default measurement only.
+    No person profiles, no identification, no cross-site advertising signals, and
+    no change to the read-only, backendless nature of the site.
+  - Rejected simpler alternative: server log analysis, which cannot attribute
+    in-page reading depth or contact-funnel drop-off on a statically served site.
+- Templates reviewed:
+  - ✅ .specify/templates/plan-template.md — no change required
+  - ✅ .specify/templates/spec-template.md — no change required
+- Runtime guidance reviewed: ✅ README.md updated; ✅ AGENTS.md needs no change
+- Dependent specifications updated: specs/001-portfolio-foundation/spec.md,
+  research.md, checklists/experience.md
+- Approval: project owner, 2026-09-09
+- Deferred TODOs: none
+
+Previous Sync Impact Report (1.0.0)
 - Version change: template -> 1.0.0
 - Added principles:
   - I. Evidence Before Promotion
@@ -81,10 +102,18 @@ accessibility defect may be deferred.
 ### VII. Minimal Data and Scope
 
 The portfolio MUST remain a public, read-only presentation site unless a later specification
-explicitly expands it. Version one MUST NOT add a CMS, database, authentication, contact-form
-backend, analytics, cookies, blog, services funnel, or heavy 3D effects. Contact uses direct
-links. Personal data beyond the approved public email and approved professional URLs MUST NOT
-be published implicitly. This constraint minimizes privacy risk, maintenance, and failure modes.
+explicitly expands it. It MUST NOT add a CMS, database, authentication, contact-form backend,
+blog, services funnel, or heavy 3D effects. Contact uses direct links. Personal data beyond the
+approved public email and approved professional URLs MUST NOT be published implicitly. This
+constraint minimizes privacy risk, maintenance, and failure modes.
+
+Measurement is permitted within strict limits. Analytics MUST be optional and fully disabled when
+unconfigured, MUST NOT identify visitors or create person profiles, MUST NOT set cookies for
+product analytics, and MUST NOT enable advertising, remarketing, or cross-site signals. Any
+free-text a visitor types MUST be masked in session recordings. Analytics MUST NOT be a paid
+dependency: providers are used strictly within a free tier, with billing limits set so that
+exceeding a quota drops data rather than incurring cost. Analytics MUST NOT regress the
+performance or accessibility gates in Principle VI.
 
 ## Product and Technical Constraints
 
@@ -123,4 +152,4 @@ materially expanded obligation, and PATCH for non-semantic clarification. Every 
 MUST include a constitution compliance check. Complexity and quality-gate exceptions MUST be
 visible, time-bounded, and approved rather than silently accepted.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-22 | **Last Amended**: 2026-07-22
+**Version**: 1.1.0 | **Ratified**: 2026-07-22 | **Last Amended**: 2026-09-09

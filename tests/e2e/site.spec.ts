@@ -55,15 +55,10 @@ test("homepage exposes the primary portfolio journey", async ({ page }) => {
 test("homepage first load plays the terminal launch intro", async ({ page }) => {
   await page.goto("/");
 
-  const dialog = page.getByRole("dialog", { name: "pavanpatil.dev launch" });
-  await expect(dialog).toBeVisible();
-  await expect(dialog).toHaveCSS("background-color", "rgb(2, 2, 3)");
-
-  const command = page.locator(".launch-terminal-command");
-  await expect(command).toHaveAttribute("aria-label", "npm rundev", { timeout: 4000 });
-  await expect(command).toHaveAttribute("aria-label", "npm run dev", { timeout: 4000 });
-  await expect(page.getByText("Website: https://pavanpatil.dev")).toBeVisible({ timeout: 7000 });
-  await expect(dialog).toBeHidden({ timeout: 3000 });
+  const terminal = page.locator("[data-launch-terminal]");
+  await expect(terminal).toBeVisible();
+  await expect(terminal).toHaveCSS("background-color", "rgb(2, 2, 3)");
+  await expect(terminal).toBeHidden({ timeout: 3000 });
   await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
 });
 
@@ -71,7 +66,7 @@ test("homepage skips the terminal launch intro after it has played this session"
   await skipLaunchIntro(page);
   await page.goto("/");
 
-  await expect(page.getByRole("dialog", { name: "pavanpatil.dev launch" })).toHaveCount(0);
+  await expect(page.locator("[data-launch-terminal]")).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
 });
 
@@ -203,8 +198,7 @@ test("homepage can force replay the terminal launch intro for testing", async ({
   await skipLaunchIntro(page);
   await page.goto("/?intro=1");
 
-  await expect(page.getByRole("dialog", { name: "pavanpatil.dev launch" })).toBeVisible();
-  await expect(page.locator(".launch-terminal-command")).toHaveAttribute("aria-label", "npm rundev", { timeout: 4000 });
+  await expect(page.locator("[data-launch-terminal]")).toBeVisible();
 });
 
 for (const [slug, title] of projects) {

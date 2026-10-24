@@ -211,9 +211,11 @@ traceable to the resume.
   patterns, accessibility, motion, content voice, and do/don't guidance.
 - **FR-026**: The public experience MUST remain usable in the current and previous major versions
   of Chrome, Safari, Firefox, and Edge, including contemporary iOS Safari and Android Chrome.
-- **FR-027**: Version one MUST remain a static public portfolio without a CMS, runtime database,
-  authentication, blog, analytics, cookies, contact-form backend, services funnel, or heavy 3D
-  effects.
+- **FR-027**: The site MUST remain a static public portfolio without a CMS, runtime database,
+  authentication, blog, contact-form backend, services funnel, or heavy 3D effects. Amended
+  2026-09-09: anonymous, cookieless, free-tier analytics is permitted under constitution v1.1.0
+  Principle VII; identified analytics, advertising signals, and paid analytics tiers remain
+  excluded.
 - **FR-028**: All public facts MUST be traceable to the current resume or an explicit approved
   source, and all supplied or client-owned media MUST have confirmed publication permission.
 
@@ -277,8 +279,9 @@ traceable to the resume.
 
 ## Out of Scope
 
-- A CMS, database, authenticated administration, user accounts, blog, analytics, cookie banner,
+- A CMS, database, authenticated administration, user accounts, blog, cookie banner,
   backend contact form, services sales funnel, or heavy 3D/continuous animation.
+  (Analytics moved into scope on 2026-09-09 — see FR-027.)
 - Fabricating project dashboards, launch status, user counts, performance figures, testimonials,
   or client-confidential implementation detail.
 - Publishing the phone number in page copy, metadata, media, or the downloadable resume without

@@ -1,6 +1,3 @@
-"use client";
-
-import { Card, Chip } from "@heroui/react";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,7 +21,7 @@ export function ProjectCard({
   index: number;
 }) {
   return (
-    <Card className="project-card" variant="default">
+    <article className="project-card">
       <div className="project-card-visual-wrap">
         <div className="project-index">0{index + 1}</div>
         {project.media ? (
@@ -47,30 +44,30 @@ export function ProjectCard({
           />
         )}
       </div>
-      <Card.Content className="project-card-content">
+      <div className="project-card-content">
         <p className="project-kicker">{project.kicker}</p>
-        <Card.Title className="project-title">{project.cardHeadline}</Card.Title>
-        <Card.Description className="project-summary">{project.summary}</Card.Description>
+        <h3 className="project-title">{project.cardHeadline}</h3>
+        <p className="project-summary">{project.summary}</p>
         <div
           className="project-tags"
           aria-label={formatCopy(copy.technologiesAria, { title: project.title })}
         >
           {project.technologies.slice(0, 4).map((technology) => (
-            <Chip key={technology} size="sm" variant="secondary">
+            <span className="portfolio-chip" key={technology}>
               {technology}
-            </Chip>
+            </span>
           ))}
         </div>
-      </Card.Content>
-      <Card.Footer className="project-card-footer">
+      </div>
+      <div className="project-card-footer">
         <Link
           href={getWorkPath(locale, project.slug)}
-          aria-label={formatCopy(copy.readCaseStudyAria, { title: project.title })}
         >
           {copy.readCaseStudy}
+          <span className="sr-only">: {project.title}</span>
           <ArrowUpRight aria-hidden="true" size={17} />
         </Link>
-      </Card.Footer>
-    </Card>
+      </div>
+    </article>
   );
 }

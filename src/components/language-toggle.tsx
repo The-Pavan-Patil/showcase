@@ -4,6 +4,7 @@ import { Languages } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { trackEvent } from "@/lib/analytics";
 import {
   getPathForLocale,
   navbarLocales,
@@ -46,7 +47,13 @@ export function LanguageToggle({
             hrefLang={targetLocale}
             key={targetLocale}
             lang={targetLocale}
-            onClick={onNavigate}
+            onClick={() => {
+              trackEvent("language_changed", {
+                from: locale,
+                to: targetLocale,
+              });
+              onNavigate?.();
+            }}
           >
             {copy.languageOptionLabels[targetLocale]}
           </Link>

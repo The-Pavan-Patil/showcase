@@ -18,7 +18,7 @@ export function SiteFooter({ copy, locale, profile, socialLinks }: SiteFooterPro
     <footer className="site-footer">
       <Container>
         <div className="footer-top">
-          <Link className="brand-link" href={getHomePath(locale)} aria-label={copy.brandAria}>
+          <Link className="brand-link" href={getHomePath(locale)}>
             <span className="brand-mark" aria-hidden="true">P</span>
             <span>Pavan Patil</span>
           </Link>

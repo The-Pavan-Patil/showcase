@@ -236,6 +236,46 @@ const getKeyDisplayLabel = (keyCode: string): string => {
   return keyCode;
 };
 
+const KEY_ACCESSIBLE_LABELS: Record<string, string> = {
+  Escape: "Escape key",
+  Backspace: "Delete key",
+  Tab: "Tab key",
+  Enter: "Return key",
+  ShiftLeft: "Left Shift key",
+  ShiftRight: "Right Shift key",
+  ControlLeft: "Left Control key",
+  ControlRight: "Right Control key",
+  AltLeft: "Left Option key",
+  AltRight: "Right Option key",
+  MetaLeft: "Left Command key",
+  MetaRight: "Right Command key",
+  Space: "Space key",
+  CapsLock: "Caps Lock key",
+  ArrowUp: "Up arrow key",
+  ArrowDown: "Down arrow key",
+  ArrowLeft: "Left arrow key",
+  ArrowRight: "Right arrow key",
+  Backquote: "Backquote key",
+  Minus: "Minus key",
+  Equal: "Equals key",
+  BracketLeft: "Left bracket key",
+  BracketRight: "Right bracket key",
+  Backslash: "Backslash key",
+  Semicolon: "Semicolon key",
+  Quote: "Quote key",
+  Comma: "Comma key",
+  Period: "Period key",
+  Slash: "Slash key",
+  Fn: "Function key",
+};
+
+const getKeyAccessibleLabel = (keyCode: string): string => {
+  if (KEY_ACCESSIBLE_LABELS[keyCode]) return KEY_ACCESSIBLE_LABELS[keyCode];
+  if (keyCode.startsWith("Key")) return `${keyCode.slice(3)} key`;
+  if (keyCode.startsWith("Digit")) return `${keyCode.slice(5)} key`;
+  return `${keyCode} key`;
+};
+
 interface KeyboardContextType {
   playSoundDown: (keyCode: string) => void;
   playSoundUp: (keyCode: string) => void;
@@ -259,53 +299,62 @@ const useKeyboardSound = () => {
 const KeyboardProvider = ({
   children,
   enableSound = false,
-  containerRef,
   onVirtualKeyPress,
 }: {
   children: React.ReactNode;
   enableSound?: boolean;
-  containerRef: React.RefObject<HTMLDivElement | null>;
   onVirtualKeyPress?: (keyCode: string) => void;
 }) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const audioInitPromiseRef = useRef<Promise<void> | null>(null);
   const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set());
   const [lastPressedKey, setLastPressedKey] = useState<string | null>(null);
-  const [soundLoaded, setSoundLoaded] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
   const previewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (!enableSound) return;
+  const ensureAudio = useCallback(() => {
+    if (
+      !enableSound ||
+      audioBufferRef.current ||
+      audioInitPromiseRef.current
+    ) {
+      return;
+    }
 
-    // Initialize AudioContext and load sound file
-    const initAudio = async () => {
+    audioInitPromiseRef.current = (async () => {
       try {
-        audioContextRef.current = new AudioContext();
+        const audioContext = new AudioContext();
+        audioContextRef.current = audioContext;
         const response = await fetch("/sounds/sound.ogg");
         if (!response.ok) {
           console.warn("Sound file not available");
           return;
         }
         const arrayBuffer = await response.arrayBuffer();
-        audioBufferRef.current =
-          await audioContextRef.current.decodeAudioData(arrayBuffer);
-        setSoundLoaded(true);
+        audioBufferRef.current = await audioContext.decodeAudioData(arrayBuffer);
       } catch (error) {
         console.warn("Failed to load sound:", error);
+      } finally {
+        audioInitPromiseRef.current = null;
       }
-    };
+    })();
+  }, [enableSound]);
 
-    initAudio();
-
+  useEffect(() => {
     return () => {
       audioContextRef.current?.close();
+      audioContextRef.current = null;
+      audioBufferRef.current = null;
     };
-  }, [enableSound]);
+  }, []);
 
   const playSoundDown = useCallback(
     (keyCode: string) => {
-      if (!enableSound || !soundLoaded) return;
+      if (!enableSound) return;
+      if (!audioBufferRef.current) {
+        ensureAudio();
+        return;
+      }
       if (!audioContextRef.current || !audioBufferRef.current) return;
 
       const soundDef = SOUND_DEFINES_DOWN[keyCode];
@@ -317,7 +366,7 @@ const KeyboardProvider = ({
 
       // Resume audio context if suspended (browser autoplay policy)
       if (audioContextRef.current.state === "suspended") {
-        audioContextRef.current.resume();
+        void audioContextRef.current.resume();
       }
 
       const source = audioContextRef.current.createBufferSource();
@@ -325,12 +374,12 @@ const KeyboardProvider = ({
       source.connect(audioContextRef.current.destination);
       source.start(0, startTime, duration);
     },
-    [enableSound, soundLoaded],
+    [enableSound, ensureAudio],
   );
 
   const playSoundUp = useCallback(
     (keyCode: string) => {
-      if (!enableSound || !soundLoaded) return;
+      if (!enableSound) return;
       if (!audioContextRef.current || !audioBufferRef.current) return;
 
       const soundDef = SOUND_DEFINES_UP[keyCode];
@@ -342,7 +391,7 @@ const KeyboardProvider = ({
 
       // Resume audio context if suspended (browser autoplay policy)
       if (audioContextRef.current.state === "suspended") {
-        audioContextRef.current.resume();
+        void audioContextRef.current.resume();
       }
 
       const source = audioContextRef.current.createBufferSource();
@@ -350,7 +399,7 @@ const KeyboardProvider = ({
       source.connect(audioContextRef.current.destination);
       source.start(0, startTime, duration);
     },
-    [enableSound, soundLoaded],
+    [enableSound],
   );
 
   const setPressed = useCallback((keyCode: string) => {
@@ -382,29 +431,8 @@ const KeyboardProvider = ({
     };
   }, []);
 
-  // Track visibility with IntersectionObserver
+  // Mirror physical keyboard events while the on-screen keyboard is mounted.
   useEffect(() => {
-    const element = containerRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 },
-    );
-
-    observer.observe(element);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [containerRef]);
-
-  // Handle physical keyboard events (only when visible)
-  useEffect(() => {
-    if (!isVisible) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       // Prevent repeat events
       if (e.repeat) return;
@@ -427,7 +455,7 @@ const KeyboardProvider = ({
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("keyup", handleKeyUp);
     };
-  }, [isVisible, playSoundDown, playSoundUp, setPressed, setReleased]);
+  }, [playSoundDown, playSoundUp, setPressed, setReleased]);
 
   return (
     <KeyboardContext.Provider
@@ -505,18 +533,16 @@ export const Keyboard = ({
   showPreview?: boolean;
   onVirtualKeyPress?: (keyCode: string) => void;
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   return (
     <KeyboardProvider
       enableSound={enableSound}
-      containerRef={containerRef}
       onVirtualKeyPress={onVirtualKeyPress}
     >
       <div
-        ref={containerRef}
+        // ph-no-capture: the ~90 virtual keys would otherwise emit one
+        // analytics autocapture event per keystroke.
         className={cn(
-          "relative mx-auto w-fit [zoom:0.8] sm:[zoom:1.25] md:[zoom:1.5] lg:[zoom:1.75] xl:[zoom:2]",
+          "ph-no-capture relative mx-auto w-fit [zoom:0.8] sm:[zoom:1.25] md:[zoom:1.5] lg:[zoom:1.75] xl:[zoom:2]",
           className,
         )}
       >
@@ -836,53 +862,73 @@ const Key = ({
   } = useKeyboardSound();
   const isPressed = keyCode ? pressedKeys.has(keyCode) : false;
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (keyCode) {
-      event.preventDefault();
-      playSoundDown(keyCode);
-      setPressed(keyCode);
-      onVirtualKeyPress?.(keyCode);
-    }
+  const handlePressStart = () => {
+    if (!keyCode) return;
+    playSoundDown(keyCode);
+    setPressed(keyCode);
   };
 
-  const handleMouseUp = () => {
+  const handlePressEnd = () => {
     if (keyCode && isPressed) {
       playSoundUp(keyCode);
       setReleased(keyCode);
     }
   };
 
-  const handleMouseLeave = () => {
+  const handlePressCancel = () => {
     if (keyCode && isPressed) {
       setReleased(keyCode);
     }
   };
 
+  const keyClassName = cn(
+    "flex h-6 w-6 items-center justify-center rounded-[3.5px] bg-gray-100 shadow-[0px_0px_1px_0px_rgba(0,0,0,0.5),0px_1px_1px_0px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(255,255,255,1)_inset] transition-transform duration-75",
+    keyCode && "cursor-pointer active:scale-[0.98]",
+    isPressed &&
+      "scale-[0.98] bg-gray-100/80 shadow-[0px_0px_1px_0px_rgba(0,0,0,0.5),0px_1px_1px_0px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(255,255,255,0.5)]",
+    className,
+  );
+
+  const content = (
+    <div
+      className={cn(
+        "flex h-full w-full flex-col items-center justify-center text-[5px] text-neutral-700",
+        childrenClassName,
+      )}
+    >
+      {children}
+    </div>
+  );
+
   return (
     <div className={cn("keyboard-3d-key rounded-[4px] p-[0.5px]", containerClassName)}>
-      <button
-        type="button"
-        data-key-code={keyCode}
-        data-pressed={isPressed ? "true" : undefined}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
-        className={cn(
-          "flex h-6 w-6 cursor-pointer items-center justify-center rounded-[3.5px] bg-gray-100 shadow-[0px_0px_1px_0px_rgba(0,0,0,0.5),0px_1px_1px_0px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(255,255,255,1)_inset] transition-transform duration-75 active:scale-[0.98]",
-          isPressed &&
-            "scale-[0.98] bg-gray-100/80 shadow-[0px_0px_1px_0px_rgba(0,0,0,0.5),0px_1px_1px_0px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(255,255,255,0.5)]",
-          className,
-        )}
-      >
-        <div
-          className={cn(
-            "flex h-full w-full flex-col items-center justify-center text-[5px] text-neutral-700",
-            childrenClassName,
-          )}
+      {keyCode ? (
+        <button
+          type="button"
+          aria-label={getKeyAccessibleLabel(keyCode)}
+          tabIndex={-1}
+          data-key-code={keyCode}
+          data-pressed={isPressed ? "true" : undefined}
+          onClick={() => onVirtualKeyPress?.(keyCode)}
+          onPointerDown={handlePressStart}
+          onPointerUp={handlePressEnd}
+          onPointerCancel={handlePressCancel}
+          onPointerLeave={handlePressCancel}
+          onKeyDown={(event) => {
+            if (!event.repeat && (event.key === "Enter" || event.key === " ")) {
+              handlePressStart();
+            }
+          }}
+          onKeyUp={handlePressEnd}
+          className={keyClassName}
         >
-          {children}
-        </div>
-      </button>
+          {content}
+        </button>
+      ) : (
+        <span aria-hidden="true" className={keyClassName}>
+          {content}
+        </span>
+      )}
     </div>
   );
 };
@@ -908,23 +954,20 @@ const ModifierKey = ({
   } = useKeyboardSound();
   const isPressed = keyCode ? pressedKeys.has(keyCode) : false;
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (keyCode) {
-      event.preventDefault();
-      playSoundDown(keyCode);
-      setPressed(keyCode);
-      onVirtualKeyPress?.(keyCode);
-    }
+  const handlePressStart = () => {
+    if (!keyCode) return;
+    playSoundDown(keyCode);
+    setPressed(keyCode);
   };
 
-  const handleMouseUp = () => {
+  const handlePressEnd = () => {
     if (keyCode && isPressed) {
       playSoundUp(keyCode);
       setReleased(keyCode);
     }
   };
 
-  const handleMouseLeave = () => {
+  const handlePressCancel = () => {
     if (keyCode && isPressed) {
       setReleased(keyCode);
     }
@@ -934,11 +977,21 @@ const ModifierKey = ({
     <div className={cn("keyboard-3d-key rounded-[4px] p-[0.5px]", containerClassName)}>
       <button
         type="button"
+        aria-label={keyCode ? getKeyAccessibleLabel(keyCode) : undefined}
+        tabIndex={-1}
         data-key-code={keyCode}
         data-pressed={isPressed ? "true" : undefined}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseLeave}
+        onClick={() => keyCode && onVirtualKeyPress?.(keyCode)}
+        onPointerDown={handlePressStart}
+        onPointerUp={handlePressEnd}
+        onPointerCancel={handlePressCancel}
+        onPointerLeave={handlePressCancel}
+        onKeyDown={(event) => {
+          if (!event.repeat && (event.key === "Enter" || event.key === " ")) {
+            handlePressStart();
+          }
+        }}
+        onKeyUp={handlePressEnd}
         className={cn(
           "flex h-6 w-6 cursor-pointer items-center justify-center rounded-[3.5px] bg-gray-100 shadow-[0px_0px_1px_0px_rgba(0,0,0,0.5),0px_1px_1px_0px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(255,255,255,1)_inset] transition-transform duration-75 active:scale-[0.98]",
           isPressed &&

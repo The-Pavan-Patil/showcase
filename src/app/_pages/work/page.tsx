@@ -210,6 +210,7 @@ export function WorkPage({
             </article>
 
             <ArticleMap
+              slug={project.slug}
               heading={ui.work.articleMap}
               navigationLabel={formatCopy(ui.work.sectionsNavigationAria, { title: project.title })}
               sections={article.sections.map((section) => ({

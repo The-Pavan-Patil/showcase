@@ -35,6 +35,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 `DISCORD_WEBHOOK_URL` must be set for the anonymous keyboard message section to deliver visitor notes to Discord. The webhook stays server-only and is not exposed to the browser.
 
+`NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` enable PostHog product analytics. Both must be present and well formed; otherwise the SDK is never imported, no requests are made, and every `trackEvent` call is a no-op. Setting them also activates the `/ingest` reverse proxy in `next.config.ts`, which serves PostHog from this origin so that ad blockers do not drop events. Leave them unset for local development unless you are specifically testing analytics: the end-to-end suite asserts a clean browser console.
+
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` enables Google Analytics 4. Google Analytics is skipped entirely when the variable is absent or is not a `G-` measurement id. Pageviews are sent manually rather than by enhanced measurement, so "Page changes based on browser history events" must be turned **off** in the GA4 data stream — the site pushes history state for in-page anchor navigation, which would otherwise be counted as extra pageviews.
+
 Validate the local Discord webhook configuration with:
 
 ```bash
@@ -81,4 +85,6 @@ The target is Vercel. Before production deployment:
 3. Complete the manual accessibility checklist in the design-system documentation.
 4. Review the generated Open Graph card at `public/og.png`.
 
-No CMS, database, authentication, analytics, or unlicensed HeroUI Pro assets are used in version one. The only backend contact path is an anonymous, message-only Discord webhook endpoint with no visitor registration, reply field, or stored message history.
+No CMS, database, authentication, or unlicensed HeroUI Pro assets are used. The only backend contact path is an anonymous, message-only Discord webhook endpoint with no visitor registration, reply field, or stored message history.
+
+Analytics is optional and disabled unless configured. When enabled it is privacy-conservative by default: PostHog uses local storage rather than cookies and creates no person profiles, session replay masks all inputs, and Google Analytics runs with consent-mode defaults denying advertising storage, with Google signals and ad personalisation switched off.

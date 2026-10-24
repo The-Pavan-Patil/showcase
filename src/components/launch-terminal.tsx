@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { trackEvent } from "@/lib/analytics";
 
 const SESSION_KEY = "launch-terminal-seen";
 const DIRECTORY_LABEL = "/Users/pavanpatil/Developer/Portfolio";
@@ -16,7 +18,7 @@ const outputLines = [
   "- Local:        http://localhost:3000",
   "- Network:      http://192.168.1.8:3000",
   "",
-  "✓ Starting...",
+  "✓ Starting…",
   "✓ Ready in 1387ms",
 ];
 
@@ -64,11 +66,18 @@ export function LaunchTerminal({
   const [cursorIndex, setCursorIndex] = useState(0);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [visibleOutputCount, setVisibleOutputCount] = useState(0);
+  const startedAtRef = useRef<number | null>(null);
+
+  function elapsedSinceStart() {
+    return startedAtRef.current === null ? 0 : Date.now() - startedAtRef.current;
+  }
 
   useEffect(() => {
+    startedAtRef.current = Date.now();
     let isCancelled = false;
 
-    async function finishIntro(delay = 560) {
+    async function finishIntro(delay = 160) {
+      trackEvent("intro_completed", { elapsed_ms: elapsedSinceStart() });
       markIntroSeen();
       setIsExiting(true);
       await sleep(delay);
@@ -80,44 +89,47 @@ export function LaunchTerminal({
       const forceIntro = shouldForceIntro();
 
       if ((!forceIntro && hasSeenIntro()) || prefersReducedMotion) {
+        trackEvent("intro_not_shown", {
+          reason: prefersReducedMotion ? "reduced_motion" : "already_seen",
+        });
         markIntroSeen();
         setIsVisible(false);
         return;
       }
 
-      await sleep(420);
+      await sleep(50);
 
       for (let index = 0; index < MISTYPED_COMMAND.length; index += 1) {
         if (isCancelled) return;
         const nextCommand = MISTYPED_COMMAND.slice(0, index + 1);
         setCommand(nextCommand);
         setCursorIndex(nextCommand.length);
-        await sleep(index === 3 ? 150 : 74);
+        await sleep(index === 3 ? 24 : 14);
       }
 
-      await sleep(420);
+      await sleep(25);
       for (let index = MISTYPED_COMMAND.length - 1; index >= CORRECTION_INDEX; index -= 1) {
         if (isCancelled) return;
         setCursorIndex(index);
-        await sleep(105);
+        await sleep(18);
       }
 
-      await sleep(260);
+      await sleep(25);
       if (isCancelled) return;
       setCommand(FINAL_COMMAND);
       setCursorIndex(FINAL_COMMAND.length);
 
-      await sleep(520);
+      await sleep(40);
       if (isCancelled) return;
       setHasSubmitted(true);
 
       for (let index = 0; index < outputLines.length + 1; index += 1) {
         if (isCancelled) return;
         setVisibleOutputCount(index + 1);
-        await sleep((outputLines[index] ?? websiteLine) === "" ? 90 : 190);
+        await sleep((outputLines[index] ?? websiteLine) === "" ? 16 : 28);
       }
 
-      await sleep(700);
+      await sleep(80);
       if (!isCancelled) await finishIntro();
     }
 
@@ -129,6 +141,7 @@ export function LaunchTerminal({
   }, [websiteLine]);
 
   function skipIntro() {
+    trackEvent("intro_skipped", { elapsed_ms: elapsedSinceStart() });
     markIntroSeen();
     setIsExiting(true);
     window.setTimeout(() => setIsVisible(false), 180);
@@ -140,11 +153,10 @@ export function LaunchTerminal({
   const commandAfterCursor = command.slice(cursorIndex);
 
   return (
-    <div
+    <aside
       className={`launch-terminal${isExiting ? " launch-terminal-exit" : ""}`}
-      role="dialog"
-      aria-modal="true"
       aria-labelledby="launch-terminal-title"
+      data-launch-terminal
     >
       <button className="launch-terminal-skip" type="button" onClick={skipIntro}>
         {copy.skip}
@@ -172,7 +184,7 @@ export function LaunchTerminal({
           </div>
 
           {hasSubmitted ? (
-            <div className="launch-terminal-output" aria-live="polite">
+            <div className="launch-terminal-output" role="status" aria-live="polite">
               {[...outputLines, websiteLine].slice(0, visibleOutputCount).map((line, index) => (
                 <p
                   className={line.includes("Ready") || line.includes("Website") ? "launch-terminal-success" : undefined}
@@ -185,6 +197,6 @@ export function LaunchTerminal({
           ) : null}
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

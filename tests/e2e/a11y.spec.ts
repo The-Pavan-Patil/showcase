@@ -72,6 +72,6 @@ test("axe reports no violations in the launch terminal intro", async ({ page }, 
   test.skip(testInfo.project.name !== "chromium");
 
   await page.goto("/");
-  await expect(page.getByRole("dialog", { name: "pavanpatil.dev launch" })).toBeVisible();
+  await expect(page.locator("[data-launch-terminal]")).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });

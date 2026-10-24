@@ -88,9 +88,13 @@ The reduced-motion stylesheet disables smooth scrolling and collapses authored t
 - Skip link, html language, semantic page landmarks, and labeled navigation.
 - One primary page heading and ordered section headings.
 - Labeled icon buttons and aria-hidden decorative icons.
-- HeroUI Popover and Button primitives for mobile utility navigation and theme state.
+- A labelled non-modal dialog for mobile utility navigation, with native buttons for theme state.
 - Persistent mobile section destinations never require opening an overlay.
-- Browser-verified utility behavior: focus enters the Popover, Escape closes it, and focus returns to the trigger.
+- Browser-verified utility behavior: focus enters the dialog, Escape closes it, and focus returns to the trigger.
+- The quick-message form has a named textarea, visible submit button, adjacent live status, invalid-state exposure, and focus recovery after client-side validation.
+- Every interactive virtual key has an accessible name and native button activation. Virtual keys are intentionally removed from sequential focus order so the full visual keyboard does not add roughly 80 Tab stops; the textarea and visible submit button are the primary keyboard path.
+- The decorative Touch ID key is hidden from assistive technology, while physical key presses are mirrored on the visible keyboard.
+- The launch terminal is a short, non-modal status surface. It never hides or makes the main document inert, and reduced-motion visitors skip it.
 - Homepage section observation and case-study routing expose the current destination with aria-current="location" in desktop and mobile navigation.
 - Global focus-visible outline.
 - Matching project-card hover and focus-within elevation.
@@ -102,7 +106,7 @@ The reduced-motion stylesheet disables smooth scrolling and collapses authored t
 
 ### Known gaps
 
-No open accessibility gaps remain in the current foundation audit. Continue to run the release checks below as the implementation changes.
+No open automated accessibility violations remained in the audit completed on 2026-10-20. Axe passed the English, Japanese, and German homepages plus representative case studies in both themes on desktop and mobile Chromium. Continue to run the release checks below as the implementation changes.
 
 New-tab destinations are correctly named by destination and secured with noopener/noreferrer. A visible “opens in a new tab” convention is optional usability enhancement rather than a current WCAG failure.
 

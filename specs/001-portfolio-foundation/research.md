@@ -129,13 +129,19 @@ establish accessibility or behavior.
 ## Decision 10: Deployment Boundary
 
 **Decision**: Deploy the static/server-rendered application to Vercel with no backend services,
-secrets, analytics, cookies, or runtime persistence beyond the browser theme preference.
+secrets, cookies, or runtime persistence beyond the browser theme preference.
+
+**Amended 2026-09-09**: anonymous, cookieless analytics (PostHog on its free tier, reverse-proxied
+through `/ingest`, plus Google Analytics 4) is now in scope under constitution v1.1.0. It adds no
+backend service and no runtime persistence beyond browser-local analytics state.
 
 **Rationale**: This is the smallest operational surface that meets the hiring goal and aligns with
 the constitution's privacy and simplicity requirements.
 
 **Alternatives considered**: A contact-form service introduces data handling and abuse controls.
-Analytics add consent and privacy decisions that the user excluded from version one.
+Analytics were originally excluded because they add consent and privacy decisions; that trade-off
+was revisited on 2026-09-09 and resolved by choosing an anonymous, cookieless, no-banner
+configuration rather than by dropping measurement.
 
 ## Decision 11: Apple-Neutral Liquid Glass Navigation
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { Button } from "@heroui/react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
+
+import { trackEvent } from "@/lib/analytics";
 
 const subscribe = () => () => undefined;
 
@@ -33,11 +34,13 @@ export function ThemeToggle({
 
   const changeTheme = () => {
     setTheme(nextTheme);
+    trackEvent("theme_changed", { theme: nextTheme, surface: presentation });
     onThemeChange?.();
   };
 
   const selectTheme = (theme: "light" | "dark") => {
     setTheme(theme);
+    trackEvent("theme_changed", { theme, surface: presentation });
     onThemeChange?.();
   };
 
@@ -65,16 +68,14 @@ export function ThemeToggle({
   }
 
   return (
-    <Button
+    <button
       aria-label={label}
       className={presentation === "menu" ? "theme-toggle theme-toggle-menu" : "theme-toggle"}
-      isIconOnly={presentation === "icon"}
-      size="sm"
-      variant="ghost"
-      onPress={changeTheme}
+      type="button"
+      onClick={changeTheme}
     >
       {isDark ? <Sun aria-hidden="true" size={16} /> : <Moon aria-hidden="true" size={16} />}
       {presentation === "menu" && <span>{label}</span>}
-    </Button>
+    </button>
   );
 }
