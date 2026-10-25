@@ -8,6 +8,7 @@ export function SectionHeading({
   description,
   align = "left",
   accentAnchor,
+  accentSpacer = false,
 }: {
   id?: string;
   eyebrow: string;
@@ -16,7 +17,14 @@ export function SectionHeading({
   description?: string;
   align?: "left" | "center";
   accentAnchor?: "work" | "experience" | "workflow" | "about";
+  /**
+   * Reserves the accent dot's slot without registering an anchor, for headings
+   * inside a pinned stage whose anchor is measured from outside the stage.
+   */
+  accentSpacer?: boolean;
 }) {
+  const hasAccentSlot = Boolean(accentAnchor) || accentSpacer;
+
   return (
     <div
       className={cn(
@@ -24,7 +32,7 @@ export function SectionHeading({
         align === "center" && "section-heading-center",
       )}
     >
-      <p className={cn("eyebrow", accentAnchor && "scroll-accent-eyebrow")}>
+      <p className={cn("eyebrow", hasAccentSlot && "scroll-accent-eyebrow")}>
         {accentAnchor ? (
           <span
             className="scroll-accent-heading-target"
@@ -32,6 +40,8 @@ export function SectionHeading({
             data-scroll-accent-phase="heading"
             aria-hidden="true"
           />
+        ) : accentSpacer ? (
+          <span className="scroll-accent-heading-target" aria-hidden="true" />
         ) : null}
         {eyebrow}
       </p>

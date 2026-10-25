@@ -1212,7 +1212,6 @@ a {
 
 .hero-section {
   position: relative;
-  min-height: 52rem;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
   padding: 9.5rem 0 calc(5rem + 6px);
@@ -1249,9 +1248,7 @@ a {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(0, 1.03fr) minmax(25rem, 0.97fr);
-  align-items: center;
-  gap: 4rem;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .hero-copy {
@@ -1273,6 +1270,11 @@ a {
   font-weight: 560;
   letter-spacing: -0.065em;
   line-height: 0.98;
+}
+
+.hero-copy h1 {
+  max-width: 16ch;
+  font-size: clamp(3rem, 6.4vw, 5.8rem);
 }
 
 .hero-copy h1 span {
@@ -1345,24 +1347,6 @@ a {
   font-size: 0.78rem;
 }
 
-/* Sized, empty box that anchors the resting pose of the case-study deck. The
-   cards themselves live in .project-grid and are transformed up to here — they
-   cannot be children, because .hero-section clips its overflow. */
-.hero-deck {
-  position: relative;
-  min-height: 33rem;
-  isolation: isolate;
-}
-
-.hero-stage-glow {
-  position: absolute;
-  inset: 15% 5% 10%;
-  z-index: -1;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--accent-bright) 20%, transparent);
-  filter: blur(65px);
-}
-
 .window-bar {
   display: flex;
   align-items: center;
@@ -1423,10 +1407,6 @@ a {
   scroll-margin-top: 7rem;
 }
 
-#work {
-  padding-top: calc(8rem - 6px);
-}
-
 .section-heading {
   max-width: 44rem;
 }
@@ -1473,43 +1453,6 @@ a {
   text-transform: uppercase;
 }
 
-.project-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 1rem;
-  margin-top: 3.5rem;
-}
-
-.project-flight {
-  --flight-x: 0px;
-  --flight-y: 0px;
-  --flight-scale: 1;
-  --flight-rotate: 0deg;
-  --flight-z: 40;
-  display: grid;
-  grid-column: span 6;
-}
-
-.project-flight:first-child {
-  grid-column: span 12;
-}
-
-/* Only carry a transform while travelling, so a landed card is a plain grid
-   item again — no stray stacking context or containing block. Lifted above the
-   hero and proof strip, but kept under the fixed site header (z-index 50).
-   Cards stay clickable throughout: they hit-test where they are drawn, so the
-   resting deck in the hero is a working set of case-study links. */
-.project-flight[data-flying="true"] {
-  position: relative;
-  z-index: var(--flight-z);
-  will-change: transform;
-  transform:
-    translate3d(var(--flight-x), var(--flight-y), 0)
-    scale(var(--flight-scale))
-    rotate(var(--flight-rotate));
-  transform-origin: center;
-}
-
 .project-card {
   display: flex;
   flex-direction: column;
@@ -1519,11 +1462,6 @@ a {
   background: var(--surface) !important;
   box-shadow: var(--shadow-card) !important;
   transition: transform var(--motion-base) cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow var(--motion-base) ease !important;
-}
-
-.project-flight:first-child .project-card {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
 }
 
 .project-card:hover,
@@ -1536,11 +1474,6 @@ a {
   position: relative;
   min-height: 20rem;
   padding: 0.75rem;
-}
-
-.project-flight:first-child .project-card .project-card-visual-wrap {
-  grid-row: span 3;
-  min-height: 31rem;
 }
 
 .project-index {
@@ -1568,11 +1501,6 @@ a {
   padding: 1.25rem 1.4rem 0 !important;
 }
 
-.project-flight:first-child .project-card .project-card-content {
-  align-self: end;
-  padding: 3rem 2rem 0 !important;
-}
-
 .project-kicker {
   margin: 0;
   color: var(--accent-text);
@@ -1591,8 +1519,6 @@ a {
   letter-spacing: -0.045em !important;
   line-height: 1.12 !important;
 }
-
-.project-flight:first-child .project-card .project-title { font-size: 2rem !important; }
 
 .project-summary {
   margin-top: 0.85rem !important;
@@ -1628,8 +1554,6 @@ a {
 .project-card-footer {
   padding: 1rem 1.4rem 1.4rem !important;
 }
-
-.project-flight:first-child .project-card .project-card-footer { padding: 1.3rem 2rem 2rem !important; }
 
 .project-card-footer a {
   display: inline-flex;
@@ -1696,6 +1620,124 @@ a {
   font-weight: 800;
   line-height: 1.25;
   backdrop-filter: blur(14px);
+}
+
+/* Selected work: a pinned stack of full cards that fits one viewport. Without
+   `data-live` (server render, no script, reduced motion) it is a plain column
+   of the same full cards. */
+.work-section {
+  --work-stage-pad-top: 6.5rem;
+  position: relative;
+  scroll-margin-top: 0;
+}
+.work-stack-track {
+  position: relative;
+}
+.work-stack-anchor-layer {
+  position: absolute;
+  top: calc(var(--work-stage-pad-top) + 0.275rem);
+  right: 0;
+  left: 0;
+  pointer-events: none;
+}
+.work-stack-stage {
+  padding: var(--work-stage-pad-top) 0 6rem;
+}
+.work-stack-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+.work-stack-deck {
+  display: grid;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.work-stack-card {
+  display: grid;
+  min-height: min(40rem, 82svh);
+}
+.work-stack-card .project-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  height: 100%;
+}
+.work-stack-card .project-card-visual-wrap {
+  grid-row: 1 / span 2;
+  min-height: 0;
+}
+.work-stack-card .project-card-content {
+  align-self: end;
+  min-height: 0;
+  padding: 2.5rem 2.25rem 0 !important;
+}
+.work-stack-card .project-title {
+  max-width: 18ch;
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem) !important;
+}
+.work-stack-card .project-card-footer {
+  padding: 1.4rem 2.25rem 2.25rem !important;
+}
+
+.work-stack-track[data-live] {
+  height: calc(var(--stack-count) * 100svh);
+}
+.work-stack-track[data-live] .work-stack-stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  overflow: hidden;
+  padding-bottom: 1.5rem;
+}
+.work-stack-track[data-live] .work-stack-inner {
+  flex: 1;
+  min-height: 0;
+  gap: clamp(1rem, 3svh, 2.5rem);
+}
+.work-stack-track[data-live] .work-stack-deck {
+  --stack-peek: 0.85rem;
+  position: relative;
+  display: block;
+  flex: 1;
+  min-height: 0;
+  /* Waiting cards sit below the deck; clip only that edge. */
+  clip-path: inset(-3rem -3rem 0 -3rem);
+}
+/* Each card is offset by a sliver so the edges of the cards beneath peek out
+   above it; covered cards shrink from their top edge. */
+.work-stack-track[data-live] .work-stack-card {
+  position: absolute;
+  top: calc(var(--stack-index) * var(--stack-peek));
+  right: 0;
+  left: 0;
+  height: calc(100% - (var(--stack-count) - 1) * var(--stack-peek));
+  min-height: 0;
+  transform-origin: 50% 0;
+}
+.work-stack-track[data-live] .project-card:hover,
+.work-stack-track[data-live] .project-card:focus-within {
+  transform: none;
+}
+.work-stack-track[data-live] .project-summary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+/* Short screens: drop the section blurb and tighten the card copy so the
+   whole section still fits one viewport. */
+@media (max-height: 760px) {
+  .work-stack-track[data-live] .section-description { display: none; }
+  .work-stack-track[data-live] .section-heading h2 { font-size: clamp(1.75rem, 3vw, 2.4rem); }
+  .work-stack-track[data-live] .project-summary { -webkit-line-clamp: 2; }
+  .work-stack-track[data-live] .project-card-content { padding: 1.5rem 1.75rem 0 !important; }
+  .work-stack-track[data-live] .project-card-footer { padding: 1rem 1.75rem 1.5rem !important; }
 }
 
 .project-visual {
@@ -2716,132 +2758,214 @@ a {
   font-size: 0.62rem;
 }
 
-.about-shell {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
-  gap: 1.6rem 4.5rem;
-  align-items: start;
-}
-.about-portrait {
+/* About: a full-bleed scroll scene. Without `data-live` (server render,
+   no script, reduced motion) it is the finished composition. */
+.about-scene {
   position: relative;
-  grid-column: 2;
-  grid-row: 1;
-  width: min(100%, 18rem);
+  padding-top: 6rem;
+  scroll-margin-top: 0;
+}
+.about-scene-anchor-row {
+  height: 0.5rem;
+  margin-bottom: 2rem;
+}
+.about-scene-track {
+  position: relative;
+}
+.about-scene-stage {
+  display: grid;
+  gap: clamp(2rem, 5vw, 4rem);
+  padding-inline: clamp(1rem, 2.5vw, 2rem);
+}
+.about-scene-title {
+  display: grid;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(4.5rem, 18vw, 17rem);
+  font-weight: 640;
+  letter-spacing: -0.065em;
+  line-height: 0.82;
+  text-transform: uppercase;
+}
+.about-scene-word {
+  display: block;
+  width: fit-content;
+}
+.about-scene-word-right {
   justify-self: end;
 }
-.comet-card {
-  perspective: 1200px;
-}
-.comet-card-surface {
+/* The card keeps the photo's proportions (the portrait, extended sideways to
+   4:3) so the whole photo is shown at its natural shape. */
+.about-scene-card {
+  --about-photo-ratio: 2051 / 1538;
   position: relative;
-  transform-style: preserve-3d;
-}
-.about-portrait .comet-card-surface {
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--surface) 72%, transparent);
-  padding: 0.6rem;
-}
-.about-portrait-content {
-  position: relative;
-  z-index: 2;
-}
-.about-photo-frame {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 0.74;
-  border-radius: 0.4rem;
-  background: var(--surface-secondary);
-}
-.about-photo-frame img {
-  object-fit: cover;
-  object-position: 50% 46%;
-}
-.about-portrait-copy {
   display: grid;
-  gap: 0.2rem;
-  padding: 0.85rem 0.25rem 0.2rem;
-}
-.about-portrait-copy strong {
-  font-size: 0.82rem;
-  font-weight: 750;
-}
-.about-portrait-copy span {
-  color: var(--muted);
-  font-size: 0.7rem;
-  line-height: 1.4;
-}
-.about-content {
-  grid-column: 1;
-  grid-row: 1;
-  min-width: 0;
-}
-.about-beyond {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-row: 2;
-  gap: 1.5rem;
-  margin-top: 2rem;
-  border-top: 1px solid var(--border);
-  padding-top: 1.5rem;
-}
-.about-beyond h3 {
-  max-width: 22ch;
-  margin: 0.65rem 0 0;
-  font-family: var(--font-manrope), Manrope, sans-serif;
-  font-size: 1.35rem;
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1.12;
-}
-.about-beyond-list {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-.about-beyond-item {
-  display: flex;
-  flex-direction: column;
-  min-height: 29rem;
+  align-items: end;
+  width: min(100%, 60rem);
+  aspect-ratio: var(--about-photo-ratio);
+  margin-inline: auto;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  border-radius: 1.25rem;
+  background: #0b0d10;
+  isolation: isolate;
 }
-.about-beyond-image {
-  position: relative;
-  width: 100%;
-  min-height: 21rem;
-  overflow: hidden;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-secondary);
-}
-.about-beyond-ascii {
+.about-scene-photo {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.76;
-  transition: opacity var(--motion-slow) ease, transform var(--motion-slow) ease;
 }
-.about-beyond-item:hover .about-beyond-ascii {
-  opacity: 1;
-  transform: scale(1.025);
+.about-scene-photo img {
+  object-fit: cover;
 }
-.about-beyond-item-copy {
-  width: 100%;
-  padding: 1.25rem;
+.about-scene-photo-blur img {
+  filter: blur(28px) saturate(1.1);
+  transform: scale(1.12);
 }
-.about-beyond-item strong {
-  font-size: 0.82rem;
-  font-weight: 750;
+/* Hidden in the finished composition, where the copy sits on the blur. */
+.about-scene-photo-sharp {
+  opacity: 0;
 }
-.about-beyond-item p {
-  margin: 0.55rem 0 0;
-  color: var(--muted);
-  font-size: 0.8rem;
+.about-scene-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(6 8 10 / 54%);
+}
+.about-scene-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.4rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  color: #f5f5f4;
+}
+.about-scene-heading h3 {
+  max-width: 20ch;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 3.6vw, 3.4rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 1.02;
+}
+.about-scene-heading-muted {
+  color: rgb(255 255 255 / 74%);
+}
+.about-scene-body p {
+  max-width: 46rem;
+  margin: 0;
+  color: rgb(255 255 255 / 92%);
+  font-size: clamp(1.05rem, 1.3vw, 1.25rem);
   line-height: 1.6;
+}
+.resume-capsule.about-scene-resume {
+  border-color: transparent;
+  background: #fff;
+  color: #0b0d10;
+}
+
+.about-scene[data-live] {
+  padding-top: 4rem;
+}
+.about-scene[data-live] .about-scene-track {
+  height: 420svh;
+}
+/* The stage paints the page background so the title's difference blend has a
+   backdrop, and sits above the scroll-accent traveler (40) but under the
+   header (50) while the scene holds the screen. */
+.about-scene[data-live] .about-scene-stage {
+  position: sticky;
+  top: 0;
+  z-index: 41;
+  background: var(--background);
+  height: 100svh;
+  overflow: hidden;
+  place-items: center;
+  padding: 5rem clamp(1rem, 2.5vw, 2rem) 1.5rem;
+}
+.about-scene[data-live] .about-scene-title,
+.about-scene[data-live] .about-scene-card {
+  grid-area: 1 / 1;
+}
+.about-scene[data-live] .about-scene-title {
+  position: relative;
+  z-index: 2;
+  justify-items: center;
+  color: #fff;
+  font-size: clamp(5rem, 19vw, 19rem);
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+.about-scene[data-live] .about-scene-word-right {
+  justify-self: center;
+}
+/* Slightly shorter than the stage, with the spare room above the card so the
+   photo keeps clear of the navbar. */
+.about-scene[data-live] .about-scene-card {
+  width: min(100%, (100svh - 6.5rem) * 0.97 * 2051 / 1538, 50rem * 2051 / 1538);
+  align-self: end;
+}
+
+/* Very short desktop screens: the card is too small for the paragraph, so it
+   follows the scene, as on phones. */
+@media (min-width: 761px) and (max-height: 660px) {
+  .about-scene[data-live] .about-scene-card .about-scene-body { display: none; }
+  .about-scene[data-live] .about-scene-after {
+    display: block;
+    padding-top: 2.5rem;
+  }
+}
+
+.about-scene-after {
+  display: none;
+}
+.about-scene-after .about-scene-body p { color: var(--muted); }
+.about-scene-after .about-scene-resume {
+  border-color: color-mix(in srgb, var(--foreground) 16%, transparent);
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.about-beyond {
+  padding-block: clamp(5rem, 10vw, 8rem);
+}
+.about-beyond-list {
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.about-beyond-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 1.5rem 3rem;
+  align-items: end;
+  border-top: 1px solid var(--border);
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+}
+.about-beyond-row:last-child {
+  border-bottom: 1px solid var(--border);
+}
+.about-beyond-keyword {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 9vw, 8.5rem);
+  font-weight: 600;
+  letter-spacing: -0.065em;
+  line-height: 0.9;
+}
+.about-beyond-label {
+  margin: 0;
+  color: var(--accent-text);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.about-beyond-text {
+  max-width: 30rem;
+  margin: 0.75rem 0 0;
+  color: var(--foreground);
+  font-size: clamp(1rem, 1.35vw, 1.2rem);
+  line-height: 1.55;
 }
 .text-link { display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.5rem; color: var(--foreground); font-size: 0.8rem; font-weight: 750; }
 .text-link svg { transition: transform 160ms ease; } .text-link:hover svg { transform: translateX(3px); }
@@ -4219,29 +4343,8 @@ a {
   .hero-container { grid-template-columns: 1fr; gap: 1rem; }
   .hero-copy { max-width: 47rem; padding-bottom: 0; }
   .hero-copy h1 { max-width: 13ch; }
-  .hero-deck { min-height: 31rem; width: min(100%, 44rem); margin-inline: auto; }
-  .project-flight:first-child .project-card { display: block; }
-  .project-flight:first-child .project-card .project-card-visual-wrap { min-height: 25rem; }
-  .project-flight:first-child .project-card .project-card-content { padding: 1.25rem 1.4rem 0 !important; }
-  .project-flight:first-child .project-card .project-card-footer { padding: 1rem 1.4rem 1.4rem !important; }
   .experience-company-row { align-items: flex-start; }
   .experience-card-meta { flex-direction: column; align-items: flex-end; }
-  .about-shell { grid-template-columns: 1fr; gap: 1rem; }
-  .about-content,
-  .about-beyond {
-    grid-column: auto;
-    grid-row: auto;
-  }
-  .about-portrait {
-    position: relative;
-    top: auto;
-    grid-column: auto;
-    grid-row: auto;
-    width: min(100%, 22rem);
-    justify-self: start;
-  }
-  .about-photo-frame { aspect-ratio: 0.82; }
-  .about-content { grid-column: auto; }
   .quick-message-copy h2 { max-width: 16ch; }
   .case-hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
   .case-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; }
@@ -4293,20 +4396,13 @@ a {
   .hero-actions { align-items: stretch; }
   .primary-cta, .secondary-cta { flex: 1; min-width: 10rem; }
   .hero-location { align-items: start; }
-  /* The deck flight is disabled below this width, so the hero is copy only. */
-  .hero-deck { display: none; }
   .proof-grid { grid-template-columns: repeat(2, 1fr); }
   .proof-item { min-height: 6.5rem; border-bottom: 1px solid var(--border); padding: 1.25rem; }
   .proof-item:nth-child(2) { border-right: 1px solid var(--border); }
   .proof-item:nth-child(n+3) { border-bottom: 0; }
   .section-block { padding: 5.5rem 0; scroll-margin-top: 2rem; }
-  #work { padding-top: calc(5.5rem - 6px); }
   .section-header-row { display: block; }
   .section-count { display: block; margin-top: 1rem; }
-  .project-grid { display: grid; grid-template-columns: 1fr; }
-  .project-flight, .project-flight:first-child { grid-column: auto; }
-  .project-card-visual-wrap, .project-flight:first-child .project-card .project-card-visual-wrap { min-height: 21rem; }
-  .project-flight:first-child .project-card .project-title { font-size: 1.55rem !important; }
   .device-row { grid-template-columns: 1fr 0.65fr 1fr; gap: 0.45rem; }
   .sync-diagram, .browser-frame, .ops-frame, .learning-frame { width: 94%; }
   .phone-frame { min-height: 11rem; }
@@ -4350,19 +4446,50 @@ a {
     padding-inline: 0.45rem;
   }
   .ai-workflow-ship-pill { width: 100%; }
-  .about-portrait {
-    display: block;
-    width: min(100%, 20rem);
-    justify-self: center;
+  .work-section { --work-stage-pad-top: 2rem; }
+  .work-stack-card .project-card {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(14rem, 1fr) auto auto;
   }
-  .about-portrait .comet-card-surface { padding: 0.65rem; }
-  .about-photo-frame { aspect-ratio: 0.82; }
-  .about-beyond { gap: 1.1rem; }
-  .about-beyond-list { grid-template-columns: 1fr; }
-  .about-beyond-item { min-height: 26rem; }
-  .about-beyond-image { min-height: 18rem; }
-  .about-beyond h3 { max-width: 18ch; }
-  .about-content .resume-capsule { margin-bottom: 0; }
+  .work-stack-card .project-card-visual-wrap { grid-row: auto; }
+  .work-stack-card .project-card-content { padding: 1.25rem 1.25rem 0 !important; }
+  .work-stack-card .project-card-footer { padding: 1rem 1.25rem 1.25rem !important; }
+  .work-stack-card .project-title { font-size: 1.45rem !important; }
+  /* Phones have no top header but a bottom navigation bar. */
+  .work-stack-track[data-live] .work-stack-stage {
+    padding-bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px));
+  }
+  .work-stack-track[data-live] .section-description,
+  .work-stack-track[data-live] .section-count,
+  .work-stack-track[data-live] .project-tags { display: none; }
+  .work-stack-track[data-live] .section-heading h2 { font-size: 1.5rem; }
+  .work-stack-track[data-live] .work-stack-card .project-card { grid-template-rows: minmax(7rem, 1fr) auto auto; }
+  .work-stack-track[data-live] .project-summary { display: none; }
+  .work-stack-track[data-live] .project-card-media span { display: none; }
+  .about-scene { padding-top: 4rem; }
+  .about-scene-title { font-size: clamp(3.5rem, 24vw, 8rem); }
+  /* Phones have no top header but a bottom navigation bar. */
+  .about-scene[data-live] .about-scene-track { height: 300svh; }
+  .about-scene[data-live] .about-scene-stage {
+    padding: 1rem 1rem calc(6rem + env(safe-area-inset-bottom, 0px));
+  }
+  .about-scene[data-live] .about-scene-title { font-size: 27vw; }
+  .about-scene[data-live] .about-scene-card {
+    width: calc(100vw - 2rem);
+    height: calc(100svh - 7rem - env(safe-area-inset-bottom, 0px));
+    aspect-ratio: auto;
+  }
+  .about-scene[data-live] .about-scene-card .about-scene-body { display: none; }
+  .about-scene-photo img { object-position: 50% 40%; }
+  .about-scene[data-live] .about-scene-after {
+    display: block;
+    padding-top: 2.5rem;
+  }
+  .about-scene-content { gap: 1rem; padding: 1.4rem; }
+  .about-scene-heading h3 { font-size: 2.1rem; }
+  .about-scene-body p { font-size: 1rem; line-height: 1.6; }
+  .about-beyond-row { grid-template-columns: 1fr; gap: 1rem; }
+  .about-beyond-keyword { font-size: clamp(3rem, 16vw, 4.5rem); }
   .quick-message-section { padding-bottom: 5rem; scroll-margin-top: 2rem; }
   .quick-message-band { grid-template-columns: 1fr; gap: 1.45rem; }
   .quick-message-composer { margin-top: 0; }
@@ -4564,7 +4691,7 @@ a {
   .hero-stage { min-height: 23rem; }
   .hero-window-stack { display: none; }
   .hero-signal { bottom: 0.2rem; }
-  .project-card-visual-wrap, .project-flight:first-child .project-card .project-card-visual-wrap { min-height: 18rem; }
+  .project-card-visual-wrap { min-height: 18rem; }
   .project-visual { min-height: 20rem; }
   .sync-diagram { padding: 0.65rem; }
   .device-row { grid-template-columns: 1fr 0.55fr 1fr; }
@@ -4597,8 +4724,6 @@ a {
   .contact-email, .schedule-call-link { overflow-wrap: anywhere; border-radius: 1rem; }
   .quick-message-textarea { min-height: 7.5rem; }
   .quick-message-status { align-items: flex-start; }
-  .about-beyond-item { min-height: 24rem; }
-  .about-beyond-image { min-height: 16rem; }
   .project-card-media span { font-size: 0.54rem; }
   .case-media figcaption { position: static; border-width: 1px 0 0; border-radius: 0; background: var(--surface); }
   .case-ordered-list li { grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.65rem; }
@@ -4612,14 +4737,6 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .hero-deck { display: none; }
-  .hero-container { grid-template-columns: 1fr; }
-  .project-flight[data-flying="true"] {
-    transform: none !important;
-    position: static;
-    z-index: auto;
-    will-change: auto;
-  }
   .quick-message-scroll-track { min-height: auto; }
   .quick-message-band { position: static; }
   .quick-message-keyboard-camera { transform: none !important; }
@@ -4653,8 +4770,10 @@ a {
     opacity: 1;
     transform: none;
   }
-  /* Without JS the deck never flies, so hide the empty hero box and leave the
-     cards in their grid slots. */
-  .hero-deck { display: none; }
-  .hero-container { grid-template-columns: 1fr; }
+}
+
+/* Taller phones have room for the card summary again (after the phone block
+   so it wins the cascade). */
+@media (max-width: 760px) and (min-height: 700px) {
+  .work-stack-track[data-live] .project-summary { display: -webkit-box; -webkit-line-clamp: 2; }
 }

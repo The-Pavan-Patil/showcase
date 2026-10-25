@@ -1,3 +1,5 @@
+import { networkInterfaces } from "node:os";
+
 import type { NextConfig } from "next";
 
 const DEFAULT_POSTHOG_HOST = "https://eu.i.posthog.com";
@@ -19,7 +21,18 @@ const isAnalyticsConfigured = Boolean(
   process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim(),
 );
 
+/**
+ * This machine's LAN addresses, so the dev server can be opened from a phone
+ * on the same network. Next blocks dev assets for unlisted origins, which
+ * leaves the page unhydrated (stuck on the launch intro). Dev-only setting.
+ */
+const localNetworkHosts = Object.values(networkInterfaces())
+  .flat()
+  .filter((address) => address?.family === "IPv4" && !address.internal)
+  .map((address) => address!.address);
+
 const nextConfig: NextConfig = {
+  allowedDevOrigins: localNetworkHosts,
   experimental: {
     globalNotFound: true,
   },

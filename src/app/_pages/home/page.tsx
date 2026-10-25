@@ -13,11 +13,10 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
-import { AsciiArt } from "@/components/ascii-art";
-import { CometCard } from "@/components/ui/comet-card";
 import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
-import { ProjectDeckFlight } from "./_components/project-deck-flight";
+import { AboutScene } from "./_components/about-scene";
+import { ProjectStack } from "./_components/project-stack";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
@@ -40,11 +39,6 @@ export function HomePage({ locale }: { locale: Locale }) {
     skillGroups,
     socialLinks,
   } = getPortfolioContent(locale);
-  const personalNotes = [
-    { ...ui.home.personalNotes[0], image: "/images/beyond-code/calisthenics.avif" },
-    { ...ui.home.personalNotes[1], image: "/images/beyond-code/horse-riding.avif" },
-    { ...ui.home.personalNotes[2], image: "/images/beyond-code/bike-rides.webp" },
-  ];
   const homepageProjects = projects.filter(
     (project) => project.slug !== "workforce-management-system",
   );
@@ -97,10 +91,6 @@ export function HomePage({ locale }: { locale: Locale }) {
                 <MapPin aria-hidden="true" size={15} /> {ui.home.heroLocation}
               </p>
             </div>
-
-            <div className="hero-deck" aria-hidden="true">
-              <div className="hero-stage-glow" />
-            </div>
           </Container>
         </section>
 
@@ -117,26 +107,26 @@ export function HomePage({ locale }: { locale: Locale }) {
           </Container>
         </section>
 
-        <section className="section-block" id="work" aria-labelledby="work-heading">
-          <Container>
-            <div className="section-header-row">
-              <SectionHeading
-                id="work-heading"
-                eyebrow={ui.home.workEyebrow}
-                accentAnchor="work"
-                title={ui.home.workTitle}
-                muted={ui.home.workMuted}
-                description={ui.home.workDescription}
-              />
-              <span className="section-count">{ui.home.workCount}</span>
-            </div>
-            <ProjectDeckFlight
-              copy={ui.projectCard}
-              locale={locale}
-              projects={homepageProjects}
-              projectVisualCopy={ui.projectVisual}
-            />
-          </Container>
+        <section className="work-section" id="work" aria-labelledby="work-heading">
+          <ProjectStack
+            copy={ui.projectCard}
+            heading={
+              <div className="section-header-row">
+                <SectionHeading
+                  id="work-heading"
+                  eyebrow={ui.home.workEyebrow}
+                  accentSpacer
+                  title={ui.home.workTitle}
+                  muted={ui.home.workMuted}
+                  description={ui.home.workDescription}
+                />
+                <span className="section-count">{ui.home.workCount}</span>
+              </div>
+            }
+            locale={locale}
+            projects={homepageProjects}
+            projectVisualCopy={ui.projectVisual}
+          />
         </section>
 
         <section
@@ -275,81 +265,19 @@ export function HomePage({ locale }: { locale: Locale }) {
           </Container>
         </section>
 
-        <section
-          className="section-block"
-          id="about"
-          aria-labelledby="about-heading"
-          data-scroll-accent-pass
-        >
-          <Container>
-            <div className="about-shell">
-              <div className="about-content">
-                <div className="about-copy">
-                  <SectionHeading
-                    id="about-heading"
-                    eyebrow={ui.home.aboutEyebrow}
-                    title={ui.home.aboutTitle}
-                    muted={ui.home.aboutMuted}
-                    description={profile.about}
-                    accentAnchor="about"
-                  />
-                </div>
-
-                <a
-                  className="resume-capsule"
-                  href={resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {ui.home.downloadResume} <ArrowRight aria-hidden="true" size={16} />
-                </a>
-              </div>
-
-              <CometCard
-                className="about-portrait"
-                rotateDepth={4}
-                translateDepth={4}
-              >
-                <aside className="about-portrait-content" aria-label={ui.home.portraitAria}>
-                  <div className="about-photo-frame">
-                    <Image
-                      src="/pavan-profile.jpg"
-                      alt={ui.home.portraitAlt}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 32vw"
-                    />
-                  </div>
-                  <div className="about-portrait-copy">
-                    <strong>{profile.name}</strong>
-                    <span>{profile.role}</span>
-                  </div>
-                </aside>
-              </CometCard>
-
-              <div className="about-beyond">
-                <div>
-                  <p className="eyebrow">{ui.home.beyondCode}</p>
-                  <h3>{ui.home.beyondHeading}</h3>
-                </div>
-                <div className="about-beyond-list" aria-label={ui.home.personalInterestsAria}>
-                  {personalNotes.map((item) => {
-                    return (
-                      <div className="about-beyond-item" key={item.label}>
-                        <div className="about-beyond-image">
-                          <AsciiArt className="about-beyond-ascii" src={item.image} />
-                        </div>
-                        <div className="about-beyond-item-copy">
-                          <strong>{item.label}</strong>
-                          <p>{item.text}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </Container>
-        </section>
+        <AboutScene
+          displayWords={ui.home.aboutDisplay}
+          title={ui.home.aboutTitle}
+          muted={ui.home.aboutMuted}
+          description={profile.about}
+          resumeHref={resumeUrl}
+          resumeLabel={ui.home.downloadResume}
+          portraitAlt={ui.home.portraitAlt}
+          beyondEyebrow={ui.home.beyondCode}
+          beyondHeading={ui.home.beyondHeading}
+          beyondAria={ui.home.personalInterestsAria}
+          notes={ui.home.personalNotes}
+        />
 
         <QuickMessageSection copy={ui.home.quickMessage} />
 

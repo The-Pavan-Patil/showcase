@@ -92,18 +92,18 @@ export type UiCopy = {
     technologyStackAria: string;
     collapseProjects: string;
     showProjects: string;
-    aboutEyebrow: string;
+    aboutDisplay: [string, string];
     aboutTitle: string;
     aboutMuted: string;
     beyondCode: string;
     beyondHeading: string;
     personalInterestsAria: string;
     personalNotes: Array<{
+      keyword: string;
       label: string;
       text: string;
     }>;
     downloadResume: string;
-    portraitAria: string;
     portraitAlt: string;
     quickMessage: {
       eyebrow: string;
@@ -343,7 +343,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologyStackAria: "{name} technology stack",
       collapseProjects: "Collapse projects",
       showProjects: "Show projects",
-      aboutEyebrow: "About",
+      aboutDisplay: ["About", "Me"],
       aboutTitle: "Curiosity became craft,",
       aboutMuted: "and craft became my work.",
       beyondCode: "Beyond code",
@@ -351,20 +351,22 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       personalInterestsAria: "Personal interests",
       personalNotes: [
         {
+          keyword: "Discipline",
           label: "Calisthenics",
           text: "Bodyweight training taught me how discipline compounds. Competing nationally in 2024 made that lesson real.",
         },
         {
+          keyword: "Adrenaline",
           label: "Horse riding",
           text: "My adrenaline reset: fast enough to be exciting, controlled enough to demand complete attention.",
         },
         {
+          keyword: "Stillness",
           label: "Bike rides",
           text: "When I need quiet, I get on the bike. It clears my head and helps me return with more patience.",
         },
       ],
       downloadResume: "Open résumé",
-      portraitAria: "Portrait and profile summary",
       portraitAlt: "Pavan Patil smiling outdoors at night",
       quickMessage: {
         eyebrow: "Anonymous message",
@@ -606,7 +608,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologyStackAria: "{name} の技術スタック",
       collapseProjects: "プロジェクトを閉じる",
       showProjects: "プロジェクトを見る",
-      aboutEyebrow: "紹介",
+      aboutDisplay: ["私に", "ついて"],
       aboutTitle: "好奇心が技術になり、",
       aboutMuted: "技術が仕事になりました。",
       beyondCode: "コード以外",
@@ -614,20 +616,22 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       personalInterestsAria: "個人的な関心",
       personalNotes: [
         {
+          keyword: "規律",
           label: "カリステニクス",
           text: "自重トレーニングから、規律は少しずつ積み上がると学びました。2024年に全国大会へ出たことで、その意味を強く感じました。",
         },
         {
+          keyword: "刺激",
           label: "乗馬",
           text: "気持ちを切り替える時間です。スピード感がありながら、集中と落ち着きも必要です。",
         },
         {
+          keyword: "落ち着き",
           label: "バイクライド",
           text: "静かに考えたい時はバイクに乗ります。頭が整理され、より落ち着いて戻れます。",
         },
       ],
       downloadResume: "履歴書を開く",
-      portraitAria: "写真とプロフィール概要",
       portraitAlt: "夜の屋外で笑っているPavan Patil",
       quickMessage: {
         eyebrow: "匿名メッセージ",
@@ -869,7 +873,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologyStackAria: "{name} Technologie-Stack",
       collapseProjects: "Projekte einklappen",
       showProjects: "Projekte anzeigen",
-      aboutEyebrow: "Profil",
+      aboutDisplay: ["Über", "mich"],
       aboutTitle: "Neugier wurde Handwerk,",
       aboutMuted: "und Handwerk wurde meine Arbeit.",
       beyondCode: "Neben Code",
@@ -877,20 +881,22 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       personalInterestsAria: "Persönliche Interessen",
       personalNotes: [
         {
+          keyword: "Disziplin",
           label: "Calisthenics",
           text: "Training mit dem eigenen Körpergewicht hat mir gezeigt, wie Disziplin wächst. Der nationale Wettbewerb 2024 hat diese Lektion greifbar gemacht.",
         },
         {
+          keyword: "Adrenalin",
           label: "Reiten",
           text: "Mein Reset mit Adrenalin: schnell genug, um spannend zu sein, und kontrolliert genug, um volle Aufmerksamkeit zu verlangen.",
         },
         {
+          keyword: "Ruhe",
           label: "Motorradfahrten",
           text: "Wenn ich Ruhe brauche, fahre ich los. Das klärt den Kopf und bringt mich geduldiger zurück.",
         },
       ],
       downloadResume: "Lebenslauf öffnen",
-      portraitAria: "Porträt und Profilübersicht",
       portraitAlt: "Pavan Patil lächelt nachts im Freien",
       quickMessage: {
         eyebrow: "Anonyme Nachricht",
