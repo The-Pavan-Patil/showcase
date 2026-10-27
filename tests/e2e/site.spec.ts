@@ -883,12 +883,22 @@ test("about scene parts the title and reveals the profile copy on scroll", async
   await expect.poll(() => left.evaluate(translateX)).toBeLessThan(-50);
   await expect.poll(() => right.evaluate(translateX)).toBeGreaterThan(50);
 
-  await scrollAboutSceneTo(page, 1);
+  await scrollAboutSceneTo(page, 0.75);
   await expect(page.locator(".about-scene-heading")).toHaveCSS("opacity", "1");
 
   const resume = page.getByRole("link", { name: /Open résumé/ });
   await expect(resume).toBeVisible();
   await expect(resume).toHaveAttribute("target", "_blank");
+
+  // Wide screens end on Beyond code inside the card; phones show it after.
+  if ((await scene.getAttribute("data-beat")) !== null) {
+    await scrollAboutSceneTo(page, 1);
+    await expect.poll(() => page.locator(".about-scene-beyond").evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.95);
+    await expect(page.locator(".about-scene-beyond .about-beyond-keyword").first()).toBeVisible();
+    await expect(page.locator(".about-beyond-strip")).toBeHidden();
+  } else {
+    await expect(page.locator(".about-beyond-strip .about-beyond-keyword").first()).toBeVisible();
+  }
 });
 
 test("about scene scrolls forward when the résumé link receives keyboard focus", async ({ page }, testInfo) => {
@@ -900,10 +910,20 @@ test("about scene scrolls forward when the résumé link receives keyboard focus
   await page.goto("/");
   await expect(page.locator("#about")).toHaveAttribute("data-live", "");
 
-  await scrollAboutSceneTo(page, 0.1);
-  await page.locator(".about-scene-card .about-scene-resume").focus();
+  const resume = page.locator(".about-scene-card .about-scene-resume");
+  const content = page.locator(".about-scene-card .about-scene-content");
+  const opacityOf = (locator: typeof content) => locator.evaluate((element) => Number(getComputedStyle(element).opacity));
 
+  await scrollAboutSceneTo(page, 0.1);
+  await resume.focus();
   await expect.poll(() => page.locator(".about-scene-body").first().evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.95);
+
+  // Once the copy has handed over to Beyond code, focus scrolls back to it.
+  await resume.blur();
+  await scrollAboutSceneTo(page, 1);
+  await expect.poll(() => opacityOf(content)).toBeLessThan(0.05);
+  await resume.focus();
+  await expect.poll(() => opacityOf(content)).toBeGreaterThan(0.95);
 });
 
 test("about scene shows the finished composition with reduced motion", async ({ page }, testInfo) => {
@@ -918,74 +938,69 @@ test("about scene shows the finished composition with reduced motion", async ({ 
   await expect(page.locator(".about-scene-stage")).toHaveCSS("position", "static");
   await expect(page.locator(".about-scene-card .about-scene-heading")).toHaveCSS("opacity", "1");
   await expect(page.locator(".about-scene-card .about-scene-resume")).toBeVisible();
-  await expect(page.locator(".about-beyond-keyword").first()).toHaveCSS("opacity", "1");
+  await expect(page.locator(".about-beyond-strip .about-beyond-keyword").first()).toBeVisible();
+  await expect(page.locator(".about-scene-beyond")).toBeHidden();
 });
 
-async function scrollWorkStackTo(page: import("@playwright/test").Page, progress: number) {
+async function scrollWorkDustTo(page: import("@playwright/test").Page, progress: number) {
   await page.evaluate((target) => {
-    const track = document.querySelector<HTMLElement>(".work-stack-track");
-    if (!track) throw new Error("Work stack track is missing");
+    const track = document.querySelector<HTMLElement>(".dust-track");
+    if (!track) throw new Error("Work dust track is missing");
     const bounds = track.getBoundingClientRect();
     const top = bounds.top + window.scrollY + (bounds.height - window.innerHeight) * target;
     window.scrollTo({ top, behavior: "instant" });
   }, progress);
 }
 
-test("selected work pins in one viewport and stacks the project cards", async ({ page }, testInfo) => {
+// Mirrors resolveProgressForIndex in project-dust-timeline.ts for 3 cards.
+const dustRestProgress = (index: number) => (index + 0.3) / (2 + 0.3 * 2);
+
+test("selected work carries portrait cards through the dust lane on scroll", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await skipLaunchIntro(page);
   await page.goto("/");
 
-  const track = page.locator(".work-stack-track");
+  const track = page.locator(".dust-track");
   await expect(track).toHaveAttribute("data-live", "");
-  await expect(page.locator(".hero-deck")).toHaveCount(0);
-
-  const cards = page.locator(".work-stack-card");
+  const cards = page.locator(".dust-card");
   await expect(cards).toHaveCount(3);
+  await expect(page.locator(".dust-canvas")).toHaveCount(1);
 
-  // The whole section (heading and deck) fits the viewport, with no card
-  // content overflowing its card.
-  await scrollWorkStackTo(page, 0);
-  const fit = await page.evaluate(() => {
-    const stage = document.querySelector<HTMLElement>(".work-stack-stage")!.getBoundingClientRect();
-    const overflowing = [...document.querySelectorAll<HTMLElement>(".work-stack-card .project-card")].filter(
-      (card) => card.scrollHeight > card.clientHeight + 1,
-    ).length;
-    return { stageTop: stage.top, stageHeight: stage.height, viewport: window.innerHeight, overflowing };
-  });
-  expect(fit.stageTop).toBeCloseTo(0, 0);
-  expect(fit.stageHeight).toBeLessThanOrEqual(fit.viewport);
-  expect(fit.overflowing).toBe(0);
+  // Distance of a card's centre from the lane's centre.
+  const offCentre = (index: number) =>
+    page.evaluate((cardIndex) => {
+      const lane = document.querySelector<HTMLElement>(".dust-lane")!.getBoundingClientRect();
+      const card = document.querySelectorAll<HTMLElement>(".dust-card")[cardIndex]!.getBoundingClientRect();
+      return card.left + card.width / 2 - (lane.left + lane.width / 2);
+    }, index);
 
-  const cardTop = (index: number) =>
-    cards.nth(index).evaluate((element) => element.getBoundingClientRect().top);
-  const deckBottom = () =>
-    page.locator(".work-stack-deck").evaluate((element) => element.getBoundingClientRect().bottom);
+  for (const index of [0, 1, 2]) {
+    await scrollWorkDustTo(page, dustRestProgress(index));
+    await expect.poll(() => offCentre(index)).toBeCloseTo(0, 0);
+    await expect(page.locator(".dust-counter")).toContainText(`0${index + 1}`);
+    // The stage stays pinned to the viewport while the cards travel.
+    expect(await page.locator(".dust-stage").evaluate((element) => element.getBoundingClientRect().top)).toBeCloseTo(0, 0);
+  }
 
-  // Before the hand-off the last card waits below the deck.
-  expect(await cardTop(2)).toBeGreaterThanOrEqual(await deckBottom());
-
-  // Once the stack lands, every card sits inside the deck, layered in order.
-  await scrollWorkStackTo(page, 1);
-  await expect.poll(() => cardTop(2)).toBeLessThan(await deckBottom());
-  const tops = [await cardTop(0), await cardTop(1), await cardTop(2)];
-  expect(tops[0]).toBeLessThan(tops[1]);
-  expect(tops[1]).toBeLessThan(tops[2]);
-
-  await expect(cards.nth(2).getByRole("link", { name: /View case study/ })).toBeVisible();
+  // Earlier cards have moved off to the left, the way they left.
+  expect(await offCentre(0)).toBeLessThan(0);
+  await expect(cards.nth(2).getByRole("link", { name: /Read the Philips Greenheart case study/ })).toBeVisible();
 });
 
-test("selected work shows a plain column of cards with reduced motion", async ({ page }, testInfo) => {
+test("selected work shows a plain row of portrait cards with reduced motion", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await skipLaunchIntro(page);
   await page.goto("/");
 
-  await expect(page.locator(".work-stack-track")).not.toHaveAttribute("data-live", "");
-  await expect(page.locator(".work-stack-stage")).toHaveCSS("position", "static");
+  await expect(page.locator(".dust-track")).not.toHaveAttribute("data-live", "");
+  await expect(page.locator(".dust-stage")).toHaveCSS("position", "static");
+  await expect(page.locator(".dust-canvas")).toHaveCount(0);
   for (const index of [0, 1, 2]) {
-    await expect(page.locator(".work-stack-card").nth(index)).toHaveCSS("transform", "none");
+    const card = page.locator(".dust-card").nth(index);
+    await expect(card).toHaveCSS("transform", "none");
+    await expect(card.getByRole("link")).toBeVisible();
   }
 });

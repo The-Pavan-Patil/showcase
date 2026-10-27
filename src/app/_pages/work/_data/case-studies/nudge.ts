@@ -30,9 +30,11 @@ export const nudge = {
   ],
   media: {
     src: "/nudge-iphone-trio.png",
+    focus: "50% 50%",
     alt: "Three iPhone screens showing the Nudge social task app interface",
     caption: "Nudge task deck across owner and collaborator flows",
   },
+  cardPalette: { base: "#d9503f", glow: "#ff9a7a", deep: "#7a1f17" },
   visual: "sync",
   visualLabel: "Nudge task deck showing role-aware gestures, offline queue, and Supabase synchronization",
   caseStudy: {

@@ -16,7 +16,7 @@ import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
 import { AboutScene } from "./_components/about-scene";
-import { ProjectStack } from "./_components/project-stack";
+import { ProjectDust } from "./_components/project-dust";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
@@ -108,7 +108,7 @@ export function HomePage({ locale }: { locale: Locale }) {
         </section>
 
         <section className="work-section" id="work" aria-labelledby="work-heading">
-          <ProjectStack
+          <ProjectDust
             copy={ui.projectCard}
             heading={
               <div className="section-header-row">
@@ -125,7 +125,6 @@ export function HomePage({ locale }: { locale: Locale }) {
             }
             locale={locale}
             projects={homepageProjects}
-            projectVisualCopy={ui.projectVisual}
           />
         </section>
 

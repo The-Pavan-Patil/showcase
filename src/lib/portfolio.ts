@@ -11,6 +11,7 @@ export type {
   ExperienceProject,
   PortfolioContent,
   Profile,
+  ProjectCardPalette,
   ProjectMedia,
   ProjectCaseStudy,
   ProjectMetric,

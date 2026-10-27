@@ -18,6 +18,9 @@ for (const [name, route] of routes) {
     if (route === "/") await skipLaunchIntro(page);
     await page.goto(route);
     await page.evaluate(() => document.fonts.ready);
+    // The Selected Work dust loads three.js on demand; wait until it has
+    // settled on WebGL dust or the plain fallback.
+    if (route === "/") await page.locator(".dust-track[data-dust]").waitFor({ state: "attached" });
     await expect(page).toHaveScreenshot(`${name}-light.png`, { fullPage: true, animations: "disabled" });
 
     if (testInfo.project.name === "mobile-chromium") {

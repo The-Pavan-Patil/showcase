@@ -37,9 +37,11 @@ export const mainichiKoto = {
   ],
   media: {
     src: "/images/projects/mainichi-koto-kanji.png",
+    focus: "50% 55%",
     alt: "Mainichi koto kanji study screen showing a Word Kanji flashcard for 着く with an I remember review action",
     caption: "Mainichi koto Word Kanji review surface",
   },
+  cardPalette: { base: "#4f6b45", glow: "#9cbf7a", deep: "#1f2d1c" },
   visual: "learning",
   visualLabel:
     "Mainichi koto learning system showing vocabulary cards, contextual kanji recall, spaced review, and a durable review queue",

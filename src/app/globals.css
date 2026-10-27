@@ -95,7 +95,7 @@ html[lang="ja"] body {
   font-family: var(--font-noto-sans-jp), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-html[lang="ja"] :where(h1, h2, h3, h4, .brand-link, .section-heading, .proof-item strong, .project-title, .case-section-body h2, .next-project-section a strong) {
+html[lang="ja"] :where(h1, h2, h3, h4, .brand-link, .section-heading, .proof-item strong, .dust-card-title, .case-section-body h2, .next-project-section a strong) {
   font-family: var(--font-noto-sans-jp), var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -1453,81 +1453,6 @@ a {
   text-transform: uppercase;
 }
 
-.project-card {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-feature) !important;
-  background: var(--surface) !important;
-  box-shadow: var(--shadow-card) !important;
-  transition: transform var(--motion-base) cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow var(--motion-base) ease !important;
-}
-
-.project-card:hover,
-.project-card:focus-within {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-float) !important;
-}
-
-.project-card-visual-wrap {
-  position: relative;
-  min-height: 20rem;
-  padding: 0.75rem;
-}
-
-.project-index {
-  position: absolute;
-  top: 1.3rem;
-  left: 1.3rem;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  width: 2.15rem;
-  height: 2.15rem;
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 80%, transparent);
-  color: var(--muted);
-  font-size: 0.66rem;
-  font-weight: 800;
-  backdrop-filter: blur(10px);
-}
-
-.project-card-content {
-  display: flex !important;
-  flex: 1;
-  flex-direction: column;
-  padding: 1.25rem 1.4rem 0 !important;
-}
-
-.project-kicker {
-  margin: 0;
-  color: var(--accent-text);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.project-title {
-  max-width: 21ch;
-  margin-top: 0.75rem !important;
-  font-family: var(--font-manrope), Manrope, sans-serif !important;
-  font-size: 1.55rem !important;
-  font-weight: 620 !important;
-  letter-spacing: -0.045em !important;
-  line-height: 1.12 !important;
-}
-
-.project-summary {
-  margin-top: 0.85rem !important;
-  color: var(--muted) !important;
-  font-size: 0.86rem !important;
-  line-height: 1.65 !important;
-}
-
-.project-tags,
 .case-tags,
 .skill-chips {
   display: flex;
@@ -1551,141 +1476,167 @@ a {
   white-space: nowrap;
 }
 
-.project-card-footer {
-  padding: 1rem 1.4rem 1.4rem !important;
-}
-
-.project-card-footer a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  width: fit-content;
-  min-height: 2.8rem;
-  border: 1px solid color-mix(in srgb, var(--foreground) 16%, transparent);
-  border-radius: var(--radius-pill);
-  background: var(--foreground);
-  color: var(--background);
-  padding: 0.75rem 1.05rem 0.75rem 1.15rem;
-  font-size: 0.8rem;
-  font-weight: 760;
-  transition: transform var(--motion-fast) ease, opacity var(--motion-fast) ease;
-}
-
-.project-card-footer a svg { transition: transform 170ms ease; }
-.project-card-footer a:hover svg { transform: translate(2px, -2px); }
-.project-card-footer a:active { transform: scale(0.98); opacity: 0.82; }
-
-.project-card-media {
-  position: absolute;
-  inset: 0.75rem;
-  display: block;
-  width: auto;
-  min-height: 0;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
-  border-radius: 1.3rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--surface) 88%, transparent), transparent),
-    var(--surface-secondary);
-}
-
-.project-card-media img {
-  object-fit: contain;
-  object-position: center;
-}
-
-.project-card-media::after {
-  position: absolute;
-  inset: auto 0 0;
-  height: 34%;
-  background: linear-gradient(to top, rgb(0 0 0 / 35%), transparent);
-  content: "";
-  pointer-events: none;
-}
-
-.project-card-media span {
-  position: absolute;
-  right: 1rem;
-  bottom: 1rem;
-  left: 1rem;
-  z-index: 2;
-  width: fit-content;
-  max-width: calc(100% - 2rem);
-  border: 1px solid rgb(255 255 255 / 34%);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 82%);
-  color: #143232;
-  padding: 0.45rem 0.7rem;
-  font-size: 0.62rem;
-  font-weight: 800;
-  line-height: 1.25;
-  backdrop-filter: blur(14px);
-}
-
-/* Selected work: a pinned stack of full cards that fits one viewport. Without
-   `data-live` (server render, no script, reduced motion) it is a plain column
-   of the same full cards. */
+/* Selected work: a pinned full-screen lane of portrait cards. Scrolling
+   moves them right to left; past the dust lines a card exists only as
+   particles (WebGL, see dust-field.ts) and the solid card is clipped there.
+   Without `data-live` (server render, no script, reduced motion) the same
+   cards sit in a plain row. */
 .work-section {
   --work-stage-pad-top: 6.5rem;
   position: relative;
   scroll-margin-top: 0;
 }
-.work-stack-track {
+.dust-track {
   position: relative;
 }
-.work-stack-anchor-layer {
+.dust-anchor-layer {
   position: absolute;
   top: calc(var(--work-stage-pad-top) + 0.275rem);
   right: 0;
   left: 0;
   pointer-events: none;
 }
-.work-stack-stage {
+.dust-stage {
   padding: var(--work-stage-pad-top) 0 6rem;
 }
-.work-stack-inner {
+.dust-head {
   display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
 }
-.work-stack-deck {
+.dust-lane {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
-  margin: 0;
+  width: min(100% - 2.5rem, var(--container-page));
+  margin: 2.5rem auto 0;
   padding: 0;
   list-style: none;
 }
-.work-stack-card {
+/* Each card wears its project's colours (--card-*, set from the project
+   data); the screenshot sits in a framed window in the middle. The same
+   layers are redrawn on the canvas in dust-field.ts, so keep them in step. */
+.dust-card {
+  --card-base: #27272a;
+  --card-glow: #52525b;
+  --card-deep: #09090b;
+  position: relative;
   display: grid;
-  min-height: min(40rem, 82svh);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(90% 60% at 85% 10%, var(--card-glow) 0%, transparent 62%),
+    radial-gradient(110% 70% at 10% 95%, var(--card-deep) 0%, transparent 70%),
+    var(--card-base);
+  color: #fff;
+  isolation: isolate;
 }
-.work-stack-card .project-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto;
+.dust-card-media {
+  position: relative;
+  grid-row: 2;
+  place-self: center;
+  width: 84%;
+  max-height: 100%;
+  aspect-ratio: 16 / 11;
+  overflow: hidden;
+  border-radius: 0.85rem;
+  box-shadow:
+    0 18px 40px rgb(0 0 0 / 32%),
+    0 0 0 1px rgb(255 255 255 / 14%);
+}
+.dust-card-media img {
+  object-fit: cover;
+}
+/* Kept in step with SHADE_STOPS in dust-field.ts. */
+.dust-card-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgb(0 0 0 / 34%) 0%,
+    rgb(0 0 0 / 0%) 32%,
+    rgb(0 0 0 / 0%) 70%,
+    rgb(0 0 0 / 30%) 100%
+  );
+}
+.dust-card-head {
+  grid-row: 1;
+  padding: clamp(1.25rem, 2.2vw, 1.85rem) clamp(1.25rem, 2.2vw, 1.85rem) 0;
+}
+.dust-card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2vw, 1.95rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+.dust-card-kicker {
+  margin: 0.45rem 0 0;
+  color: rgb(255 255 255 / 80%);
+  font-size: clamp(0.92rem, 1.1vw, 1.05rem);
+  line-height: 1.4;
+}
+.dust-card-foot {
+  grid-row: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 clamp(1.25rem, 2.2vw, 1.85rem) clamp(1.25rem, 2.2vw, 1.85rem);
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-weight: 600;
+}
+.dust-card-arrow {
+  flex: none;
+  transition: transform 170ms ease;
+}
+.dust-card:hover .dust-card-arrow,
+.dust-card:focus-within .dust-card-arrow {
+  transform: translate(2px, -2px);
+}
+/* The whole card is the link. */
+.dust-card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+.dust-card-link:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+.dust-counter {
+  flex: none;
+  margin: 0;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.dust-counter-total {
+  color: var(--muted);
+}
+.dust-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
   height: 100%;
-}
-.work-stack-card .project-card-visual-wrap {
-  grid-row: 1 / span 2;
-  min-height: 0;
-}
-.work-stack-card .project-card-content {
-  align-self: end;
-  min-height: 0;
-  padding: 2.5rem 2.25rem 0 !important;
-}
-.work-stack-card .project-title {
-  max-width: 18ch;
-  font-size: clamp(1.6rem, 2.6vw, 2.4rem) !important;
-}
-.work-stack-card .project-card-footer {
-  padding: 1.4rem 2.25rem 2.25rem !important;
+  pointer-events: none;
+  /* Dust fades out near the heading instead of ending on a hard line. */
+  mask-image: linear-gradient(180deg, transparent 0, #000 2.5rem);
 }
 
-.work-stack-track[data-live] {
-  height: calc(var(--stack-count) * 100svh);
+.dust-track[data-live] {
+  height: calc((var(--dust-count) + 1) * 100svh);
 }
-.work-stack-track[data-live] .work-stack-stage {
+.dust-track[data-live] .dust-stage {
   position: sticky;
   top: 0;
   display: flex;
@@ -1694,50 +1645,52 @@ a {
   overflow: hidden;
   padding-bottom: 1.5rem;
 }
-.work-stack-track[data-live] .work-stack-inner {
-  flex: 1;
-  min-height: 0;
-  gap: clamp(1rem, 3svh, 2.5rem);
-}
-.work-stack-track[data-live] .work-stack-deck {
-  --stack-peek: 0.85rem;
+.dust-track[data-live] .dust-head {
   position: relative;
-  display: block;
+  z-index: 3;
+}
+.dust-track[data-live] .section-description,
+.dust-track[data-live] .section-count {
+  display: none;
+}
+.dust-track[data-live] .section-heading h2 {
+  font-size: clamp(1.6rem, 2.6vw, 2.3rem);
+}
+.dust-track[data-live] .dust-field {
+  position: relative;
   flex: 1;
   min-height: 0;
-  /* Waiting cards sit below the deck; clip only that edge. */
-  clip-path: inset(-3rem -3rem 0 -3rem);
+  margin-top: 1rem;
 }
-/* Each card is offset by a sliver so the edges of the cards beneath peek out
-   above it; covered cards shrink from their top edge. */
-.work-stack-track[data-live] .work-stack-card {
+/* Every card is centred in the lane; the scene offsets them sideways. The
+   lane is inset from the dust field's top so dust can fade in above it. */
+.dust-track[data-live] .dust-lane {
   position: absolute;
-  top: calc(var(--stack-index) * var(--stack-peek));
-  right: 0;
-  left: 0;
-  height: calc(100% - (var(--stack-count) - 1) * var(--stack-peek));
-  min-height: 0;
-  transform-origin: 50% 0;
+  inset: 2.5rem 0 0;
+  display: block;
+  width: auto;
+  margin: 0;
+  container-type: size;
 }
-.work-stack-track[data-live] .project-card:hover,
-.work-stack-track[data-live] .project-card:focus-within {
-  transform: none;
+.dust-track[data-live] .dust-slot {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
 }
-.work-stack-track[data-live] .project-summary {
-  display: -webkit-box;
-  overflow: hidden;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
+.dust-track[data-live] .dust-card {
+  height: min(94cqh, 42rem, (100cqw - 3rem) * 1.25);
+  pointer-events: auto;
+  will-change: transform;
 }
-
-/* Short screens: drop the section blurb and tighten the card copy so the
-   whole section still fits one viewport. */
-@media (max-height: 760px) {
-  .work-stack-track[data-live] .section-description { display: none; }
-  .work-stack-track[data-live] .section-heading h2 { font-size: clamp(1.75rem, 3vw, 2.4rem); }
-  .work-stack-track[data-live] .project-summary { -webkit-line-clamp: 2; }
-  .work-stack-track[data-live] .project-card-content { padding: 1.5rem 1.75rem 0 !important; }
-  .work-stack-track[data-live] .project-card-footer { padding: 1rem 1.75rem 1.5rem !important; }
+/* With WebGL the canvas draws the cards; the DOM cards stay in place,
+   invisible, for links, focus and screen readers (and show on focus). */
+.dust-track[data-dust="ready"] .dust-card {
+  opacity: 0;
+}
+.dust-track[data-dust="ready"] .dust-card:focus-within {
+  opacity: 1;
 }
 
 .project-visual {
@@ -2869,6 +2822,10 @@ a {
 .about-scene[data-live] .about-scene-track {
   height: 420svh;
 }
+/* The Beyond-code beat adds a hold at the end without changing the pace. */
+.about-scene[data-beat] .about-scene-track {
+  height: 520svh;
+}
 /* The stage paints the page background so the title's difference blend has a
    backdrop, and sits above the scroll-accent traveler (40) but under the
    header (50) while the scene holds the screen. */
@@ -2925,35 +2882,58 @@ a {
   color: var(--background);
 }
 
-.about-beyond {
-  padding-block: clamp(5rem, 10vw, 8rem);
+/* Beyond code: the About card's final beat in the live scene, otherwise a
+   compact strip under the card. Kept quieter than the work sections. */
+.about-beyond-strip {
+  padding-block: clamp(3.5rem, 6vw, 5rem);
+}
+.about-scene-card > .about-scene-content,
+.about-scene-card > .about-scene-beyond {
+  grid-area: 1 / 1;
+}
+.about-scene-beyond {
+  display: none;
+  position: relative;
+  z-index: 1;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  pointer-events: none;
+}
+.about-scene[data-beat] .about-scene-beyond { display: block; }
+.about-scene[data-beat] .about-beyond-strip { display: none; }
+.about-beyond-in-card .eyebrow { color: rgb(255 255 255 / 82%); }
+.about-beyond-in-card .about-beyond-list { margin-top: 1.25rem; }
+.about-beyond-in-card .about-beyond-row { border-top-color: rgb(255 255 255 / 22%); }
+.about-beyond-in-card .about-beyond-keyword {
+  color: #fff;
+  font-size: clamp(1.75rem, 2.8vw, 2.6rem);
+}
+.about-beyond-in-card .about-beyond-label { color: rgb(255 255 255 / 72%); }
+.about-beyond-in-card .about-beyond-text {
+  color: rgb(255 255 255 / 88%);
+  font-size: clamp(0.98rem, 1.15vw, 1.1rem);
 }
 .about-beyond-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.5rem;
   margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
 }
 .about-beyond-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-  gap: 1.5rem 3rem;
-  align-items: end;
   border-top: 1px solid var(--border);
-  padding-block: clamp(2.5rem, 6vw, 4.5rem);
-}
-.about-beyond-row:last-child {
-  border-bottom: 1px solid var(--border);
+  padding-top: 1.5rem;
 }
 .about-beyond-keyword {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3.25rem, 9vw, 8.5rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
   font-weight: 600;
-  letter-spacing: -0.065em;
-  line-height: 0.9;
+  letter-spacing: -0.04em;
+  line-height: 1;
 }
 .about-beyond-label {
-  margin: 0;
+  margin: 0.85rem 0 0;
   color: var(--accent-text);
   font-size: 0.72rem;
   font-weight: 750;
@@ -2961,11 +2941,11 @@ a {
   text-transform: uppercase;
 }
 .about-beyond-text {
-  max-width: 30rem;
-  margin: 0.75rem 0 0;
-  color: var(--foreground);
-  font-size: clamp(1rem, 1.35vw, 1.2rem);
-  line-height: 1.55;
+  max-width: 26rem;
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.6;
 }
 .text-link { display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.5rem; color: var(--foreground); font-size: 0.8rem; font-weight: 750; }
 .text-link svg { transition: transform 160ms ease; } .text-link:hover svg { transform: translateX(3px); }
@@ -4447,25 +4427,12 @@ a {
   }
   .ai-workflow-ship-pill { width: 100%; }
   .work-section { --work-stage-pad-top: 2rem; }
-  .work-stack-card .project-card {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(14rem, 1fr) auto auto;
-  }
-  .work-stack-card .project-card-visual-wrap { grid-row: auto; }
-  .work-stack-card .project-card-content { padding: 1.25rem 1.25rem 0 !important; }
-  .work-stack-card .project-card-footer { padding: 1rem 1.25rem 1.25rem !important; }
-  .work-stack-card .project-title { font-size: 1.45rem !important; }
+  .dust-lane { grid-template-columns: 1fr; }
   /* Phones have no top header but a bottom navigation bar. */
-  .work-stack-track[data-live] .work-stack-stage {
+  .dust-track[data-live] .dust-stage {
     padding-bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px));
   }
-  .work-stack-track[data-live] .section-description,
-  .work-stack-track[data-live] .section-count,
-  .work-stack-track[data-live] .project-tags { display: none; }
-  .work-stack-track[data-live] .section-heading h2 { font-size: 1.5rem; }
-  .work-stack-track[data-live] .work-stack-card .project-card { grid-template-rows: minmax(7rem, 1fr) auto auto; }
-  .work-stack-track[data-live] .project-summary { display: none; }
-  .work-stack-track[data-live] .project-card-media span { display: none; }
+  .dust-track[data-live] .section-heading h2 { font-size: 1.5rem; }
   .about-scene { padding-top: 4rem; }
   .about-scene-title { font-size: clamp(3.5rem, 24vw, 8rem); }
   /* Phones have no top header but a bottom navigation bar. */
@@ -4488,8 +4455,19 @@ a {
   .about-scene-content { gap: 1rem; padding: 1.4rem; }
   .about-scene-heading h3 { font-size: 2.1rem; }
   .about-scene-body p { font-size: 1rem; line-height: 1.6; }
-  .about-beyond-row { grid-template-columns: 1fr; gap: 1rem; }
-  .about-beyond-keyword { font-size: clamp(3rem, 16vw, 4.5rem); }
+  .about-beyond-list { grid-template-columns: 1fr; gap: 1.25rem; margin-top: 1rem; }
+  /* Keyword and activity share a line; the sentence runs below. */
+  .about-beyond-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: baseline;
+    column-gap: 0.75rem;
+    padding-top: 1rem;
+  }
+  .about-beyond-copy { display: contents; }
+  .about-beyond-keyword { font-size: 1.45rem; }
+  .about-beyond-label { margin: 0; justify-self: end; }
+  .about-beyond-text { grid-column: 1 / -1; margin-top: 0.5rem; font-size: 0.92rem; }
   .quick-message-section { padding-bottom: 5rem; scroll-margin-top: 2rem; }
   .quick-message-band { grid-template-columns: 1fr; gap: 1.45rem; }
   .quick-message-composer { margin-top: 0; }
@@ -4691,7 +4669,6 @@ a {
   .hero-stage { min-height: 23rem; }
   .hero-window-stack { display: none; }
   .hero-signal { bottom: 0.2rem; }
-  .project-card-visual-wrap { min-height: 18rem; }
   .project-visual { min-height: 20rem; }
   .sync-diagram { padding: 0.65rem; }
   .device-row { grid-template-columns: 1fr 0.55fr 1fr; }
@@ -4724,7 +4701,6 @@ a {
   .contact-email, .schedule-call-link { overflow-wrap: anywhere; border-radius: 1rem; }
   .quick-message-textarea { min-height: 7.5rem; }
   .quick-message-status { align-items: flex-start; }
-  .project-card-media span { font-size: 0.54rem; }
   .case-media figcaption { position: static; border-width: 1px 0 0; border-radius: 0; background: var(--surface); }
   .case-ordered-list li { grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.65rem; }
   .setup-command-panel { border-radius: 1rem; }
@@ -4770,10 +4746,4 @@ a {
     opacity: 1;
     transform: none;
   }
-}
-
-/* Taller phones have room for the card summary again (after the phone block
-   so it wins the cascade). */
-@media (max-width: 760px) and (min-height: 700px) {
-  .work-stack-track[data-live] .project-summary { display: -webkit-box; -webkit-line-clamp: 2; }
 }

@@ -5,10 +5,21 @@ export type ProjectMetric = {
   label: string;
 };
 
+/** Colours for the homepage card (#rrggbb), from the project's own brand. */
+export type ProjectCardPalette = {
+  base: string;
+  /** Soft light in the top-right corner. */
+  glow: string;
+  /** Shadow in the bottom-left corner. */
+  deep: string;
+};
+
 export type ProjectMedia = {
   src: string;
   alt: string;
   caption?: string;
+  /** CSS object-position for the portrait homepage card crop. */
+  focus?: string;
 };
 
 export type CaseStudyTextBlock =
@@ -71,6 +82,7 @@ export type ProjectCaseStudy = {
   visual: ProjectVisual;
   visualLabel: string;
   media?: ProjectMedia;
+  cardPalette?: ProjectCardPalette;
   caseStudy?: CaseStudyArticle;
 };
 
