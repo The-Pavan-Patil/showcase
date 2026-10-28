@@ -2,77 +2,67 @@
 
 ## Color system
 
-Semantic variables live in src/app/globals.css. Components must use semantic roles rather than hard-coded theme colors unless the color communicates a stable status.
+The palette follows v6.usestate.org: a monochrome set of greys with one violet (`--brand-main`, #B45EFF) kept for focus rings and decorative highlights. Brand values are declared once as `--brand-*` and `--gray-*` in src/app/globals.css; components consume the semantic roles below, never the brand values directly.
 
 | Token | Light | Dark | Use |
 | --- | --- | --- | --- |
-| background | #F5F5F5 | #060607 | Page canvas |
-| foreground | #18181B | #FAFAFA | Primary text and inverse surfaces |
-| surface | #FFFFFF | #18181B | Cards, popovers, and contained regions |
-| surface-secondary | #EEEEEF | #232325 | Subtle fields, tags, and diagram panels |
-| surface-tertiary | #E7E7E9 | #2A2A2D | Quiet controls and diagram details |
-| muted | #6B6B73 | #9F9FA9 | Secondary copy and metadata |
-| border | #DEDEE0 | #28282C | Dividers and component outlines |
-| accent | #0D7377 | #0D7377 | Filled actions and selected controls |
-| accent-text | #0A5C5F | #5EEAD4 | Accessible teal text and small labels |
-| accent-foreground | #FFFFFF | #FFFFFF | Text on accent fills |
-| accent-bright | #14919B | #14919B | Decorative glow only |
-| accent-soft | #E6F4F4 | #0A2E30 | Quiet selected or informative surfaces |
-| inverse-accent | #5EC8CC | #0A5C5F | Teal text on the inverse contact surface |
-| focus | #0D7377 | #5EEAD4 | Focus-visible outline |
+| background | #EFEFEF | #111111 | Page canvas |
+| foreground | #1B1B1B | #EFEFEF | Primary text and inverse surfaces |
+| surface | #E6E6E6 | #1B1B1B | Cards, tiles, and contained regions (one tone step from the canvas) |
+| surface-secondary | #DEDEDE | #272727 | Secondary buttons, chips, selection capsules |
+| surface-tertiary | #CFCFCF | #393939 | Hover and pressed tone for quiet controls |
+| muted | #5A5A5A | #A3A3A3 | Secondary copy and metadata |
+| border | #C1C1C1 | #393939 | Form fields, timelines, and list rows only |
+| accent | #1B1B1B | #EFEFEF | Filled actions and selected controls (ink) |
+| accent-text | #1B1B1B | #EFEFEF | Selected text |
+| accent-foreground | #EFEFEF | #1B1B1B | Text on accent fills |
+| accent-bright | #B45EFF | #B45EFF | Decorative only |
+| accent-soft | #DEDEDE | #272727 | Quiet selected or informative surfaces |
+| inverse-accent | #C1C1C1 | #515151 | Secondary text on the inverse contact surface |
+| focus | #B45EFF | #B45EFF | Focus-visible outline |
+| selection | #383838 / #FFFFFF | same | Text selection |
 
-Status green is a limited exception. Availability uses #22C55E, and success labels use coordinated light and dark foreground/background pairs. Do not use green as a second brand color.
+Status green is a limited exception. Availability uses #22C55E, and success labels use coordinated light and dark foreground/background pairs. Project cards keep each project's own colours.
 
 ### Contrast notes
 
-Measured ratios for core pairs:
-
 | Pair | Ratio | Result |
 | --- | --- | --- |
-| light foreground on light background | 16.25:1 | Pass |
-| light muted on white surface | 5.28:1 | Pass for normal text |
-| light muted on light background | 4.84:1 | Pass for normal text |
-| light accent-text on white surface | 7.75:1 | Pass for normal text |
-| light accent-text on light background | 7.11:1 | Pass for normal text |
-| white on action accent | 5.62:1 | Pass for normal text |
-| dark foreground on dark background | 19.40:1 | Pass |
-| dark muted on dark background | 7.72:1 | Pass |
-| dark accent-text on dark background | 13.69:1 | Pass |
-| dark accent-text on dark surface | 11.98:1 | Pass |
-| light inverse-accent on light inverse surface | 8.95:1 | Pass |
-| dark inverse-accent on dark inverse surface | 7.43:1 | Pass |
+| light foreground on light background | 14.98:1 | Pass |
+| light muted on light background | 6.0:1 | Pass for normal text |
+| light muted on light surface | 5.4:1 | Pass for normal text |
+| dark foreground on dark background | 16.42:1 | Pass |
+| dark muted on dark surface | 6.83:1 | Pass |
+| inverse-accent on light inverse surface | 9.57:1 | Pass |
+| focus violet on light background | 3.05:1 | Pass for non-text (focus ring) |
+| focus violet on dark background | 5.38:1 | Pass |
 
-Decorative accent-bright must not carry text or state by itself. See [Accessibility](./accessibility.md) before changing foreground roles.
+The violet must not carry text on the light theme. See [Accessibility](./accessibility.md) before changing foreground roles.
 
 ### Do / don’t
 
 | Do | Don’t |
 | --- | --- |
-| Use accent for a primary action or selected control. | Use action teal for paragraphs or small labels. |
-| Use accent-text for eyebrows, code labels, and other teal text. | Use decorative accent-bright for text. |
-| Use muted for supporting information on page or surface backgrounds. | Reduce muted text opacity below the verified token value. |
-| Use borders and surface changes for quiet grouping. | Rely on low-opacity color alone to separate required content. |
+| Use accent (ink) for the primary action or a selected control. | Introduce a second hue for actions. |
+| Separate surfaces with a tone step (background → surface). | Separate sections with hairlines or shadows. |
+| Use muted for supporting information. | Set running text in muted grey. |
 | Keep status colors semantic and pair them with text. | Communicate status through color alone. |
 
 ## Typography
 
-Inter is the body and UI family. Manrope is the display and brand family. Both are loaded through next/font with swap rendering and CSS variables.
+Lato is the body and UI family (300, 400, 700). Figtree (variable 300–900) is the display family. Noto Sans JP covers Japanese. All load through next/font with swap rendering and CSS variables (`--font-sans`, `--font-display`; `--font-mono` maps to Figtree for the footer watermark and keyboard keycaps).
 
-| Role | Family | Current size | Weight / treatment |
+| Role | Family | Size | Treatment |
 | --- | --- | --- | --- |
-| Hero heading | Manrope | clamp(48px, 5.25vw, 72.8px) | 560, −0.065em, 0.98 line height |
-| Mobile hero heading | Manrope | clamp(44.8px, 14vw, 65.6px) | Same display treatment |
-| Section heading | Manrope | clamp(36px, 4vw, 48px) | 560, −0.055em, 1.03 line height |
-| Case-study heading | Manrope | clamp(56px, 7vw, 91.2px) | 560, −0.065em |
-| Card heading | Manrope | 24.8px; 32px for featured desktop card | 620, compact leading |
-| Body | Inter | 14.4–16.6px by context | Regular, 1.65–1.75 line height |
-| UI / metadata | Inter | 10.4–14px | 600–800 |
-| Eyebrow | Inter | 12px | 750, uppercase, 0.11em tracking |
-| Code diagram | System monospace | 12.8px desktop | Normal with semantic syntax color |
+| Hero heading | Figtree | clamp(48px, 5.6vw, 96px); clamp(38.4px, 10vw, 54.4px) on mobile | 500, −0.04em, line height 1, uppercase |
+| Section heading | Figtree | clamp(36px, 4vw, 48px) | 500, −0.04em, line height 1, uppercase |
+| Article heading | Figtree | clamp(27.5px, 3.1vw, 40.8px) | 500, −0.04em, sentence case |
+| Stat figure | Figtree | 24px | 500, −0.04em, uppercase |
+| Body | Lato | 15–18px by context | 400, 1.6 line height, full ink |
+| Nav, buttons, labels | Lato | 13–14px | 400–700, uppercase, no tracking; desktop nav wrapped in ( ) |
+| Code | System monospace | 12.8px | Real code only |
 
-Display headings use tight tracking and short line lengths. Body copy uses a comfortable line height and usually caps between 36rem and 42rem.
-
-Use sentence case for headings and controls. Uppercase is reserved for short eyebrows and diagram micro-labels. Do not use Manrope for long paragraphs or Inter for a large editorial headline unless an accessibility requirement demands a fallback.
+Nothing meant to be read is set below 13px; the drawn interface mock-ups inside project visuals are the exception. Uppercase never carries letter-spacing. Project card titles stay in their written case because the WebGL dust scene redraws them on canvas without text-transform.
 
 ## Spacing
 
@@ -98,12 +88,15 @@ The current CSS includes optical exceptions such as 10.4px, 14.4px, and 20.8px. 
 
 | Token | Value | Contract |
 | --- | --- | --- |
-| container-page | 72rem | Maximum shared page width |
-| radius | 8px | Base control/detail radius |
-| radius-card | 20px | Standard card and metric group |
-| radius-feature | 24px | Featured card and mobile major panel |
-| radius-panel | 32px | Contact and contribution panels |
-| radius-pill | 999px | Pill actions and circular controls |
+| container-page | 2700px | Maximum shared page width (full bleed below it) |
+| page-gutter | 40px; 20px at 767px and below | Outer page margin on both sides |
+| grid-gap | 10px | Gap between tiles in stat and card grids |
+| radius | 0 | Base control/detail radius |
+| radius-card | 0 | Cards, media, and metric groups |
+| radius-feature | 0 | Featured card and mobile major panel |
+| radius-panel | 0 | Contact and contribution panels |
+| radius-sm | 6px | Mobile utility menu |
+| radius-pill | 100vmax | Pill actions and circular controls |
 | motion-fast | 150ms | Compact interaction feedback |
 | motion-base | 220ms | Card elevation and standard transitions |
 | motion-slow | 300ms | Reserved bounded overlay/layout transition |
@@ -112,10 +105,9 @@ Major containers, cards, panels, pills, and interaction transitions consume thes
 
 ## Layout
 
-- Page container: maximum 72rem through container-page.
-- Desktop page gutter: 1.25rem on each side.
-- Mobile page gutter at 760px and below: 1rem on each side.
-- Header shell: maximum 64rem within the page.
+- Page container: full width minus page-gutter on each side, capped at container-page.
+- Page gutter: 40px on desktop, 20px at 767px and below.
+- Header shell: spans the page container; compact state narrows to 48rem.
 - Minimum supported viewport: 320px.
 - Anchor offset and section scroll margin: 7rem to clear the fixed header.
 - Homepage project layout: 12 columns, 1rem gap; the first card spans 12 and the remaining cards span 6.
@@ -132,26 +124,21 @@ Breakpoints are component-driven rather than device-named:
 
 ## Radius
 
+Surfaces are square; controls are pills. Decided once, not per component.
+
 | Role | Token / current value |
 | --- | --- |
-| Base | radius · 8px |
-| Small icon tile | approximately 10px optical exception |
-| Diagram controls | 8–16px local values |
-| Standard card | radius-card · 20px |
-| Featured card / mobile major panel | radius-feature · 24px |
-| Major panel | radius-panel · 32px |
-| Buttons and circular controls | radius-pill · 999px |
-
-Use larger radii for major surfaces and pills for actions. Avoid mixing several radii inside one small component.
+| Cards, media, panels, tiles | radius-card · 0 |
+| Buttons, chips, toggles, nav capsules | radius-pill · 100vmax |
+| Mobile utility menu | radius-sm · 6px |
+| Drawn interface mock-ups and the launch terminal | Their own local values (they depict real UI) |
 
 ## Elevation
 
-Two semantic shadows are implemented:
+- **shadow-card:** none. Resting surfaces separate by tone, not shadow.
+- **shadow-float:** only for things that genuinely float: the fixed header, the mobile tab bar and utility orb, popovers, and the article-map preview.
 
-- **shadow-card:** quiet separation for standard cards.
-- **shadow-float:** stronger separation for the fixed header, floating hero windows, active project cards, and diagram frames.
-
-Dark-theme shadows increase opacity because black elevation needs more separation from dark surfaces. Use borders with shadows; shadow alone is not a reliable boundary.
+No glass: floating bars use an opaque background instead of backdrop blur.
 
 ## Iconography
 

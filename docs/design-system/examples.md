@@ -7,7 +7,7 @@ These comparisons turn the portfolio system into implementation rules. They supp
 | Do | Don’t |
 | --- | --- |
 | Use `var(--surface)` for a card in both themes. | Add a component-only white background and a separate dark override. |
-| Use `var(--accent)` for a filled action and `var(--accent-text)` for teal text. | Put `#14919B` on small text; it is decorative only. |
+| Use `var(--accent)` (ink) for a filled action and `var(--accent-text)` for selected text. | Put `#B45EFF` on text; it is for focus and decoration only. |
 | Use `var(--radius-card)`, `var(--radius-feature)`, or `var(--radius-panel)` according to surface hierarchy. | Introduce another large radius because one card looks slightly different. |
 | Use `var(--motion-fast)` or `var(--motion-base)` for feedback. | Add an unbounded or looping decorative animation. |
 

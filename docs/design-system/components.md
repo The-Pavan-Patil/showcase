@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | Container | Centers content, applies responsive gutters, caps width at 72rem | Portfolio-owned div |
 | SectionHeading | Eyebrow, required title, optional muted phrase and description | Portfolio-owned semantic composition |
-| SiteHeader | Direction-aware desktop glass shell plus persistent mobile destination and utility layers | Semantic header/nav plus HeroUI Popover |
+| SiteHeader | Direction-aware desktop opaque shell plus persistent mobile destination and utility layers | Semantic header/nav plus HeroUI Popover |
 | ThemeToggle | Toggles persisted light/dark selection in icon or labeled-menu presentation | HeroUI Button |
 | Button and link variants | Primary, secondary, inverse, icon, text, social, and navigation treatments | Semantic links and HeroUI Button |
 | Proof metrics | Four evidence-led facts with value/label pairing | Semantic content grid |
@@ -37,11 +37,11 @@ Provide one concise eyebrow and a sentence-case title. The optional muted phrase
 
 ### SiteHeader
 
-The header is portfolio-owned because HeroUI v3 has no Navbar. It remains a semantic header containing labeled nav elements and lists. Above 760px, it uses an expanded 60px regular-glass pill capped at 64rem. After the page is below 96px and 24px of downward movement accumulates, it compresses to 48px and approximately 44rem. Sixteen pixels of upward travel, returning within 64px of the top, a route change, or keyboard focus entering the header restores the expanded state.
+The header is portfolio-owned because HeroUI v3 has no Navbar. It remains a semantic header containing labeled nav elements and lists. Above 760px, it uses an expanded 60px opaque pill spanning the page container. After the page is below 96px and 24px of downward movement accumulates, it compresses to 48px and approximately 44rem. Sixteen pixels of upward travel, returning within 64px of the top, a route change, or keyboard focus entering the header restores the expanded state.
 
-At 760px and below, the desktop header is absent. A safe-area-aware bottom glass pill permanently exposes Work, Experience, About, and Contact with icons above labels; the current destination receives a softly tinted inner capsule. A separate utility orb opens a HeroUI Popover for Home, labeled theme selection, and résumé download. Footer clearance prevents either surface from covering the final actions.
+At 760px and below, the desktop header is absent. A safe-area-aware bottom opaque pill permanently exposes Work, Experience, About, and Contact with icons above labels; the current destination receives a softly tinted inner capsule. A separate utility orb opens a HeroUI Popover for Home, labeled theme selection, and résumé download. Footer clearance prevents either surface from covering the final actions.
 
-On the homepage, an IntersectionObserver tracks the Work, Experience, About, and Contact sections. The matching desktop and mobile link receives aria-current="location". On /work/[slug] routes, Work is current. Active destinations use the accessible teal text role plus an inner capsule; focus retains a separate visible outline.
+On the homepage, an IntersectionObserver tracks the Work, Experience, About, and Contact sections. The matching desktop and mobile link receives aria-current="location". On /work/[slug] routes, Work is current. Active destinations use the foreground text role plus an inner capsule; focus retains a separate visible outline.
 
 The responsive navigation must:
 
@@ -49,7 +49,7 @@ The responsive navigation must:
 - use a passive, requestAnimationFrame-coordinated scroll listener;
 - expose utility-orb state through a named, keyboard-focusable trigger;
 - close the Popover on Escape, outside interaction, destination choice, or theme selection;
-- use one glass layer per surface, with a solid fallback when transparency is reduced or unsupported;
+- use opaque surfaces (no backdrop blur) separated by tone, with shadow-float only on surfaces that float;
 - never duplicate visible desktop and mobile navigation at the same breakpoint.
 
 ### ProjectCard
@@ -82,12 +82,12 @@ Every interactive component must be evaluated in all eight states below. The mat
 | Component | Default | Hover | Pressed | Focus-visible | Disabled | Dark theme | Mobile | Reduced motion |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Brand / home link | Foreground wordmark and inverse mark | No separate visual change | No separate styling; navigation is immediate | Global 2px focus outline | Links are not disabled; remove destination rather than fake it | Tokens invert the mark | Name hides at 760px; mark remains | No moving effect |
-| Desktop nav link | Muted label in a centered inner capsule; current location uses accent text and a tinted item capsule | Foreground and stronger surface | Immediate link activation; no transform | Global focus outline | Not applicable | Token-driven glass | Hidden at 760px | Density and color changes become immediate |
+| Desktop nav link | Uppercase muted label in parentheses; current location uses accent text and a tone capsule | Foreground and stronger surface | Immediate link activation; no transform | Global focus outline | Not applicable | Token-driven opaque surface | Hidden at 760px | Density and color changes become immediate |
 | Résumé download | Foreground-filled pill with icon and label | −1px lift and 0.86 opacity | Returns to baseline and lowers opacity to 0.72 | Global focus outline | Remove if unavailable | Token inversion retains contrast | Moved into utility Popover | Label compression and lift are suppressed |
 | Theme toggle | Muted circular icon button or labeled menu row | Secondary surface and foreground icon | HeroUI button semantics | Global focus plus HeroUI semantics | Not used | Label/icon describe the next theme | Labeled inside utility Popover | State change is immediate |
-| Utility orb | Labeled circular ellipsis control | Stronger edge highlight and surface | HeroUI press semantics | Global focus plus Popover focus restoration | Not used | Token-driven glass | Adjacent to bottom destination pill | Transition duration collapses |
-| Mobile nav link | Icon above compact label; current location uses accent text and a tinted inner capsule | Stronger text/surface where hover exists | Immediate destination activation | Global focus outline | Not applicable | Token-driven glass | Persistent at 760px and below | No authored movement |
-| Primary CTA | #0D7377 pill with white text | −2px lift | Returns to baseline and scales to 0.98 | Global focus outline | Custom link has no disabled form; remove if unavailable | Same action teal in both themes | Shares row, then full width at 420px | Lift and transitions suppressed |
+| Utility orb | Labeled circular ellipsis control | Stronger edge highlight and surface | HeroUI press semantics | Global focus plus Popover focus restoration | Not used | Token-driven opaque surface | Adjacent to bottom destination pill | Transition duration collapses |
+| Mobile nav link | Icon above compact label; current location uses accent text and a tinted inner capsule | Stronger text/surface where hover exists | Immediate destination activation | Global focus outline | Not applicable | Token-driven opaque surface | Persistent at 760px and below | No authored movement |
+| Primary CTA | Ink (accent) pill with accent-foreground uppercase text | −2px lift | Returns to baseline and scales to 0.98 | Global focus outline | Custom link has no disabled form; remove if unavailable | Inverts with the theme | Shares row, then full width at 420px | Lift and transitions suppressed |
 | Secondary / email CTA | Bordered or inverse pill | Lift/border feedback on hero secondary | Hero secondary returns to baseline and scales to 0.98; contact email scales to 0.98 | Global focus outline | Links have no disabled form | Semantic tokens/inverse contact surface | Wraps safely; direct email uses anywhere wrapping at 420px | Authored transitions suppressed |
 | Project case-study link | Text and arrow in card footer | Arrow moves 2px up/right; parent card lifts | No separate styling; navigation is immediate | Link gets global focus and parent card receives matching focus-within elevation | Not applicable | Card/surface tokens adapt | Single-column card layout | Card and arrow motion suppressed |
 | Text / back link | Compact text and arrow | Text-link arrow moves right; back link changes color | No separate styling; navigation is immediate | Global focus outline | Not applicable | Token-driven | Layout remains inline and wraps naturally | Arrow movement suppressed |
