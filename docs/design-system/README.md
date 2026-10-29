@@ -27,7 +27,7 @@ The system is light-first, supports an optional dark theme, and uses verified pr
 | Concern | Implemented source |
 | --- | --- |
 | Global tokens and component styling | src/app/globals.css |
-| Lato, Figtree, and Noto Sans JP loading | src/app/_components/root-shell.tsx |
+| Lato, Figtree, Michroma, and Noto Sans JP loading | src/app/_components/root-shell.tsx |
 | Theme behavior | src/components/providers.tsx |
 | Shared content and project records | src/lib/portfolio.ts |
 | Page width | src/components/container.tsx |

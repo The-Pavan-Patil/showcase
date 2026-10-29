@@ -50,7 +50,7 @@ The violet must not carry text on the light theme. See [Accessibility](./accessi
 
 ## Typography
 
-Lato is the body and UI family (300, 400, 700). Figtree (variable 300–900) is the display family. Noto Sans JP covers Japanese. All load through next/font with swap rendering and CSS variables (`--font-sans`, `--font-display`; `--font-mono` maps to Figtree for the footer watermark and keyboard keycaps).
+Lato is the body and UI family (300, 400, 700). Figtree (variable 300–900) is the display family. Noto Sans JP covers Japanese. All load through next/font with swap rendering and CSS variables (`--font-sans`, `--font-display`; `--font-mono` maps to Figtree for keyboard keycaps). Michroma (`--font-michroma`) is kept only for the footer PAVAN watermark.
 
 | Role | Family | Size | Treatment |
 | --- | --- | --- | --- |

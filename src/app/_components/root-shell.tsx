@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Figtree, Lato, Noto_Sans_JP } from "next/font/google";
+import { Figtree, Lato, Michroma, Noto_Sans_JP } from "next/font/google";
 
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { Providers } from "@/components/providers";
@@ -18,6 +18,14 @@ const lato = Lato({
 const figtree = Figtree({
   variable: "--font-figtree",
   subsets: ["latin"],
+  display: "swap",
+  preload: false,
+});
+
+const michroma = Michroma({
+  variable: "--font-michroma",
+  subsets: ["latin"],
+  weight: "400",
   display: "swap",
   preload: false,
 });
@@ -43,7 +51,7 @@ export function RootShell({
       lang={locale}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${lato.variable} ${figtree.variable} ${notoSansJp.variable}`}
+      className={`${lato.variable} ${figtree.variable} ${michroma.variable} ${notoSansJp.variable}`}
     >
       <body>
         <a className="skip-link" href="#main-content">{ui.header.skipToMain}</a>
