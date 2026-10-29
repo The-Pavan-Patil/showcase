@@ -91,12 +91,11 @@ The current CSS includes optical exceptions such as 10.4px, 14.4px, and 20.8px. 
 | container-page | 2700px | Maximum shared page width (full bleed below it) |
 | page-gutter | 40px; 20px at 767px and below | Outer page margin on both sides |
 | grid-gap | 10px | Gap between tiles in stat and card grids |
-| radius | 0 | Base control/detail radius |
-| radius-card | 0 | Cards, media, and metric groups |
-| radius-feature | 0 | Featured card and mobile major panel |
-| radius-panel | 0 | Contact and contribution panels |
-| radius-sm | 6px | Mobile utility menu |
-| radius-pill | 100vmax | Pill actions and circular controls |
+| radius | 8px | Base control/detail radius |
+| radius-card | 20px | Standard card and metric group |
+| radius-feature | 24px | Featured card and mobile major panel |
+| radius-panel | 32px | Contact and contribution panels |
+| radius-pill | 999px | Pill actions and circular controls |
 | motion-fast | 150ms | Compact interaction feedback |
 | motion-base | 220ms | Card elevation and standard transitions |
 | motion-slow | 300ms | Reserved bounded overlay/layout transition |
@@ -124,14 +123,17 @@ Breakpoints are component-driven rather than device-named:
 
 ## Radius
 
-Surfaces are square; controls are pills. Decided once, not per component.
-
 | Role | Token / current value |
 | --- | --- |
-| Cards, media, panels, tiles | radius-card · 0 |
-| Buttons, chips, toggles, nav capsules | radius-pill · 100vmax |
-| Mobile utility menu | radius-sm · 6px |
-| Drawn interface mock-ups and the launch terminal | Their own local values (they depict real UI) |
+| Base | radius · 8px |
+| Small icon tile | approximately 10px optical exception |
+| Diagram controls | 8–16px local values |
+| Standard card | radius-card · 20px |
+| Featured card / mobile major panel | radius-feature · 24px |
+| Major panel | radius-panel · 32px |
+| Buttons and circular controls | radius-pill · 999px |
+
+Use larger radii for major surfaces and pills for actions. Avoid mixing several radii inside one small component.
 
 ## Elevation
 

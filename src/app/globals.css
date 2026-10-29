@@ -44,12 +44,11 @@
   --container-page: 2700px;
   --page-gutter: 40px;
   --grid-gap: 10px;
-  --radius: 0;
-  --radius-card: 0;
-  --radius-feature: 0;
-  --radius-panel: 0;
-  --radius-sm: 6px;
-  --radius-pill: 100vmax;
+  --radius: 0.5rem;
+  --radius-card: 1.25rem;
+  --radius-feature: 1.5rem;
+  --radius-panel: 2rem;
+  --radius-pill: 999px;
   --motion-fast: 150ms;
   --motion-base: 220ms;
   --motion-slow: 300ms;
@@ -546,7 +545,7 @@ a {
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border-radius: var(--radius-card);
+  border-radius: 0.62rem;
   background: var(--foreground);
   color: var(--background);
   font-family: var(--font-display);
@@ -894,7 +893,7 @@ a {
 .mobile-tab-bar {
   min-width: 0;
   overflow: visible;
-  border-radius: var(--radius-pill);
+  border-radius: 1.7rem;
   padding: 0.28rem;
 }
 
@@ -919,7 +918,7 @@ a {
   align-items: center;
   justify-content: center;
   gap: 0.18rem;
-  border-radius: var(--radius-pill);
+  border-radius: 1.4rem;
   color: var(--muted);
   font-size: 0.75rem;
   font-weight: 400;
@@ -990,7 +989,7 @@ a {
   max-width: calc(100vw - 1.5rem);
   overflow: hidden;
   border: 0 !important;
-  border-radius: var(--radius-sm) !important;
+  border-radius: 1.45rem !important;
   background: var(--background) !important;
   box-shadow: var(--shadow-float) !important;
   padding: 0.42rem !important;
@@ -1039,7 +1038,7 @@ a {
   justify-content: center !important;
   gap: 0.3rem;
   width: 100%;
-  border-radius: var(--radius-sm) !important;
+  border-radius: 1.05rem !important;
   color: var(--foreground) !important;
   padding: 0.55rem !important;
   font-size: 0.8125rem;
@@ -1193,7 +1192,7 @@ a {
   justify-content: center;
   gap: 0.5rem;
   min-height: 3rem;
-  border-radius: var(--radius-pill);
+  border-radius: 999px;
   padding: 0.7rem 1.25rem;
   font-size: 0.875rem;
   font-weight: 700;
@@ -1406,7 +1405,7 @@ a {
   grid-template-rows: auto minmax(0, 1fr) auto;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: 1.25rem;
   background:
     radial-gradient(90% 60% at 85% 10%, var(--card-glow) 0%, transparent 62%),
     radial-gradient(110% 70% at 10% 95%, var(--card-deep) 0%, transparent 70%),
@@ -1422,7 +1421,7 @@ a {
   max-height: 100%;
   aspect-ratio: 16 / 11;
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: 0.85rem;
   box-shadow:
     0 18px 40px rgb(0 0 0 / 32%),
     0 0 0 1px rgb(255 255 255 / 14%);
@@ -1580,7 +1579,7 @@ a {
   width: 100%;
   min-height: 31rem;
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: 1.3rem;
   background: var(--surface-secondary);
 }
 
@@ -2300,7 +2299,7 @@ a {
 .experience-logo {
   width: 3rem;
   height: 3rem;
-  border-radius: var(--radius-card);
+  border-radius: 0.75rem;
 }
 
 .experience-logo img,
@@ -2530,7 +2529,7 @@ a {
 .client-project-logo {
   width: 2.35rem;
   height: 2.35rem;
-  border-radius: var(--radius-card);
+  border-radius: 0.6rem;
 }
 
 .client-project-body {
@@ -2576,7 +2575,7 @@ a {
 
 .client-project-tech span {
   min-height: 1.45rem;
-  border-radius: var(--radius);
+  border-radius: 0.45rem;
   background: var(--surface-secondary);
   padding: 0.3rem 0.5rem;
   font-size: 0.8125rem;
@@ -2629,7 +2628,7 @@ a {
   aspect-ratio: var(--about-photo-ratio);
   margin-inline: auto;
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: 1.25rem;
   background: #0b0d10;
   isolation: isolate;
 }
@@ -2922,7 +2921,7 @@ a {
   min-height: 6.5rem;
   resize: vertical;
   border: 1px solid var(--border);
-  border-radius: var(--radius-card);
+  border-radius: 1rem;
   background: var(--background);
   color: var(--foreground);
   padding: 1rem;
@@ -3170,7 +3169,7 @@ a {
   aspect-ratio: 1800 / 1300;
   overflow: hidden;
   margin: 0;
-  border-radius: var(--radius-card);
+  border-radius: 1.2rem;
   background: var(--surface-secondary);
 }
 
@@ -3197,7 +3196,7 @@ a {
 
 .case-hero > .site-container > .project-visual {
   min-height: 38rem;
-  border-radius: var(--radius-card);
+  border-radius: 1.2rem;
 }
 
 .case-metrics { padding: 1.25rem 0 0; }
@@ -3206,7 +3205,7 @@ a {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: 0.8rem;
   gap: var(--grid-gap);
 }
 
@@ -3298,7 +3297,7 @@ a {
   width: min(24rem, 42vw);
   transform: translateY(-50%);
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: 1rem;
   background: var(--surface);
   padding: 1rem 1.1rem;
   box-shadow: var(--shadow-float);
@@ -3492,7 +3491,7 @@ a {
   grid-template-columns: auto minmax(0, 1fr);
   gap: 0.85rem;
   border: 1px solid color-mix(in srgb, #a16207 22%, var(--border));
-  border-radius: var(--radius-card);
+  border-radius: 0.8rem;
   background: color-mix(in srgb, #f59e0b 7%, var(--surface));
   padding: 1rem;
 }
@@ -3520,7 +3519,7 @@ a {
   grid-template-columns: auto minmax(0, 1fr);
   gap: 1rem;
   margin: 3rem 0 0;
-  border-radius: var(--radius-card);
+  border-radius: 1rem;
   background: var(--foreground);
   color: var(--background);
   padding: clamp(1.5rem, 4vw, 2.6rem);
@@ -3541,7 +3540,7 @@ a {
 }
 
 .contribution-section { padding-bottom: 8rem; }
-.contribution-card { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 4rem; border-radius: var(--radius-card); background: var(--surface); padding: clamp(2rem, 5vw, 4rem); }
+.contribution-card { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 4rem; border-radius: 1rem; background: var(--surface); padding: clamp(2rem, 5vw, 4rem); }
 .contribution-card h2 { max-width: 14ch; font-size: clamp(2rem, 3vw, 2.7rem); }
 .contribution-card ul { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
 .contribution-card li { display: flex; align-items: start; gap: 0.7rem; border-bottom: 1px solid var(--border); padding: 1rem 0; color: var(--muted); font-size: 0.82rem; line-height: 1.55; }
@@ -3616,7 +3615,7 @@ a {
 
 .setup-command-panel {
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: 1.25rem;
   background: var(--surface);
 }
 
@@ -3770,7 +3769,7 @@ a {
 
 .setup-orchestration-card,
 .setup-desk-grid article {
-  border-radius: var(--radius-card);
+  border-radius: 1rem;
   background: var(--surface);
 }
 
@@ -3786,7 +3785,7 @@ a {
   width: 2.5rem;
   height: 2.5rem;
   place-items: center;
-  border-radius: var(--radius-card);
+  border-radius: 0.75rem;
   background: var(--accent-soft);
   color: var(--accent-text);
 }
@@ -3988,7 +3987,7 @@ a {
   grid-template-columns: auto minmax(0, 1fr);
   gap: 0.75rem;
   margin: 0;
-  border-radius: var(--radius-card);
+  border-radius: 0.8rem;
   background: var(--surface);
   padding: 1rem;
   color: var(--muted);
@@ -3998,7 +3997,7 @@ a {
 
 .setup-automation-panel {
   align-self: stretch;
-  border-radius: var(--radius-card);
+  border-radius: 1rem;
   background: var(--surface);
   padding: clamp(1.5rem, 4vw, 2rem);
 }
@@ -4284,7 +4283,7 @@ a {
   .case-hero-grid { grid-template-columns: 1fr; gap: 2rem; padding: 3rem 0 2rem; }
   .case-summary { font-size: 0.9rem; }
   .case-facts { grid-template-columns: 1fr; }
-  .case-media { border-radius: var(--radius-card); }
+  .case-media { border-radius: 0.85rem; }
   .case-media figcaption {
     position: absolute;
     right: 0.65rem;
@@ -4295,7 +4294,7 @@ a {
     padding: 0.5rem 0.6rem;
     font-size: 0.75rem;
   }
-  .case-hero > .site-container > .project-visual { min-height: 25rem; border-radius: var(--radius-card); }
+  .case-hero > .site-container > .project-visual { min-height: 25rem; border-radius: 1.35rem; }
   .case-metrics-grid { grid-template-columns: 1fr; }
   .case-metrics-grid div { min-height: 6rem; }
   .case-metrics-grid div:last-child { border-bottom: 0; }
@@ -4359,7 +4358,7 @@ a {
   .case-ordered-list li { font-size: 0.88rem; }
   .case-closing-quote { grid-template-columns: 1fr; }
   .contribution-section { padding-bottom: 5rem; }
-  .contribution-card { grid-template-columns: 1fr; gap: 2rem; border-radius: var(--radius-card); }
+  .contribution-card { grid-template-columns: 1fr; gap: 2rem; border-radius: 1rem; }
   .next-project-section a { grid-template-columns: 1fr auto; gap: 1rem; }
   .next-project-section a span { grid-column: 1 / -1; }
   .not-found-main { padding: 5rem 0 8rem; }
@@ -4439,7 +4438,7 @@ a {
   .mobile-tab-bar { padding: 0.23rem; }
   .mobile-tab-bar a {
     min-height: 3.55rem;
-    border-radius: var(--radius-pill);
+    border-radius: 1.25rem;
     font-size: 0.6875rem;
   }
   .mobile-utility-trigger {
@@ -4481,12 +4480,12 @@ a {
   .ops-main { padding: 0.55rem; }
   .ops-stats > div { padding: 0.4rem; }
   .ops-table > div { font-size: 0.42rem; }
-  .contact-email, .schedule-call-link { overflow-wrap: anywhere; border-radius: var(--radius-pill); }
+  .contact-email, .schedule-call-link { overflow-wrap: anywhere; border-radius: 1rem; }
   .quick-message-textarea { min-height: 7.5rem; }
   .quick-message-status { align-items: flex-start; }
   .case-media figcaption { position: static; border-width: 1px 0 0; border-radius: 0; background: var(--surface); }
   .case-ordered-list li { grid-template-columns: 2.2rem minmax(0, 1fr); gap: 0.65rem; }
-  .setup-command-panel { border-radius: var(--radius-card); }
+  .setup-command-panel { border-radius: 1rem; }
   .setup-command-body { padding-inline: 1rem; }
   .setup-command-body p { grid-template-columns: 1fr; gap: 0.32rem; }
   .setup-section-heading h2,
