@@ -176,7 +176,7 @@ test("localized homepages render natural Japanese and German copy", async ({ pag
   await skipLaunchIntro(page);
   await page.goto("/ja");
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("信頼できるソフトウェア");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("任せられる人");
   await expectLanguageOption(page, testInfo, "言語を切り替える: EN", "/");
 
   await skipLaunchIntro(page);

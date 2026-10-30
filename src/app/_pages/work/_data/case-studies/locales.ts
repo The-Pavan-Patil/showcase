@@ -54,7 +54,7 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
     cardHeadline:
       "シンプルなタスクアプリの下に、オフライン優先の共同作業を支える仕組みを作りました。",
     summary:
-      "Nudgeは、何度も一緒に予定を立てるグループ向けの軽いソーシャルタスク体験です。表面はシンプルなジェスチャー操作で、裏側はローカル優先の同期設計になっています。",
+      "Nudgeは、何度も一緒に予定を立てるグループ向けの軽いソーシャルタスク体験です。表面はシンプルなジェスチャー操作で、裏側はローカル優先の同期設計になっています。ownpath Studiosの一員として取り組んだクライアント案件です。",
     role: "フルスタック開発者",
     experienceContext: "Ownpath · 2025年11月 - 現在",
     challenge:
@@ -85,7 +85,7 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
     kicker: "グローバルWeb体験",
     cardHeadline: "Figmaから本番向けの多言語Webサイトを実装しました。",
     summary:
-      "Figmaデザインをもとに作ったReactとTypeScriptの企業サイトです。地域別のローカライズ、ユニットテスト、アプリケーション性能監視を含みます。",
+      "Figmaデザインをもとに作ったReactとTypeScriptの企業サイトです。地域別のローカライズ、ユニットテスト、アプリケーション性能監視を含みます。ownpath Studiosの一員として取り組んだクライアント案件です。",
     role: "ソフトウェアエンジニア",
     experienceContext: "Ownpath · 2025年11月 - 現在",
     challenge:
@@ -166,7 +166,7 @@ export const deProjectTranslations: Record<string, ProjectTranslation> = {
     cardHeadline:
       "Eine einfache Aufgaben-App mit Offline-first-Zusammenarbeit im Hintergrund.",
     summary:
-      "Nudge ist ein leichtes soziales Aufgabenerlebnis für Gruppen, die wiederholt gemeinsam planen. Die Oberfläche bleibt einfach, darunter arbeitet eine lokal-first Synchronisationsarchitektur.",
+      "Nudge ist ein leichtes soziales Aufgabenerlebnis für Gruppen, die wiederholt gemeinsam planen. Die Oberfläche bleibt einfach, darunter arbeitet eine lokal-first Synchronisationsarchitektur. Dieses Kundenprojekt wurde im Rahmen von ownpath Studios umgesetzt.",
     role: "Full-Stack-Entwickler",
     experienceContext: "Ownpath · Nov. 2025 - heute",
     challenge:
@@ -197,7 +197,7 @@ export const deProjectTranslations: Record<string, ProjectTranslation> = {
     kicker: "Globales Web-Erlebnis",
     cardHeadline: "Eine produktionsreife mehrsprachige Website aus Figma.",
     summary:
-      "Eine Corporate Website mit React und TypeScript, umgesetzt aus Figma-Designs, mit regionaler Lokalisierung, Unit-Tests und Application Performance Monitoring.",
+      "Eine Corporate Website mit React und TypeScript, umgesetzt aus Figma-Designs, mit regionaler Lokalisierung, Unit-Tests und Application Performance Monitoring. Dieses Kundenprojekt wurde im Rahmen von ownpath Studios umgesetzt.",
     role: "Softwareentwickler",
     experienceContext: "Ownpath · Nov. 2025 - heute",
     challenge:

@@ -73,7 +73,7 @@ export function HomePage({ locale }: { locale: Locale }) {
                 {profile.heroEyebrow}
               </p>
               <h1 id="hero-title">
-                {profile.heroTitle}
+                {profile.heroTitle}{" "}
                 <span>{profile.heroAccent}</span>
               </h1>
               <p className="hero-description">{profile.heroDescription}</p>

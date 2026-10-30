@@ -6,7 +6,7 @@ export const philipsGreenheart = {
   kicker: "Global web experience",
   cardHeadline: "A production-ready multilingual website from Figma.",
   summary:
-    "A React and TypeScript corporate website built from Figma designs, with region-specific localization, unit testing, and application performance monitoring.",
+    "A React and TypeScript corporate website built from Figma designs, with region-specific localization, unit testing, and application performance monitoring. This client project was performed as part of ownpath Studios.",
   role: "Software Engineer",
   experienceContext: "Ownpath · Nov 2025–Present",
   client: "Philips",
