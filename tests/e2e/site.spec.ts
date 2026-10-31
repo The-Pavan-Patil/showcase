@@ -976,15 +976,15 @@ async function scrollExperienceToNode(page: import("@playwright/test").Page, anc
   });
 }
 
+// Each live node publishes where it is when the accent dot reaches it.
 function distanceFromFocus(page: import("@playwright/test").Page, anchor: string) {
   return page.locator(`[data-scroll-accent-anchor="${anchor}"]`).evaluate((element) => {
-    const track = element.closest<HTMLElement>("[data-scroll-accent-track]");
     const bounds = element.getBoundingClientRect();
-    return Math.abs(bounds.top + bounds.height / 2 - Number(track?.dataset.scrollAccentFocus));
+    return Math.abs(bounds.top + bounds.height / 2 - Number((element as HTMLElement).dataset.scrollAccentFocus));
   });
 }
 
-test("experience scene pins one screen and steps through the timeline", async ({ page }, testInfo) => {
+test("experience scene pins one screen and moves the timeline with the scroll", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await skipLaunchIntro(page);
@@ -1010,6 +1010,7 @@ test("experience scene scrolls to a project toggle that receives keyboard focus"
   await page.setViewportSize({ width: 1440, height: 900 });
   await skipLaunchIntro(page);
   await page.goto("/");
+  await expect(page.locator("#experience")).toHaveAttribute("data-live", "");
   await expect(page.locator(".experience-track")).toHaveAttribute("data-scroll-accent-focus", /\d/);
 
   // Resting on the last node, the first company's toggle is out of the window.
@@ -1024,6 +1025,21 @@ test("experience scene scrolls to a project toggle that receives keyboard focus"
   await toggle.focus();
   await expect.poll(() => distanceFromFocus(page, "experience-company-0")).toBeLessThan(2);
   await expect(toggle).toBeInViewport();
+});
+
+test("experience index jumps to a company and marks it current", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  const index = page.locator(".experience-index-button");
+  await expect(index).toHaveCount(3);
+  await index.nth(1).click();
+  await expect.poll(() => distanceFromFocus(page, "experience-company-1")).toBeLessThan(2);
+  await expect(index.nth(1)).toHaveAttribute("aria-current", "step");
+  await expect(index.nth(0)).not.toHaveAttribute("aria-current", "step");
 });
 
 test("experience shows the plain timeline with reduced motion", async ({ page }, testInfo) => {
