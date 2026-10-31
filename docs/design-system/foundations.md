@@ -54,13 +54,23 @@ Lato is the body and UI family (300, 400, 700). Figtree (variable 300–900) is 
 
 | Role | Family | Size | Treatment |
 | --- | --- | --- | --- |
-| Hero heading | Figtree | clamp(48px, 5.6vw, 96px); clamp(38.4px, 10vw, 54.4px) on mobile | 500, −0.04em, line height 1, uppercase |
-| Section heading | Figtree | clamp(36px, 4vw, 48px) | 500, −0.04em, line height 1, uppercase |
+| Hero heading | Figtree | clamp(40px, min(5.6vw, 11svh), 96px); clamp(35.2px, min(10vw, 6.5svh), 54.4px) on mobile | 500, −0.04em, line height 1, uppercase, centred |
+| Page heading | Figtree | clamp(48px, 5.25vw, 72.8px) | Case-study and Setup heroes; 500, −0.04em, line height 1, uppercase |
+| Section heading | Figtree | `--title-section`: clamp(32px, min(4vw, 7svh), 48px) | 500, −0.04em, line height 1, uppercase |
+| Stage heading | Figtree | `--title-stage`: clamp(24px, min(2.6vw, 4.6svh), 36.8px) | Section headings inside a pinned one-screen scene (Work, Experience) |
 | Article heading | Figtree | clamp(27.5px, 3.1vw, 40.8px) | 500, −0.04em, sentence case |
 | Stat figure | Figtree | 24px | 500, −0.04em, uppercase |
+| Section intro | Lato | `--text-intro`: 17px | The paragraph under a section heading; 1.6 line height |
 | Body | Lato | 15–18px by context | 400, 1.6 line height, full ink |
 | Nav, buttons, labels | Lato | 13–14px | 400–700, uppercase, no tracking; desktop nav wrapped in ( ) |
 | Code | System monospace | 12.8px | Real code only |
+
+### Heading rules
+
+- Centre a heading only when it stands alone on the screen with nothing beside it to read along: the homepage hero, the About display word, and the Setup closing quote. Left-align every heading that introduces content to read or scan, on the same left edge as that content.
+- A section heading uses the section size; inside a pinned scene it uses the stage size. Do not give a section its own heading size.
+- A heading is one colour. The `.heading-muted` span inherits the heading ink.
+- Every h1 and h2 uses balanced line breaks, so no line ends on a single word. Section intros use `text-wrap: pretty`.
 
 Nothing meant to be read is set below 13px; the drawn interface mock-ups inside project visuals are the exception. Uppercase never carries letter-spacing. Project card titles stay in their written case because the WebGL dust scene redraws them on canvas without text-transform.
 
@@ -96,6 +106,10 @@ The current CSS includes optical exceptions such as 10.4px, 14.4px, and 20.8px. 
 | radius-feature | 24px | Featured card and mobile major panel |
 | radius-panel | 32px | Contact and contribution panels |
 | radius-pill | 999px | Pill actions and circular controls |
+| pill-height | 48px | Minimum height of every pill action |
+| title-section | clamp(32px, min(4vw, 7svh), 48px) | Section heading size |
+| title-stage | clamp(24px, min(2.6vw, 4.6svh), 36.8px) | Section heading size inside a pinned scene |
+| text-intro | 17px | Paragraph under a section heading |
 | motion-fast | 150ms | Compact interaction feedback |
 | motion-base | 220ms | Card elevation and standard transitions |
 | motion-slow | 300ms | Reserved bounded overlay/layout transition |
@@ -110,14 +124,14 @@ Major containers, cards, panels, pills, and interaction transitions consume thes
 - Minimum supported viewport: 320px.
 - Anchor offset and section scroll margin: 7rem to clear the fixed header.
 - Homepage project layout: 12 columns, 1rem gap; the first card spans 12 and the remaining cards span 6.
-- Homepage hero: two columns above 1024px, stacked below.
+- Homepage hero: one centred column that fills the first screen.
 - Case-study hero: 1.45 / 0.55 columns on wide screens, then one column at 760px.
 
 Breakpoints are component-driven rather than device-named:
 
 | Breakpoint | Purpose |
 | --- | --- |
-| 1024px | Stack the hero; simplify featured card and experience layout |
+| 1024px | Stack the case-study hero; simplify featured card and experience layout |
 | 760px | Switch to mobile navigation; collapse major grids |
 | 420px | Protect narrow visuals, CTAs, and email wrapping |
 

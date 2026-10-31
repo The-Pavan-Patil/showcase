@@ -37,10 +37,10 @@ Use a nested reading width only for long prose. The current body-copy caps of 36
 
 | Pattern | Wide | 1024px and below | 760px and below |
 | --- | --- | --- | --- |
-| Hero | Two balanced columns | One column | One column with reduced visual scale |
+| Hero | One centred column | Same | Same, with smaller type |
 | Proof metrics | Four columns | Four columns | Two by two |
 | Project cards | 12-column; 12 + 6 + 6 spans | Featured card loses internal split | One column |
-| Experience | Index / role / meta / highlights | Highlights move below | Two-column index/content stack |
+| Experience | Title and company index / timeline | One column; a counter replaces the index | Same |
 | About / skills | 0.82 / 1.18 | One column | Skills collapse to one column |
 | Contact | 1.25 / 0.75 | Same | One column |
 | Case hero | 1.45 / 0.55 | 1 / 0.6 | One column |
@@ -52,11 +52,11 @@ Use a nested reading width only for long prose. The current body-copy caps of 36
 
 ### Above 1024px
 
-Use the full editorial composition: split hero, floating system windows, featured project split, and multi-column experience.
+Use the full editorial composition: the centred hero, the featured project split, and the two-column experience timeline.
 
 ### 761–1024px
 
-Stack the hero, keep the system visual centered and capped at 44rem, simplify the featured card, and move experience highlights below the role/meta columns.
+Simplify the featured card and stack the experience title above its timeline.
 
 ### 421–760px
 

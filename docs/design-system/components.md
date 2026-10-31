@@ -33,7 +33,7 @@ Use Container as the first child of full-width sections. Full-width background, 
 
 ### SectionHeading
 
-Provide one concise eyebrow and a sentence-case title. The optional muted phrase creates a two-tone continuation, not a separate heading. The component renders h2, so do not use it where the page needs h1 or h3.
+Provide one concise eyebrow and a sentence-case title. The optional muted phrase continues the title in the same ink, not a separate heading or a second tone. The component renders h2, so do not use it where the page needs h1 or h3.
 
 ### SiteHeader
 
