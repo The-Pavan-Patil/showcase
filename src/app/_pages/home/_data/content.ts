@@ -28,12 +28,6 @@ export const homeContent = {
       ariaLabel: "Visit Pavan Patil on LinkedIn (opens in a new tab)",
     },
   ],
-  proofMetrics: [
-    { value: "2+ Years", label: "Experience of developing software" },
-    { value: "AI Enabled", label: "Automated workflows" },
-    { value: "DRDO", label: "Worked for Ministry of Defence" },
-    { value: "0-1", label: "Products built from scratch" },
-  ],
 
   experience: [
     {

@@ -21,7 +21,7 @@ export type {
 } from "./portfolio-types";
 
 export const portfolioContent = portfolioContentByLocale[defaultLocale];
-export const { profile, socialLinks, proofMetrics, projects, experience, skillGroups } = portfolioContent;
+export const { profile, socialLinks, projects, experience, skillGroups } = portfolioContent;
 
 export function getPortfolioContent(locale: Locale) {
   return portfolioContentByLocale[locale];

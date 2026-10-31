@@ -131,7 +131,6 @@ export type Profile = {
 export type PortfolioContent = {
   profile: Profile;
   socialLinks: SocialLink[];
-  proofMetrics: ProjectMetric[];
   projects: ProjectCaseStudy[];
   experience: ExperienceItem[];
   skillGroups: SkillGroup[];

@@ -125,7 +125,7 @@ html[lang="ja"] body {
   font-family: var(--font-noto-sans-jp), var(--font-sans);
 }
 
-html[lang="ja"] :where(h1, h2, h3, h4, .brand-link, .section-heading, .proof-item strong, .dust-card-title, .case-section-body h2, .next-project-section a strong) {
+html[lang="ja"] :where(h1, h2, h3, h4, .brand-link, .section-heading, .dust-card-title, .case-section-body h2, .next-project-section a strong) {
   font-family: var(--font-noto-sans-jp), var(--font-display);
 }
 
@@ -1265,23 +1265,6 @@ html[lang="ja"] .hero-copy {
 }
 
 
-.proof-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--grid-gap);
-}
-
-.proof-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-height: 7.5rem;
-  background: var(--surface);
-  padding: 1.7rem 1.5rem;
-}
-
-.proof-item strong { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; letter-spacing: -0.04em; text-transform: uppercase; }
-.proof-item span { color: var(--muted); font-size: 0.875rem; line-height: 1.45; }
 
 .section-block {
   padding: 8rem 0;
@@ -4173,8 +4156,6 @@ html[lang="ja"] .hero-copy {
   .not-found-main .site-container > p:not(.eyebrow) { font-size: 1rem; }
   .hero-actions { align-items: stretch; }
   .primary-cta, .secondary-cta { flex: 1; min-width: 10rem; }
-  .proof-grid { grid-template-columns: repeat(2, 1fr); }
-  .proof-item { min-height: 6.5rem; padding: 1.25rem; }
   .section-block { padding: 5.5rem 0; scroll-margin-top: 2rem; }
   .section-header-row { display: block; }
   .section-count { display: block; margin-top: 1rem; }

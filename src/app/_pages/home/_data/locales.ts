@@ -2,7 +2,6 @@ import { homeContent as en } from "./content";
 import type {
   ExperienceItem,
   PortfolioContent,
-  ProjectMetric,
   SocialLink,
 } from "@/lib/portfolio-types";
 import type { Locale } from "@/lib/i18n";
@@ -124,20 +123,6 @@ const deExperience: ExperienceItem[] = [
   },
 ];
 
-const jaProofMetrics: ProjectMetric[] = [
-  { value: "1,000+", label: "対応した作業員記録" },
-  { value: "<100 ms", label: "LiDAR API応答時間" },
-  { value: "10 GB+", label: "1日に処理した点群データ" },
-  { value: "30%", label: "パイプライン転送レイテンシ削減" },
-];
-
-const deProofMetrics: ProjectMetric[] = [
-  { value: "1,000+", label: "unterstützte Mitarbeiterdatensätze" },
-  { value: "<100 ms", label: "LiDAR API-Antwortzeit" },
-  { value: "10 GB+", label: "Punktwolkendaten täglich verarbeitet" },
-  { value: "30%", label: "geringere Pipeline-Transferlatenz" },
-];
-
 const jaSocialLinks: SocialLink[] = en.socialLinks.map((link) => ({
   ...link,
   ariaLabel:
@@ -171,7 +156,6 @@ export const portfolioContentByLocale: Record<Locale, PortfolioContent> = {
         "電子・コンピューター工学 学士 · PES Modern College of Engineering · 9.4 SGPA",
     },
     socialLinks: jaSocialLinks,
-    proofMetrics: jaProofMetrics,
     projects: getLocalizedCaseStudies(jaProjectTranslations),
     experience: jaExperience,
     skillGroups: [
@@ -196,7 +180,6 @@ export const portfolioContentByLocale: Record<Locale, PortfolioContent> = {
         "Bachelor of Engineering in Electronics and Computer Engineering · PES Modern College of Engineering · 9.4 SGPA",
     },
     socialLinks: deSocialLinks,
-    proofMetrics: deProofMetrics,
     projects: getLocalizedCaseStudies(deProjectTranslations),
     experience: deExperience,
     skillGroups: [

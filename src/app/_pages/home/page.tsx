@@ -33,7 +33,6 @@ export function HomePage({ locale }: { locale: Locale }) {
     experience,
     profile,
     projects,
-    proofMetrics,
     skillGroups,
     socialLinks,
   } = getPortfolioContent(locale);
@@ -72,19 +71,6 @@ export function HomePage({ locale }: { locale: Locale }) {
                 <span>{profile.heroAccent}</span>
               </h1>
               <p className="hero-description">{profile.heroDescription}</p>
-            </div>
-          </Container>
-        </section>
-
-        <section className="proof-section" aria-label={ui.home.proofAria}>
-          <Container>
-            <div className="proof-grid">
-              {proofMetrics.map((metric) => (
-                <div key={metric.label} className="proof-item">
-                  <strong>{metric.value}</strong>
-                  <span>{metric.label}</span>
-                </div>
-              ))}
             </div>
           </Container>
         </section>

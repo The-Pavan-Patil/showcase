@@ -49,7 +49,6 @@ export type UiCopy = {
     stack: string;
   };
   home: {
-    proofAria: string;
     workEyebrow: string;
     workTitle: string;
     workMuted: string;
@@ -277,7 +276,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      proofAria: "Selected engineering metrics",
       workEyebrow: "Selected work",
       workTitle: "Built for real constraints.",
       workMuted: "Designed to hold up.",
@@ -539,7 +537,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      proofAria: "主なエンジニアリング指標",
       workEyebrow: "主な実績",
       workTitle: "現場の制約に向き合って作りました。",
       workMuted: "長く使えることを大切に。",
@@ -801,7 +798,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      proofAria: "Ausgewählte Engineering-Kennzahlen",
       workEyebrow: "Ausgewählte Arbeit",
       workTitle: "Gebaut für reale Anforderungen.",
       workMuted: "Entwickelt, um stabil zu bleiben.",

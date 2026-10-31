@@ -7,13 +7,12 @@
 The homepage follows a recruiter-first reading order:
 
 1. Fixed header with direct section access, theme, and résumé.
-2. Hero with role, value proposition, direct work/email actions, location, and system illustration.
-3. Four verified proof metrics.
-4. Three featured case studies.
-5. Chronological professional experience.
-6. About, education, and categorized skills.
-7. Direct email and approved social links.
-8. Footer.
+2. Centred hero with the value proposition and a one-line introduction by name.
+3. Three featured case studies.
+4. Chronological professional experience.
+5. About, education, and categorized skills.
+6. Direct email and approved social links.
+7. Footer.
 
 This order moves from positioning to evidence to conversion. Do not place a generic biography or skill cloud before selected work.
 
