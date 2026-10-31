@@ -161,7 +161,6 @@ export const portfolioContentByLocale: Record<Locale, PortfolioContent> = {
     profile: {
       ...en.profile,
       role: "ソフトウェアエンジニア",
-      heroEyebrow: "ソフトウェアエンジニア · Web・モバイル・バックエンド",
       heroTitle: "任せられる人、",
       heroAccent: "ここにいます。",
       heroDescription:
@@ -187,7 +186,6 @@ export const portfolioContentByLocale: Record<Locale, PortfolioContent> = {
     profile: {
       ...en.profile,
       role: "Softwareentwickler",
-      heroEyebrow: "Softwareentwickler · Web, Mobile & Backend",
       heroTitle: "Ich baue zuverlässige Software",
       heroAccent: "für komplexe reale Workflows.",
       heroDescription:

@@ -49,9 +49,6 @@ export type UiCopy = {
     stack: string;
   };
   home: {
-    heroPrimaryCta: string;
-    heroSecondaryCta: string;
-    heroLocation: string;
     proofAria: string;
     workEyebrow: string;
     workTitle: string;
@@ -280,9 +277,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      heroPrimaryCta: "View selected work",
-      heroSecondaryCta: "Email me",
-      heroLocation: "India · Open to software engineering roles",
       proofAria: "Selected engineering metrics",
       workEyebrow: "Selected work",
       workTitle: "Built for real constraints.",
@@ -545,9 +539,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      heroPrimaryCta: "主な実績を見る",
-      heroSecondaryCta: "メールする",
-      heroLocation: "インド · ソフトウェアエンジニアの仕事を探しています",
       proofAria: "主なエンジニアリング指標",
       workEyebrow: "主な実績",
       workTitle: "現場の制約に向き合って作りました。",
@@ -810,9 +801,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      heroPrimaryCta: "Ausgewählte Arbeit ansehen",
-      heroSecondaryCta: "E-Mail senden",
-      heroLocation: "Indien · Offen für Softwareentwickler-Rollen",
       proofAria: "Ausgewählte Engineering-Kennzahlen",
       workEyebrow: "Ausgewählte Arbeit",
       workTitle: "Gebaut für reale Anforderungen.",

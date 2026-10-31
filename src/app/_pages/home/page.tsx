@@ -1,12 +1,10 @@
 import {
-  ArrowDown,
   ArrowRight,
   ArrowUpRight,
   Briefcase,
   CalendarDays,
   ChevronUp,
   Mail,
-  MapPin,
   Trophy,
 } from "lucide-react";
 import Image from "next/image";
@@ -21,7 +19,7 @@ import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
-import { getHashHref, getSetupPath, type Locale } from "@/lib/i18n";
+import { getSetupPath, type Locale } from "@/lib/i18n";
 import { getPortfolioContent } from "@/lib/portfolio";
 import { getSiteUrl, resumeUrl } from "@/lib/site";
 import { getGoogleCalendarBookingUrl } from "@/lib/scheduling";
@@ -63,33 +61,17 @@ export function HomePage({ locale }: { locale: Locale }) {
         <section className="hero-section" aria-labelledby="hero-title">
           <Container className="hero-container">
             <div className="hero-copy">
-              <p className="eyebrow hero-eyebrow scroll-accent-eyebrow">
-                <span
-                  className="scroll-accent-heading-target scroll-accent-fallback"
-                  data-scroll-accent-anchor="hero"
-                  data-scroll-accent-phase="heading"
-                  aria-hidden="true"
-                />
-                {profile.heroEyebrow}
-              </p>
+              <span
+                className="scroll-accent-heading-target scroll-accent-fallback"
+                data-scroll-accent-anchor="hero"
+                data-scroll-accent-phase="heading"
+                aria-hidden="true"
+              />
               <h1 id="hero-title">
                 {profile.heroTitle}{" "}
                 <span>{profile.heroAccent}</span>
               </h1>
               <p className="hero-description">{profile.heroDescription}</p>
-              <div className="hero-actions">
-                <Link className="primary-cta" href={getHashHref(locale, "#work")}>
-                  {ui.home.heroPrimaryCta}
-                  <ArrowDown aria-hidden="true" size={17} />
-                </Link>
-                <a className="secondary-cta" href={`mailto:${profile.email}`}>
-                  {ui.home.heroSecondaryCta}
-                  <ArrowUpRight aria-hidden="true" size={17} />
-                </a>
-              </div>
-              <p className="hero-location">
-                <MapPin aria-hidden="true" size={15} /> {ui.home.heroLocation}
-              </p>
             </div>
           </Container>
         </section>

@@ -1145,23 +1145,6 @@ a {
   text-wrap: balance;
 }
 
-.hero-eyebrow {
-  width: fit-content;
-}
-
-/* Centred hero rows wrap as text, so the dot and pin stay beside the first word. */
-.hero-copy .hero-eyebrow,
-.hero-copy .hero-location {
-  display: block;
-}
-
-.hero-copy .hero-eyebrow > .scroll-accent-heading-target,
-.hero-copy .hero-location > svg {
-  display: inline-block;
-  margin-right: 0.5rem;
-  vertical-align: -0.1em;
-}
-
 html[lang="ja"] .hero-copy {
   word-break: auto-phrase;
 }
@@ -1248,15 +1231,6 @@ html[lang="ja"] .hero-copy {
 .primary-cta:active,
 .secondary-cta:active {
   transform: translateY(0) scale(0.98);
-}
-
-.hero-location {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 1.4rem;
-  color: var(--muted);
-  font-size: 0.875rem;
 }
 
 .window-bar {
@@ -4199,7 +4173,6 @@ html[lang="ja"] .hero-copy {
   .not-found-main .site-container > p:not(.eyebrow) { font-size: 1rem; }
   .hero-actions { align-items: stretch; }
   .primary-cta, .secondary-cta { flex: 1; min-width: 10rem; }
-  .hero-location { align-items: start; }
   .proof-grid { grid-template-columns: repeat(2, 1fr); }
   .proof-item { min-height: 6.5rem; padding: 1.25rem; }
   .section-block { padding: 5.5rem 0; scroll-margin-top: 2rem; }

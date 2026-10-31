@@ -7,7 +7,6 @@ export const homeContent = {
     name: "Pavan Patil",
     role: "Software Engineer",
     email: "thepavanpatil.official@gmail.com",
-    heroEyebrow: "Software Engineer · Web, mobile & backend",
     heroTitle: "You found the person",
     heroAccent: "who can handle it.",
     heroDescription:

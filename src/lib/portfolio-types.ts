@@ -121,7 +121,6 @@ export type Profile = {
   name: string;
   role: string;
   email: string;
-  heroEyebrow: string;
   heroTitle: string;
   heroAccent: string;
   heroDescription: string;
