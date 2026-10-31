@@ -93,7 +93,6 @@ export function HomePage({ locale }: { locale: Locale }) {
             experienceEyebrow: ui.home.experienceEyebrow,
             experienceTitle: ui.home.experienceTitle,
             experienceMuted: ui.home.experienceMuted,
-            experienceDescription: ui.home.experienceDescription,
             technologyStackAria: ui.home.technologyStackAria,
             collapseProjects: ui.home.collapseProjects,
             showProjects: ui.home.showProjects,

@@ -1478,7 +1478,8 @@ html[lang="ja"] .hero-copy {
   outline: 3px solid var(--accent);
   outline-offset: -3px;
 }
-.dust-counter {
+.dust-counter,
+.experience-counter {
   flex: none;
   margin: 0;
   white-space: nowrap;
@@ -1487,7 +1488,8 @@ html[lang="ja"] .hero-copy {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.dust-counter-total {
+.dust-counter-total,
+.experience-counter-total {
   color: var(--muted);
 }
 .dust-canvas {
@@ -2224,17 +2226,107 @@ html[lang="ja"] .hero-copy {
 
 .experience-section {
   --experience-stage-pad-top: 6.5rem;
+  --experience-fade-bottom: clamp(4rem, 14svh, 8rem);
   background: var(--background);
 }
 
-.experience-list {
+/* The title column sits beside the timeline on wide screens and above it on
+   narrow ones. */
+.experience-layout {
   display: grid;
-  margin-top: 4rem;
+  grid-template-columns: minmax(15rem, 0.36fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(2rem, 5vw, 5rem);
+}
+.experience-aside {
+  position: sticky;
+  top: 7.5rem;
+}
+.experience-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+/* A compact two-tone title: the claim in ink, its scope in muted ink. */
+.experience-scene .section-heading h2 {
+  font-size: clamp(1.6rem, min(2.1vw, 4.2svh), 2.25rem);
+  line-height: 1.04;
+  text-wrap: balance;
+}
+.experience-scene .heading-muted {
+  display: block;
+  color: var(--muted);
+}
+.experience-counter {
+  display: none;
+}
+
+.experience-list {
+  position: relative;
+  display: grid;
+}
+
+/* Company index: jumps to a company and fills as the timeline passes it. */
+.experience-index {
+  display: grid;
+  gap: 0.25rem;
+  margin: clamp(1.75rem, 6svh, 4rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.experience-index-button {
+  position: relative;
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  padding: 0.65rem 0.5rem 0.65rem 1.15rem;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--motion-fast) ease;
+}
+.experience-index-button::before,
+.experience-index-fill {
+  position: absolute;
+  top: 0.65rem;
+  bottom: 0.65rem;
+  left: 0;
+  width: 2px;
+  border-radius: 999px;
+  content: "";
+}
+.experience-index-button::before {
+  background: var(--border);
+}
+.experience-index-fill {
+  background: var(--foreground);
+  transform: scaleY(0);
+  transform-origin: top;
+}
+.experience-index-button:hover,
+.experience-index-button[aria-current] {
+  color: var(--foreground);
+}
+.experience-index-name {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.experience-index-period {
+  font-size: 0.8125rem;
+  text-transform: uppercase;
 }
 
 /* Experience: a pinned scroll scene. The stage holds one screen while the
-   timeline steps from node to node inside its window. Without `data-live`
-   (server render, no script, reduced motion) it is the plain list. */
+   timeline travels through its window with the scroll. Without `data-live`
+   (server render, no script, reduced motion) it is the plain timeline. */
 .experience-track {
   position: relative;
 }
@@ -2257,24 +2349,60 @@ html[lang="ja"] .hero-copy {
   overflow: hidden;
   padding: var(--experience-stage-pad-top) 0 1.5rem;
 }
-.experience-scene[data-live] .section-heading h2 {
-  font-size: clamp(1.6rem, min(2.6vw, 5svh), 2.3rem);
+.experience-scene[data-live] .experience-layout {
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
+}
+.experience-scene[data-live] .experience-aside {
+  position: static;
+  min-height: 0;
 }
 .experience-scene[data-live] .experience-window {
   position: relative;
-  flex: 1;
   min-height: 0;
-  margin-top: clamp(0.75rem, 2svh, 1.5rem);
   overflow: hidden;
-  /* The timeline fades in under the heading and out at the bottom edge. */
-  mask-image: linear-gradient(180deg, transparent 0, #000 2.5rem, #000 calc(100% - 3rem), transparent);
+  /* The timeline fades out under the top edge and in at the bottom. */
+  mask-image: linear-gradient(180deg, transparent 0, #000 1.75rem, #000 calc(100% - var(--experience-fade-bottom)), transparent);
 }
 .experience-scene[data-live] .experience-list {
   margin-top: 0;
+  padding-bottom: var(--experience-fade-bottom);
   will-change: transform;
 }
-@media (max-height: 820px) {
-  .experience-scene[data-live] .section-description { display: none; }
+@media (min-width: 1025px) {
+  .experience-scene[data-live] .experience-layout {
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+@media (max-width: 1024px) {
+  .experience-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .experience-aside {
+    position: static;
+  }
+  .experience-scene .section-heading h2 {
+    font-size: clamp(1.6rem, min(4.4vw, 4.6svh), 2.4rem);
+  }
+  .experience-list {
+    margin-top: 3rem;
+  }
+  .experience-index {
+    display: none;
+  }
+  .experience-scene[data-live] .experience-layout {
+    display: flex;
+    flex-direction: column;
+  }
+  .experience-scene[data-live] .experience-window {
+    flex: 1;
+    margin-top: clamp(1rem, 3svh, 2rem);
+  }
+  .experience-scene[data-live] .experience-counter {
+    display: block;
+  }
 }
 
 .experience-item {
@@ -2423,17 +2551,6 @@ html[lang="ja"] .hero-copy {
   border-color: color-mix(in srgb, #fbbf24 24%, var(--border));
   background: color-mix(in srgb, #f59e0b 14%, var(--surface));
   color: #facc15;
-}
-
-.experience-description {
-  max-width: 42rem;
-  margin: 1.2rem 0 0;
-  border-left: 2px solid var(--border);
-  padding-left: 0.9rem;
-  color: var(--muted);
-  font-size: 0.86rem;
-  font-weight: 500;
-  line-height: 1.7;
 }
 
 .experience-tech-list,
@@ -4247,7 +4364,6 @@ html[lang="ja"] .hero-copy {
   .experience-company-lockup { align-items: flex-start; gap: 0.85rem; }
   .experience-logo { width: 2.75rem; height: 2.75rem; }
   .experience-card-meta { flex-direction: row; justify-content: flex-start; }
-  .experience-description { margin-top: 1.2rem; font-size: 0.84rem; }
   .client-project-list { padding-left: 0; }
   .client-project-item {
     grid-template-columns: 2.2rem minmax(0, 1fr);

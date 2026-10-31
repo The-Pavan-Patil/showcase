@@ -25,31 +25,36 @@ import { formatCopy, type UiCopy } from "@/lib/ui-copy";
 import { useScrollSceneLive } from "@/lib/use-scroll-scene";
 import { clamp, smoothstep } from "@/lib/utils";
 
-/** Scroll distance from one timeline node to the next, as a share of the stage. */
-const STEP_SHARE = 0.6;
-/** Share of each step the timeline rests on a node before gliding on. */
-const STEP_HOLD = 0.2;
-/** Extra rest on the last node before the stage releases, in steps. */
-const TAIL_STEPS = 0.5;
-/** Where nodes come to rest, below the top edge of the timeline window. */
-const FOCUS_INSET_REM = 3.5;
+/** How far a block rises into place as it enters the window (rem). */
+const RISE_REM = 2;
+/** Share of the window, from its bottom edge, over which blocks rise. */
+const RISE_SPAN = 0.25;
 
 type TimelineNode = {
   anchor: string;
-  /** Node centre from the top of the untransformed list. */
+  /** Node centre from the top of the list. */
   y: number;
-  /** Scroll into the track at which the node is in focus. */
+  /** Scroll into the track at which the accent dot reaches the node. */
   offset: number;
+  /** Where the node is then, from the top of the pinned stage. */
+  focusY: number;
 };
 
 type SceneLayout = {
-  step: number;
-  /** Focus line, from the top of the timeline window. */
-  focusInWindow: number;
+  /** How far the timeline travels before its end is in view. */
+  travel: number;
+  /** Scroll into the track the stage stays pinned for. */
+  range: number;
   /** Focus line, from the top of the pinned stage (the viewport). */
   focusY: number;
+  windowHeight: number;
+  /** RISE_REM in pixels. */
+  rise: number;
   trackHeight: number;
   nodes: TimelineNode[];
+  /** Where each company's node crosses the focus line. */
+  companyOffsets: number[];
+  reveals: { element: HTMLElement; top: number }[];
 };
 
 type ExperienceSceneProps = {
@@ -58,7 +63,6 @@ type ExperienceSceneProps = {
     | "experienceEyebrow"
     | "experienceTitle"
     | "experienceMuted"
-    | "experienceDescription"
     | "technologyStackAria"
     | "collapseProjects"
     | "showProjects"
@@ -66,10 +70,23 @@ type ExperienceSceneProps = {
   experience: ExperienceItem[];
 };
 
+/** Top of an element within the list, ignoring every transform. */
+function offsetWithin(element: HTMLElement, list: HTMLElement) {
+  let top = 0;
+  let current: HTMLElement | null = element;
+  while (current && current !== list) {
+    top += current.offsetTop;
+    current = current.offsetParent as HTMLElement | null;
+  }
+  return top;
+}
+
 /**
  * Experience as a pinned scroll scene: the stage holds one screen while the
- * timeline steps from node to node under a fixed focus line. Without
- * `data-live` (server render, no script, reduced motion) it is the plain list.
+ * timeline travels through its window one-to-one with the scroll, so it moves
+ * at the pace of the page with no stops. Blocks rise into place as they enter,
+ * and a company index tracks progress. Without `data-live` (server render, no
+ * script, reduced motion) it is the plain timeline.
  */
 export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -88,85 +105,146 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
     const list = listRef.current;
     if (!stage || !timelineWindow || !list) return;
 
-    const stageBounds = stage.getBoundingClientRect();
-    const windowTop = timelineWindow.getBoundingClientRect().top;
-    // Both rects carry the list's transform, so their difference does not.
-    const listTop = list.getBoundingClientRect().top;
+    const windowTop =
+      timelineWindow.getBoundingClientRect().top - stage.getBoundingClientRect().top;
+    const windowHeight = timelineWindow.clientHeight;
+    // Closed project lists render nothing, so their nodes drop out.
+    const nodeElements = Array.from(
+      list.querySelectorAll<HTMLElement>("[data-scroll-accent-anchor]"),
+    ).filter((node) => node.getClientRects().length > 0);
+    if (!nodeElements.length) return;
+
+    const centres = nodeElements.map(
+      (node) => offsetWithin(node, list) + node.offsetHeight / 2,
+    );
+    // The focus line is where the first node rests before the stage pins, so
+    // the timeline starts travelling from exactly where layout put it. It
+    // stops once its end is in view; the dot then carries on down the rail at
+    // the same pace to the nodes that never reached the line.
+    const firstCentre = centres[0];
+    const travel = Math.max(0, Math.round(list.offsetHeight - windowHeight));
+    const nodes = nodeElements.map((node, index) => {
+      const offset = Math.round(centres[index] - firstCentre);
+      return {
+        anchor: node.dataset.scrollAccentAnchor ?? "",
+        y: centres[index],
+        offset,
+        focusY: Math.round(windowTop + centres[index] - Math.min(offset, travel)),
+      };
+    });
+    const range = Math.max(travel, nodes[nodes.length - 1].offset);
     const rem =
       Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-    const focusInWindow = FOCUS_INSET_REM * rem;
-    const step = Math.round(stageBounds.height * STEP_SHARE);
-    // Closed project lists render nothing, so their nodes drop out.
-    const nodes = Array.from(
-      list.querySelectorAll<HTMLElement>("[data-scroll-accent-anchor]"),
-    )
-      .filter((node) => node.getClientRects().length > 0)
-      .map((node, index) => {
-        const bounds = node.getBoundingClientRect();
-        return {
-          anchor: node.dataset.scrollAccentAnchor ?? "",
-          y: bounds.top + bounds.height / 2 - listTop,
-          offset: index * step,
-        };
-      });
 
     setLayout({
-      step,
-      focusInWindow,
-      focusY: Math.round(windowTop - stageBounds.top + focusInWindow),
-      trackHeight: Math.round(
-        Math.max(0, nodes.length - 1 + TAIL_STEPS) * step + stageBounds.height,
-      ),
+      travel,
+      range,
+      focusY: Math.round(windowTop + firstCentre),
+      windowHeight,
+      rise: RISE_REM * rem,
+      trackHeight: Math.round(stage.offsetHeight + range),
       nodes,
+      companyOffsets: nodes
+        .filter((node) => node.anchor.startsWith("experience-company-"))
+        .map((node) => node.offset),
+      reveals: Array.from(
+        list.querySelectorAll<HTMLElement>("[data-experience-reveal]"),
+      )
+        .filter((element) => element.getClientRects().length > 0)
+        .map((element) => ({ element, top: offsetWithin(element, list) })),
     });
   }, []);
 
-  // Rests the focused node on the focus line, gliding between nodes.
+  // Moves the timeline with the scroll and updates everything that follows
+  // it. Writes only; positions come from the last measure.
   const place = useCallback(() => {
     const current = layoutRef.current;
     const track = trackRef.current;
-    if (!current || !track || !current.nodes.length) return;
+    const stage = stageRef.current;
+    if (!current || !track || !stage) return;
 
-    const last = current.nodes.length - 1;
-    const progress = clamp(-track.getBoundingClientRect().top / current.step, 0, last);
-    const index = Math.min(Math.floor(progress), Math.max(0, last - 1));
-    const from = current.nodes[index];
-    const to = current.nodes[Math.min(index + 1, last)];
-    const glide = smoothstep(
-      (progress - index - STEP_HOLD) / (1 - 2 * STEP_HOLD),
-    );
+    const scrolled = clamp(-track.getBoundingClientRect().top, 0, current.range);
+    const travelled = Math.min(scrolled, current.travel);
+    listY.set(-travelled);
 
-    listY.set(current.focusInWindow - (from.y + (to.y - from.y) * glide));
+    const span = current.windowHeight * RISE_SPAN;
+    for (const { element, top } of current.reveals) {
+      const entered = smoothstep((current.windowHeight - (top - travelled)) / span);
+      element.style.transform =
+        entered >= 1
+          ? ""
+          : `translate3d(0, ${((1 - entered) * current.rise).toFixed(1)}px, 0)`;
+    }
+
+    const offsets = current.companyOffsets;
+    let active = 0;
+    offsets.forEach((offset, index) => {
+      if (scrolled + 1 >= offset) active = index;
+    });
+
+    stage
+      .querySelectorAll<HTMLElement>("[data-experience-index]")
+      .forEach((item, index) => {
+        const start = offsets[index] ?? 0;
+        const end = offsets[index + 1] ?? current.range;
+        const fill = item.querySelector<HTMLElement>(".experience-index-fill");
+        if (fill) {
+          fill.style.transform = `scaleY(${clamp((scrolled - start) / Math.max(1, end - start))})`;
+        }
+        if (index === active) item.setAttribute("aria-current", "step");
+        else item.removeAttribute("aria-current");
+      });
+
+    const counter = stage.querySelector<HTMLElement>(".experience-counter-current");
+    if (counter) counter.textContent = String(active + 1).padStart(2, "0");
   }, [listY]);
 
   useMotionValueEvent(scrollY, "change", place);
 
   useLayoutEffect(() => {
+    const previous = layoutRef.current;
     layoutRef.current = isLive ? layout : null;
-    if (isLive) place();
-    else listY.set(0);
+    if (isLive) {
+      place();
+      return;
+    }
+    listY.set(0);
+    previous?.reveals.forEach(({ element }) => {
+      element.style.transform = "";
+    });
   }, [isLive, layout, listY, place]);
 
   useEffect(() => {
     if (!isLive) return;
 
-    // Fires once on observe, then whenever the stage or the list resizes
-    // (viewport changes, fonts, a project list opening or closing).
+    // Measure as soon as the live layout applies, without waiting for a frame,
+    // then again whenever the stage or the list resizes (viewport changes,
+    // fonts, a project list opening or closing).
+    const firstMeasure = window.setTimeout(measure, 0);
     const resizeObserver = new ResizeObserver(measure);
     if (stageRef.current) resizeObserver.observe(stageRef.current);
     if (listRef.current) resizeObserver.observe(listRef.current);
 
-    return () => resizeObserver.disconnect();
+    return () => {
+      window.clearTimeout(firstMeasure);
+      resizeObserver.disconnect();
+    };
   }, [isLive, measure]);
+
+  function scrollToOffset(offset: number, behavior: ScrollBehavior) {
+    const track = trackRef.current;
+    if (!track) return;
+    const top = track.getBoundingClientRect().top + window.scrollY + offset;
+    window.scrollTo({ top, behavior });
+  }
 
   // Tabbing into a part of the timeline outside the window scrolls the track
   // to the node it belongs to.
   function revealFocusedNode(event: FocusEvent<HTMLDivElement>) {
     const current = layoutRef.current;
-    const track = trackRef.current;
     const timelineWindow = windowRef.current;
     const list = listRef.current;
-    if (!current || !track || !timelineWindow || !list || !current.nodes.length) return;
+    if (!current || !timelineWindow || !list) return;
 
     const target = event.target.getBoundingClientRect();
     const windowBounds = timelineWindow.getBoundingClientRect();
@@ -178,15 +256,16 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
     const node =
       [...current.nodes].reverse().find((candidate) => candidate.y <= targetY + 1) ??
       current.nodes[0];
-    const trackTop = track.getBoundingClientRect().top + window.scrollY;
-
-    window.scrollTo({ top: trackTop + node.offset, behavior: "instant" });
+    scrollToOffset(node.offset, "instant");
   }
 
   const liveLayout = isLive ? layout : null;
-  const offsets = new Map(liveLayout?.nodes.map((node) => [node.anchor, node.offset]));
-  // Live nodes publish where they come into focus, for the accent dot.
-  const nodeOffset = (anchor: string) => offsets.get(anchor);
+  const placed = new Map(liveLayout?.nodes.map((node) => [node.anchor, node]));
+  // Live nodes publish when and where the accent dot reaches them.
+  const accentProps = (anchor: string) => ({
+    "data-scroll-accent-offset": placed.get(anchor)?.offset,
+    "data-scroll-accent-focus": placed.get(anchor)?.focusY,
+  });
 
   return (
     <section
@@ -201,6 +280,7 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
         ref={trackRef}
         data-scroll-accent-track={liveLayout ? "" : undefined}
         data-scroll-accent-focus={liveLayout?.focusY}
+        data-scroll-accent-end={liveLayout?.range}
         style={
           liveLayout
             ? ({ height: `${liveLayout.trackHeight}px` } as CSSProperties)
@@ -223,24 +303,55 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
         ) : null}
 
         <div className="experience-stage" ref={stageRef}>
-          <Container className="experience-head">
-            <SectionHeading
-              id="experience-heading"
-              eyebrow={copy.experienceEyebrow}
-              accentAnchor={isLive ? undefined : "experience"}
-              accentSpacer={isLive}
-              title={copy.experienceTitle}
-              muted={copy.experienceMuted}
-              description={copy.experienceDescription}
-            />
-          </Container>
+          <Container className="experience-layout">
+            <div className="experience-aside">
+              <div className="experience-head">
+                <SectionHeading
+                  id="experience-heading"
+                  eyebrow={copy.experienceEyebrow}
+                  accentAnchor={isLive ? undefined : "experience"}
+                  accentSpacer={isLive}
+                  title={copy.experienceTitle}
+                  muted={copy.experienceMuted}
+                />
+                {isLive ? (
+                  <p className="experience-counter" aria-hidden="true">
+                    <span className="experience-counter-current">01</span>
+                    <span className="experience-counter-total">
+                      {" "}
+                      / {String(experience.length).padStart(2, "0")}
+                    </span>
+                  </p>
+                ) : null}
+              </div>
 
-          <div
-            className="experience-window"
-            ref={windowRef}
-            onFocusCapture={revealFocusedNode}
-          >
-            <Container>
+              {liveLayout ? (
+                <ol className="experience-index" aria-label={copy.experienceEyebrow}>
+                  {experience.map((item, index) => (
+                    <li key={`${item.company}-${item.role}`}>
+                      <button
+                        type="button"
+                        className="experience-index-button"
+                        data-experience-index
+                        onClick={() =>
+                          scrollToOffset(liveLayout.companyOffsets[index] ?? 0, "smooth")
+                        }
+                      >
+                        <span className="experience-index-fill" aria-hidden="true" />
+                        <span className="experience-index-name">{item.company}</span>
+                        <span className="experience-index-period">{item.period}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+            </div>
+
+            <div
+              className="experience-window"
+              ref={windowRef}
+              onFocusCapture={revealFocusedNode}
+            >
               <motion.div
                 className="experience-list"
                 ref={listRef}
@@ -252,13 +363,13 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
                       className="experience-node"
                       data-scroll-accent-anchor={`experience-company-${experienceIndex}`}
                       data-scroll-accent-phase="experience-major"
-                      data-scroll-accent-offset={nodeOffset(`experience-company-${experienceIndex}`)}
+                      {...accentProps(`experience-company-${experienceIndex}`)}
                       aria-hidden="true"
                     >
                       <Briefcase size={15} />
                     </div>
                     <div className="experience-content">
-                      <div className="experience-company-row">
+                      <div className="experience-company-row" data-experience-reveal>
                         <div className="experience-company-lockup">
                           <span className="experience-logo">
                             <Image src={item.logoUrl} alt="" fill sizes="48px" />
@@ -283,11 +394,10 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
                         </div>
                       </div>
 
-                      <p className="experience-description">{item.description}</p>
-
                       <div
                         className="experience-tech-list"
                         aria-label={formatCopy(copy.technologyStackAria, { name: item.company })}
+                        data-experience-reveal
                       >
                         {item.technologies.map((technology) => (
                           <span className="experience-tech-chip" key={technology}>{technology}</span>
@@ -296,7 +406,7 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
 
                       {item.projects?.length ? (
                         <details className="client-projects" data-scroll-accent-details open>
-                          <summary>
+                          <summary data-experience-reveal>
                             <span className="client-project-summary-open">{copy.collapseProjects}</span>
                             <span className="client-project-summary-closed">{copy.showProjects}</span>
                             <span className="client-project-count">{item.projects.length}</span>
@@ -311,15 +421,13 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
                                   className="client-project-node"
                                   data-scroll-accent-anchor={`experience-project-${experienceIndex}-${projectIndex}`}
                                   data-scroll-accent-phase="experience-minor"
-                                  data-scroll-accent-offset={nodeOffset(
-                                    `experience-project-${experienceIndex}-${projectIndex}`,
-                                  )}
+                                  {...accentProps(`experience-project-${experienceIndex}-${projectIndex}`)}
                                   aria-hidden="true"
                                 />
-                                <span className="client-project-logo">
+                                <span className="client-project-logo" data-experience-reveal>
                                   <Image src={project.logoUrl} alt="" fill sizes="40px" />
                                 </span>
-                                <div className="client-project-body">
+                                <div className="client-project-body" data-experience-reveal>
                                   <h4>
                                     <span>{project.client}</span>
                                     <ArrowRight aria-hidden="true" size={16} />
@@ -344,8 +452,8 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
                   </article>
                 ))}
               </motion.div>
-            </Container>
-          </div>
+            </div>
+          </Container>
         </div>
       </div>
     </section>
