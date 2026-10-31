@@ -206,9 +206,11 @@ function getGlobalRailX(globalRail: HTMLElement) {
 }
 
 /**
- * While the Experience scene is pinned, its timeline nodes take turns resting
- * on one focus line. Each node publishes the scroll into the track at which it
- * rests there, so its waypoint activates then and is drawn on that line.
+ * While the Experience scene is pinned, its timeline nodes cross a focus line.
+ * Each node publishes the scroll into the track at which the dot reaches it
+ * and where it is then, so its waypoint activates at that scroll and is drawn
+ * there. The track publishes where its pinned range ends, so the dot rides the
+ * rail until the stage releases.
  */
 function getPinnedExperienceWaypoints(
   track: HTMLElement,
@@ -218,8 +220,7 @@ function getPinnedExperienceWaypoints(
   if (!Number.isFinite(focusY)) return [];
 
   const trackTop = track.getBoundingClientRect().top + window.scrollY;
-
-  return Array.from(
+  const nodes = Array.from(
     track.querySelectorAll<HTMLElement>("[data-scroll-accent-offset]"),
   )
     .filter(
@@ -227,12 +228,32 @@ function getPinnedExperienceWaypoints(
         element.dataset.scrollAccentPhase !== "experience-minor" ||
         isVisibleProjectNode(element),
     )
-    .map((element) => ({
-      ...waypointFromElement(element),
-      y: trackTop + Number(element.dataset.scrollAccentOffset) + activationY,
-      pinnedY: focusY,
-    }))
+    .map((element) => {
+      const nodeFocusY = Number.parseFloat(element.dataset.scrollAccentFocus ?? "");
+      return {
+        ...waypointFromElement(element),
+        y: trackTop + Number(element.dataset.scrollAccentOffset) + activationY,
+        pinnedY: Number.isFinite(nodeFocusY) ? nodeFocusY : focusY,
+      };
+    })
     .sort((first, second) => first.y - second.y);
+
+  const end = Number.parseFloat(track.dataset.scrollAccentEnd ?? "");
+  const lastMajor = [...nodes]
+    .reverse()
+    .find((node) => node.phase === "experience-major");
+  if (lastMajor && Number.isFinite(end) && trackTop + end + activationY > nodes[nodes.length - 1].y) {
+    nodes.push({
+      id: "experience-rail-end",
+      phase: "experience-rail",
+      x: lastMajor.x,
+      y: trackTop + end + activationY,
+      size: DEFAULT_DOT_SIZE,
+      pinnedY: focusY,
+    });
+  }
+
+  return nodes;
 }
 
 function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
