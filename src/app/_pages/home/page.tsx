@@ -1,19 +1,11 @@
-import {
-  ArrowRight,
-  ArrowUpRight,
-  Briefcase,
-  CalendarDays,
-  ChevronUp,
-  Mail,
-  Trophy,
-} from "lucide-react";
-import Image from "next/image";
+import { ArrowRight, ArrowUpRight, CalendarDays, Mail } from "lucide-react";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
 import { AboutScene } from "./_components/about-scene";
+import { ExperienceScene } from "./_components/experience-scene";
 import { ProjectDust } from "./_components/project-dust";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
@@ -23,7 +15,7 @@ import { getSetupPath, type Locale } from "@/lib/i18n";
 import { getPortfolioContent } from "@/lib/portfolio";
 import { getSiteUrl, resumeUrl } from "@/lib/site";
 import { getGoogleCalendarBookingUrl } from "@/lib/scheduling";
-import { formatCopy, uiCopyByLocale } from "@/lib/ui-copy";
+import { uiCopyByLocale } from "@/lib/ui-copy";
 
 export function HomePage({ locale }: { locale: Locale }) {
   const siteUrl = getSiteUrl();
@@ -96,118 +88,18 @@ export function HomePage({ locale }: { locale: Locale }) {
           />
         </section>
 
-        <section
-          className="section-block experience-section"
-          id="experience"
-          aria-labelledby="experience-heading"
-          data-scroll-accent-experience
-        >
-          <Container>
-            <SectionHeading
-              id="experience-heading"
-              eyebrow={ui.home.experienceEyebrow}
-              accentAnchor="experience"
-              title={ui.home.experienceTitle}
-              muted={ui.home.experienceMuted}
-              description={ui.home.experienceDescription}
-            />
-            <div className="experience-list">
-              {experience.map((item, experienceIndex) => (
-                <article className="experience-item" key={`${item.company}-${item.role}`}>
-                  <div
-                    className="experience-node"
-                    data-scroll-accent-anchor={`experience-company-${experienceIndex}`}
-                    data-scroll-accent-phase="experience-major"
-                    aria-hidden="true"
-                  >
-                    <Briefcase size={15} />
-                  </div>
-                  <div className="experience-content">
-                    <div className="experience-company-row">
-                      <div className="experience-company-lockup">
-                        <span className="experience-logo">
-                          <Image src={item.logoUrl} alt="" fill sizes="48px" />
-                        </span>
-                        <div className="experience-role">
-                          <h3>{item.company}</h3>
-                          <p>
-                            <span>{item.role}</span>
-                            <span aria-hidden="true" className="experience-meta-dot" />
-                            <span>{item.location}</span>
-                          </p>
-                        </div>
-                      </div>
-                      <div className="experience-card-meta">
-                        {item.status ? (
-                          <span className="experience-status">
-                            <Trophy aria-hidden="true" size={13} />
-                            {item.status}
-                          </span>
-                        ) : null}
-                        <span className="experience-period">{item.period}</span>
-                      </div>
-                    </div>
-
-                    <p className="experience-description">{item.description}</p>
-
-                    <div
-                      className="experience-tech-list"
-                      aria-label={formatCopy(ui.home.technologyStackAria, { name: item.company })}
-                    >
-                      {item.technologies.map((technology) => (
-                        <span className="experience-tech-chip" key={technology}>{technology}</span>
-                      ))}
-                    </div>
-
-                    {item.projects?.length ? (
-                      <details className="client-projects" data-scroll-accent-details open>
-                        <summary>
-                          <span className="client-project-summary-open">{ui.home.collapseProjects}</span>
-                          <span className="client-project-summary-closed">{ui.home.showProjects}</span>
-                          <span className="client-project-count">{item.projects.length}</span>
-                          <span className="client-project-toggle-icon" aria-hidden="true">
-                            <ChevronUp size={13} />
-                          </span>
-                        </summary>
-                        <div className="client-project-list">
-                          {item.projects.map((project, projectIndex) => (
-                            <article className="client-project-item" key={`${item.company}-${project.client}-${project.project}`}>
-                              <span
-                                className="client-project-node"
-                                data-scroll-accent-anchor={`experience-project-${experienceIndex}-${projectIndex}`}
-                                data-scroll-accent-phase="experience-minor"
-                                aria-hidden="true"
-                              />
-                              <span className="client-project-logo">
-                                <Image src={project.logoUrl} alt="" fill sizes="40px" />
-                              </span>
-                              <div className="client-project-body">
-                                <h4>
-                                  <span>{project.client}</span>
-                                  <ArrowRight aria-hidden="true" size={16} />
-                                  <span>{project.project}</span>
-                                </h4>
-                                <p>{project.description}</p>
-                                <div
-                                  className="client-project-tech"
-                                  aria-label={formatCopy(ui.home.technologyStackAria, { name: project.client })}
-                                >
-                                  {project.technologies.map((technology) => (
-                                    <span key={technology}>{technology}</span>
-                                  ))}
-                                </div>
-                              </div>
-                            </article>
-                          ))}
-                        </div>
-                      </details>
-                    ) : null}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </Container>
-        </section>
+        <ExperienceScene
+          copy={{
+            experienceEyebrow: ui.home.experienceEyebrow,
+            experienceTitle: ui.home.experienceTitle,
+            experienceMuted: ui.home.experienceMuted,
+            experienceDescription: ui.home.experienceDescription,
+            technologyStackAria: ui.home.technologyStackAria,
+            collapseProjects: ui.home.collapseProjects,
+            showProjects: ui.home.showProjects,
+          }}
+          experience={experience}
+        />
 
         <section
           className="ai-workflow-band"
