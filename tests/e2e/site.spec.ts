@@ -518,6 +518,14 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
 
   async function activate(anchor: string) {
     await page.locator(`[data-scroll-accent-anchor="${anchor}"]`).evaluate((element) => {
+      // Nodes in the pinned Experience scene publish where they come to rest.
+      const track = element.closest<HTMLElement>("[data-scroll-accent-track]");
+      const offset = (element as HTMLElement).dataset.scrollAccentOffset;
+      if (track && offset !== undefined) {
+        window.scrollTo(0, track.getBoundingClientRect().top + window.scrollY + Number(offset));
+        return;
+      }
+
       const bounds = element.getBoundingClientRect();
       const activationY = Math.min(360, Math.max(180, window.innerHeight * 0.38));
       window.scrollTo(0, bounds.top + window.scrollY + bounds.height / 2 - activationY);
@@ -940,6 +948,95 @@ test("about scene shows the finished composition with reduced motion", async ({ 
   await expect(page.locator(".about-scene-card .about-scene-resume")).toBeVisible();
   await expect(page.locator(".about-beyond-strip .about-beyond-keyword").first()).toBeVisible();
   await expect(page.locator(".about-scene-beyond")).toBeHidden();
+});
+
+test("the hero, AI workflow and contact sections each fill one screen", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  const viewportHeight = await page.evaluate(() => window.innerHeight);
+  for (const selector of [".hero-section", ".ai-workflow-band", "#contact"]) {
+    const box = await page.locator(selector).boundingBox();
+    expect(Math.abs((box?.height ?? 0) - viewportHeight), selector).toBeLessThanOrEqual(1);
+  }
+
+  // Nothing below the hero shows on landing.
+  await expect(page.locator("#work")).not.toBeInViewport();
+});
+
+async function scrollExperienceToNode(page: import("@playwright/test").Page, anchor: string) {
+  await page.locator(`[data-scroll-accent-anchor="${anchor}"]`).evaluate((element) => {
+    const track = element.closest<HTMLElement>("[data-scroll-accent-track]");
+    const offset = (element as HTMLElement).dataset.scrollAccentOffset;
+    if (!track || offset === undefined) throw new Error("Experience node has no resting offset");
+    const top = track.getBoundingClientRect().top + window.scrollY + Number(offset);
+    window.scrollTo({ top, behavior: "instant" });
+  });
+}
+
+function distanceFromFocus(page: import("@playwright/test").Page, anchor: string) {
+  return page.locator(`[data-scroll-accent-anchor="${anchor}"]`).evaluate((element) => {
+    const track = element.closest<HTMLElement>("[data-scroll-accent-track]");
+    const bounds = element.getBoundingClientRect();
+    return Math.abs(bounds.top + bounds.height / 2 - Number(track?.dataset.scrollAccentFocus));
+  });
+}
+
+test("experience scene pins one screen and steps through the timeline", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await skipLaunchIntro(page);
+  await page.goto("/");
+  await expect(page.locator("#experience")).toHaveAttribute("data-live", "");
+  await expect(page.locator(".experience-track")).toHaveAttribute("data-scroll-accent-focus", /\d/);
+
+  const viewportHeight = await page.evaluate(() => window.innerHeight);
+  for (const anchor of ["experience-company-0", "experience-project-0-0", "experience-company-1"]) {
+    await scrollExperienceToNode(page, anchor);
+    await expect.poll(() => distanceFromFocus(page, anchor)).toBeLessThan(2);
+
+    const stage = await page.locator(".experience-stage").boundingBox();
+    expect(Math.abs(stage?.y ?? Infinity)).toBeLessThanOrEqual(1);
+    expect(Math.abs((stage?.height ?? 0) - viewportHeight)).toBeLessThanOrEqual(1);
+    await expect(page.locator("#experience-heading")).toBeInViewport();
+  }
+});
+
+test("experience scene scrolls to a project toggle that receives keyboard focus", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await skipLaunchIntro(page);
+  await page.goto("/");
+  await expect(page.locator(".experience-track")).toHaveAttribute("data-scroll-accent-focus", /\d/);
+
+  // Resting on the last node, the first company's toggle is out of the window.
+  const lastAnchor = await page
+    .locator("#experience [data-scroll-accent-offset]")
+    .last()
+    .getAttribute("data-scroll-accent-anchor");
+  await scrollExperienceToNode(page, lastAnchor ?? "");
+  const toggle = page.locator("#experience details summary").first();
+  await expect(toggle).not.toBeInViewport();
+
+  await toggle.focus();
+  await expect.poll(() => distanceFromFocus(page, "experience-company-0")).toBeLessThan(2);
+  await expect(toggle).toBeInViewport();
+});
+
+test("experience shows the plain timeline with reduced motion", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  await expect(page.locator("#experience")).not.toHaveAttribute("data-live", "");
+  await expect(page.locator(".experience-stage")).toHaveCSS("position", "static");
+  await expect(page.locator("#experience [data-scroll-accent-offset]")).toHaveCount(0);
+  await expect(page.locator(".client-project-item").first()).toBeVisible();
 });
 
 async function scrollWorkDustTo(page: import("@playwright/test").Page, progress: number) {
