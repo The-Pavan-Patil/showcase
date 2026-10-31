@@ -52,6 +52,10 @@
   --motion-fast: 150ms;
   --motion-base: 220ms;
   --motion-slow: 300ms;
+  --title-section: clamp(2rem, min(4vw, 7svh), 3rem);
+  --title-stage: clamp(1.5rem, min(2.6vw, 4.6svh), 2.3rem);
+  --text-intro: 1.0625rem;
+  --pill-height: 3rem;
   --shadow-card: none;
   --shadow-float: 0 1px 2px rgb(0 0 0 / 6%), 0 20px 60px rgb(0 0 0 / 9%);
   color-scheme: light;
@@ -127,6 +131,10 @@ html[lang="ja"] body {
 
 html[lang="ja"] :where(h1, h2, h3, h4, .brand-link, .section-heading, .dust-card-title, .case-section-body h2, .next-project-section a strong) {
   font-family: var(--font-noto-sans-jp), var(--font-display);
+}
+
+:where(h1, h2) {
+  text-wrap: balance;
 }
 
 ::selection {
@@ -1206,7 +1214,7 @@ html[lang="ja"] .hero-copy {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: 3rem;
+  min-height: var(--pill-height);
   border-radius: 999px;
   padding: 0.7rem 1.25rem;
   font-size: 0.875rem;
@@ -1290,7 +1298,7 @@ html[lang="ja"] .hero-copy {
 .contribution-card h2 {
   margin: 1rem 0 0;
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 4vw, 3rem);
+  font-size: var(--title-section);
   font-weight: 500;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -1303,8 +1311,9 @@ html[lang="ja"] .hero-copy {
   max-width: 38rem;
   margin-top: 1.3rem;
   color: var(--foreground);
-  font-size: 1.0625rem;
+  font-size: var(--text-intro);
   line-height: 1.6;
+  text-wrap: pretty;
 }
 
 .section-header-row {
@@ -1524,7 +1533,7 @@ html[lang="ja"] .hero-copy {
   display: none;
 }
 .dust-track[data-live] .section-heading h2 {
-  font-size: clamp(1.6rem, 2.6vw, 2.3rem);
+  font-size: var(--title-stage);
 }
 .dust-track[data-live] .dust-field {
   position: relative;
@@ -1814,10 +1823,6 @@ html[lang="ja"] .hero-copy {
   padding: clamp(3rem, 9svh, 4.5rem) 0;
 }
 
-.ai-workflow-band .section-heading h2 {
-  font-size: clamp(2rem, min(4vw, 7svh), 3rem);
-}
-
 .ai-workflow-container {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -1836,7 +1841,7 @@ html[lang="ja"] .hero-copy {
   align-items: center;
   gap: 0.5rem;
   width: fit-content;
-  min-height: 2.9rem;
+  min-height: var(--pill-height);
   justify-self: end;
   border-radius: var(--radius-pill);
   background: var(--foreground);
@@ -2234,7 +2239,7 @@ html[lang="ja"] .hero-copy {
    narrow ones. */
 .experience-layout {
   display: grid;
-  grid-template-columns: minmax(15rem, 0.36fr) minmax(0, 1fr);
+  grid-template-columns: minmax(15rem, 0.42fr) minmax(0, 1fr);
   align-items: start;
   gap: clamp(2rem, 5vw, 5rem);
 }
@@ -2248,15 +2253,8 @@ html[lang="ja"] .hero-copy {
   justify-content: space-between;
   gap: 1.5rem;
 }
-/* A compact two-tone title: the claim in ink, its scope in muted ink. */
 .experience-scene .section-heading h2 {
-  font-size: clamp(1.6rem, min(2.1vw, 4.2svh), 2.25rem);
-  line-height: 1.04;
-  text-wrap: balance;
-}
-.experience-scene .heading-muted {
-  display: block;
-  color: var(--muted);
+  font-size: var(--title-stage);
 }
 .experience-counter {
   display: none;
@@ -2382,9 +2380,6 @@ html[lang="ja"] .hero-copy {
   }
   .experience-aside {
     position: static;
-  }
-  .experience-scene .section-heading h2 {
-    font-size: clamp(1.6rem, min(4.4vw, 4.6svh), 2.4rem);
   }
   .experience-list {
     margin-top: 3rem;
@@ -2981,7 +2976,7 @@ html[lang="ja"] .hero-copy {
   align-items: center;
   gap: 0.55rem;
   width: fit-content;
-  min-height: 2.8rem;
+  min-height: var(--pill-height);
   margin-top: 1.7rem;
   border-radius: var(--radius-pill);
   background: var(--foreground);
@@ -2989,7 +2984,7 @@ html[lang="ja"] .hero-copy {
   padding: 0.75rem 1.05rem 0.75rem 1.15rem;
   font-size: 0.875rem;
   text-transform: uppercase;
-  font-weight: 760;
+  font-weight: 700;
   transition: transform var(--motion-fast) ease, opacity var(--motion-fast) ease;
 }
 .resume-capsule svg {
@@ -3037,7 +3032,7 @@ html[lang="ja"] .hero-copy {
   max-width: 18ch;
   margin: 1rem 0 0;
   font-family: var(--font-display);
-  font-size: clamp(2.1rem, 4.4vw, 3.45rem);
+  font-size: var(--title-section);
   font-weight: 500;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -3053,8 +3048,9 @@ html[lang="ja"] .hero-copy {
   max-width: 34rem;
   margin-top: 1.25rem;
   color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.7;
+  font-size: var(--text-intro);
+  line-height: 1.6;
+  text-wrap: pretty;
 }
 
 .quick-message-composer {
@@ -3209,15 +3205,15 @@ html[lang="ja"] .hero-copy {
 .contact-section { display: grid; align-content: center; min-height: 100svh; padding: clamp(3rem, 8svh, 6rem) 0; scroll-margin-top: 7rem; }
 .contact-card { display: grid; grid-template-columns: 1.25fr 0.75fr; align-items: end; gap: 3rem; overflow: hidden; border-radius: var(--radius-panel); background: var(--foreground); color: var(--background); padding: clamp(2rem, 5vw, 4rem); }
 .contact-card .eyebrow { color: var(--inverse-accent); }
-.contact-card h2 { max-width: 20ch; font-size: clamp(2rem, min(4.8vw, 8svh), 3.7rem); }
-.contact-card > div:first-child > p:last-child { max-width: 38rem; margin-top: 1.2rem; color: color-mix(in srgb, var(--background) 62%, transparent); font-size: 0.9rem; line-height: 1.65; }
+.contact-card h2 { max-width: 20ch; }
+.contact-card > div:first-child > p:last-child { max-width: 38rem; margin-top: 1.2rem; color: color-mix(in srgb, var(--background) 62%, transparent); font-size: var(--text-intro); line-height: 1.6; text-wrap: pretty; }
 .contact-actions { display: flex; flex-direction: column; align-items: stretch; gap: 0.75rem; }
 .schedule-call { display: grid; gap: 0.55rem; }
 .schedule-call-helper { margin: 0; color: color-mix(in srgb, var(--background) 64%, transparent); padding-left: 6px; font-size: 0.8125rem; font-weight: 650; line-height: 1.45; }
-.schedule-call-link { display: flex; align-items: center; gap: 0.6rem; min-height: 3rem; border-radius: 999px; background: var(--background); color: var(--foreground); padding: 0.9rem 1rem; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; transition: background var(--motion-fast) ease, transform var(--motion-fast) ease; }
+.schedule-call-link { display: flex; align-items: center; gap: 0.6rem; min-height: var(--pill-height); border-radius: 999px; background: var(--background); color: var(--foreground); padding: 0.7rem 1rem; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; transition: background var(--motion-fast) ease, transform var(--motion-fast) ease; }
 .schedule-call-link span { flex: 1; }
 .schedule-call-link:hover { background: var(--surface-secondary); }
-.contact-email { display: flex; align-items: center; gap: 0.6rem; border-radius: 999px; background: color-mix(in srgb, var(--background) 12%, transparent); color: var(--background); padding: 0.9rem 1rem; font-size: 0.875rem; font-weight: 700; }
+.contact-email { display: flex; align-items: center; gap: 0.6rem; min-height: var(--pill-height); border-radius: 999px; background: color-mix(in srgb, var(--background) 12%, transparent); color: var(--background); padding: 0.7rem 1rem; font-size: 0.875rem; font-weight: 700; }
 .social-row { display: flex; gap: 0.55rem; }
 .social-row a { display: inline-flex; align-items: center; justify-content: center; gap: 0.3rem; flex: 1; background: color-mix(in srgb, var(--background) 12%, transparent); border-radius: 999px; padding: 0.72rem; color: color-mix(in srgb, var(--background) 72%, transparent); font-size: 0.875rem; font-weight: 700; text-transform: uppercase; transition: background 150ms ease, color 150ms ease, transform 150ms ease; }
 .social-row a:hover { background: color-mix(in srgb, var(--background) 22%, transparent); color: var(--background); }
@@ -3712,7 +3708,7 @@ html[lang="ja"] .hero-copy {
 
 .contribution-section { padding-bottom: 8rem; }
 .contribution-card { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 4rem; border-radius: 1rem; background: var(--surface); padding: clamp(2rem, 5vw, 4rem); }
-.contribution-card h2 { max-width: 14ch; font-size: clamp(2rem, 3vw, 2.7rem); }
+.contribution-card h2 { max-width: 14ch; }
 .contribution-card ul { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
 .contribution-card li { display: flex; align-items: start; gap: 0.7rem; border-bottom: 1px solid var(--border); padding: 1rem 0; color: var(--muted); font-size: 0.82rem; line-height: 1.55; }
 .contribution-card li:first-child { border-top: 1px solid var(--border); }
@@ -3869,7 +3865,7 @@ html[lang="ja"] .hero-copy {
 .setup-closing-quote h2 {
   margin: 1rem 0 0;
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 4vw, 3rem);
+  font-size: var(--title-section);
   font-weight: 500;
   letter-spacing: -0.04em;
   line-height: 1;
@@ -3880,8 +3876,9 @@ html[lang="ja"] .hero-copy {
   max-width: 40rem;
   margin-top: 1.25rem;
   color: var(--muted);
-  font-size: 0.96rem;
-  line-height: 1.75;
+  font-size: var(--text-intro);
+  line-height: 1.6;
+  text-wrap: pretty;
 }
 
 .setup-workflow-diagram {
@@ -4283,8 +4280,9 @@ html[lang="ja"] .hero-copy {
   max-width: 39rem;
   margin: 1.2rem 0 0;
   color: var(--muted);
-  font-size: 0.96rem;
-  line-height: 1.75;
+  font-size: var(--text-intro);
+  line-height: 1.6;
+  text-wrap: pretty;
 }
 
 @media (max-width: 1024px) {
@@ -4399,7 +4397,6 @@ html[lang="ja"] .hero-copy {
   .experience-scene[data-live] .experience-stage {
     padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
   }
-  .dust-track[data-live] .section-heading h2 { font-size: 1.5rem; }
   .about-scene { padding-top: 4rem; }
   .about-scene-title { font-size: clamp(3.5rem, 24vw, 8rem); }
   /* Phones have no top header but a bottom navigation bar. */
@@ -4438,7 +4435,6 @@ html[lang="ja"] .hero-copy {
   .quick-message-section { padding-bottom: 5rem; scroll-margin-top: 2rem; }
   .quick-message-band { grid-template-columns: 1fr; gap: 1.45rem; }
   .quick-message-composer { margin-top: 0; }
-  .quick-message-copy h2 { font-size: clamp(2rem, 10vw, 3rem); }
   .quick-message-meta { display: grid; gap: 0.45rem; }
   .quick-message-scroll-track { min-height: 158svh; }
   .quick-message-band { top: clamp(1.5rem, 6svh, 5.25rem); }
@@ -4661,9 +4657,6 @@ html[lang="ja"] .hero-copy {
   .setup-command-panel { border-radius: 1rem; }
   .setup-command-body { padding-inline: 1rem; }
   .setup-command-body p { grid-template-columns: 1fr; gap: 0.32rem; }
-  .setup-section-heading h2,
-  .setup-chaos-grid h2,
-  .setup-closing-quote h2 { font-size: clamp(2rem, 11vw, 2.65rem); }
 }
 
 /* Short phones: tighten the homepage sections that otherwise outgrow one
