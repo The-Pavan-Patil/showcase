@@ -11,6 +11,12 @@ export type ScrollAccentWaypoint = {
   y: number;
   size: number;
   magnet?: boolean;
+  /**
+   * For a node inside a pinned stage: the viewport y the dot rests on. `y`
+   * then only times the waypoint, which still activates when `y` reaches the
+   * activation line.
+   */
+  pinnedY?: number;
 };
 
 export type ScrollAccentFrame = ScrollAccentWaypoint;
@@ -38,6 +44,16 @@ function magnetHold(waypoint: ScrollAccentWaypoint) {
     : DEFAULT_MAGNET_HOLD;
 }
 
+/** A pinned waypoint is drawn on its resting line, wherever the scroll is. */
+function placeWaypoint(
+  waypoint: ScrollAccentWaypoint,
+  scrollY: number,
+): ScrollAccentFrame {
+  return waypoint.pinnedY === undefined
+    ? waypoint
+    : { ...waypoint, y: scrollY + waypoint.pinnedY };
+}
+
 export function resolveScrollAccentFrame(
   waypoints: ScrollAccentWaypoint[],
   scrollY: number,
@@ -50,7 +66,7 @@ export function resolveScrollAccentFrame(
   const firstActivation = Math.max(0, first.y - activationY);
 
   if (scrollY <= firstActivation || waypoints.length === 1) {
-    return first;
+    return placeWaypoint(first, scrollY);
   }
 
   for (let index = 0; index < waypoints.length - 1; index += 1) {
@@ -89,25 +105,30 @@ export function resolveScrollAccentFrame(
         nextMagnet.y - activationY,
       );
 
-      return scrollY < (previousActivation + nextActivation) / 2
-        ? previousMagnet
-        : nextMagnet;
+      return placeWaypoint(
+        scrollY < (previousActivation + nextActivation) / 2
+          ? previousMagnet
+          : nextMagnet,
+        scrollY,
+      );
     }
 
     const startHold = magnetHold(current);
     const endHold = magnetHold(next);
     const travelRange = Math.max(0.01, 1 - startHold - endHold);
     const progress = smoothstep((rawProgress - startHold) / travelRange);
+    const fromY = placeWaypoint(current, scrollY).y;
+    const toY = placeWaypoint(next, scrollY).y;
 
     return {
       ...active,
       x: current.x + (next.x - current.x) * progress,
-      y: current.y + (next.y - current.y) * progress,
+      y: fromY + (toY - fromY) * progress,
       size: current.size + (next.size - current.size) * progress,
     };
   }
 
-  return waypoints[waypoints.length - 1];
+  return placeWaypoint(waypoints[waypoints.length - 1], scrollY);
 }
 
 function elementCenter(element: HTMLElement) {
@@ -184,6 +205,36 @@ function getGlobalRailX(globalRail: HTMLElement) {
   return globalRail.getBoundingClientRect().left + window.scrollX;
 }
 
+/**
+ * While the Experience scene is pinned, its timeline nodes take turns resting
+ * on one focus line. Each node publishes the scroll into the track at which it
+ * rests there, so its waypoint activates then and is drawn on that line.
+ */
+function getPinnedExperienceWaypoints(
+  track: HTMLElement,
+  activationY: number,
+): ScrollAccentWaypoint[] {
+  const focusY = Number.parseFloat(track.dataset.scrollAccentFocus ?? "");
+  if (!Number.isFinite(focusY)) return [];
+
+  const trackTop = track.getBoundingClientRect().top + window.scrollY;
+
+  return Array.from(
+    track.querySelectorAll<HTMLElement>("[data-scroll-accent-offset]"),
+  )
+    .filter(
+      (element) =>
+        element.dataset.scrollAccentPhase !== "experience-minor" ||
+        isVisibleProjectNode(element),
+    )
+    .map((element) => ({
+      ...waypointFromElement(element),
+      y: trackTop + Number(element.dataset.scrollAccentOffset) + activationY,
+      pinnedY: focusY,
+    }))
+    .sort((first, second) => first.y - second.y);
+}
+
 function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
   const globalRail = document.querySelector<HTMLElement>(
     ".scroll-accent-global-rail",
@@ -234,8 +285,27 @@ function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | nu
   pushGlobalBridge(waypoints, globalX, heroPoint, workPoint);
   pushGlobalBridge(waypoints, globalX, workPoint, experienceHeadingPoint);
 
-  const experienceItems = Array.from(
-    experienceSection.querySelectorAll<HTMLElement>(".experience-item"),
+  const experienceTrack = experienceSection.querySelector<HTMLElement>(
+    "[data-scroll-accent-track]",
+  );
+  const pinnedExperience = experienceTrack
+    ? getPinnedExperienceWaypoints(experienceTrack, activationY)
+    : [];
+
+  if (pinnedExperience.length) {
+    pushGlobalBridge(waypoints, globalX, experienceHeadingPoint, pinnedExperience[0]);
+    pinnedExperience
+      .slice(1)
+      .forEach((point) => pushOrderedWaypoint(waypoints, point));
+  }
+
+  // The static timeline, traced at the nodes' document positions.
+  const experienceItems = (
+    pinnedExperience.length
+      ? []
+      : Array.from(
+          experienceSection.querySelectorAll<HTMLElement>(".experience-item"),
+        )
   ).map((item) => {
     const majorElement = item.querySelector<HTMLElement>(
       '[data-scroll-accent-phase="experience-major"]',
