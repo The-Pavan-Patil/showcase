@@ -2604,18 +2604,6 @@ html[lang="ja"] .hero-copy {
   color: var(--foreground);
 }
 
-.client-project-summary-closed {
-  display: none;
-}
-
-.client-projects:not([open]) .client-project-summary-open {
-  display: none;
-}
-
-.client-projects:not([open]) .client-project-summary-closed {
-  display: inline;
-}
-
 .client-project-count,
 .client-project-toggle-icon {
   display: inline-grid;

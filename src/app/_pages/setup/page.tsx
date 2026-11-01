@@ -208,7 +208,7 @@ export function SetupPage({ locale }: { locale: Locale }) {
             <div className="setup-hero-grid">
               <div className="setup-hero-copy">
                 <SetupEyebrow anchor="hero" fallback>
-                  AI workflow and Setup
+                  AI workflow and setup
                 </SetupEyebrow>
                 <h1 id="setup-title">
                   I use AI like an{" "}

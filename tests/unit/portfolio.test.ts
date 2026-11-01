@@ -95,7 +95,7 @@ describe("portfolio content", () => {
     expect(experience.map((item) => item.company)).toEqual([
       "Ownpath Pvt. Ltd.",
       "Sonai Engineering & Services",
-      "Defence Research and Development Organization",
+      "Defence Research and Development Organisation",
     ]);
     expect(experience[0].projects?.map((project) => project.client)).toEqual([
       "Hero Vida",

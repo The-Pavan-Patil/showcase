@@ -28,7 +28,7 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
     summary:
       "Mainichi kotoは、学習者自身の日本語語彙を、単語、文脈の中の漢字、間隔反復の複数の練習に変えるプロダクトです。各カードの進捗も保ちます。",
     role: "個人開発者",
-    experienceContext: "個人プロダクト · 2026年6月 - 7月",
+    experienceContext: "個人プロダクト · 2026年6月–7月",
     challenge:
       "学習者が自分の読みたい語彙を無料で学べるようにしながら、単語の意味、単語全体の読み、文脈内の漢字読みを別々の記憶として扱う必要がありました。",
     approach:
@@ -54,9 +54,9 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
     cardHeadline:
       "シンプルなタスクアプリの下に、オフライン優先の共同作業を支える仕組みを作りました。",
     summary:
-      "Nudgeは、何度も一緒に予定を立てるグループ向けの軽いソーシャルタスク体験です。表面はシンプルなジェスチャー操作で、裏側はローカル優先の同期設計になっています。ownpath Studiosの一員として取り組んだクライアント案件です。",
+      "Nudgeは、何度も一緒に予定を立てるグループ向けの軽いソーシャルタスク体験です。表面はシンプルなジェスチャー操作で、裏側はローカル優先の同期設計になっています。Ownpathで取り組んだクライアント案件です。",
     role: "フルスタック開発者",
-    experienceContext: "Ownpath · 2025年11月 - 現在",
+    experienceContext: "Ownpath · 2025年11月–現在",
     challenge:
       "アプリはすぐに動くシンプルな体験にする必要がありました。一方で、ローカル保存、ネットワーク状態、ユーザーの役割、タスクの状態、RLS、Storage、リモート同期が安全な操作に影響していました。",
     approach:
@@ -85,9 +85,9 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
     kicker: "グローバルWeb体験",
     cardHeadline: "Figmaから本番向けの多言語Webサイトを実装しました。",
     summary:
-      "Figmaデザインをもとに作ったReactとTypeScriptの企業サイトです。地域別のローカライズ、ユニットテスト、アプリケーション性能監視を含みます。ownpath Studiosの一員として取り組んだクライアント案件です。",
+      "Figmaデザインをもとに作ったReactとTypeScriptの企業サイトです。地域別のローカライズ、ユニットテスト、アプリケーション性能監視を含みます。Ownpathで取り組んだクライアント案件です。",
     role: "ソフトウェアエンジニア",
-    experienceContext: "Ownpath · 2025年11月 - 現在",
+    experienceContext: "Ownpath · 2025年11月–現在",
     challenge:
       "承認済みのFigmaデザインを、地域別コンテンツを配信でき、実行時の性能も確認できる信頼性の高いWebサイトに変える必要がありました。",
     approach:
@@ -112,7 +112,7 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
     summary:
       "複数の建設現場にまたがる勤怠、設定可能な残業給与、労務、現場、ポートフォリオ業務のためのフルスタック基盤です。AWSにデプロイしました。",
     role: "フルスタック開発者",
-    experienceContext: "Sonai · 2025年2月 - 10月",
+    experienceContext: "Sonai · 2025年2月–10月",
     challenge:
       "会社は、複数の建設現場で作業員記録、勤怠、現場情報、設定可能な残業給与を管理する必要がありました。",
     approach:
@@ -140,7 +140,7 @@ export const deProjectTranslations: Record<string, ProjectTranslation> = {
     summary:
       "Mainichi koto verwandelt den eigenen japanischen Wortschatz in mehrere Arten von Abruftraining: ganze Wörter, Kanji im Kontext und verteilte Wiederholung, ohne den Fortschritt einzelner Karten zu verlieren.",
     role: "Alleiniger Entwickler",
-    experienceContext: "Eigenes Produkt · Juni-Juli 2026",
+    experienceContext: "Eigenes Produkt · Juni–Juli 2026",
     challenge:
       "Lernende brauchten eine kostenlose Möglichkeit, die Wörter zu lernen, die sie selbst lesen möchten, während Wortbedeutung, Ganzwort-Lesung und Kanji-im-Kontext als getrennte Erinnerungen geplant werden.",
     approach:
@@ -166,9 +166,9 @@ export const deProjectTranslations: Record<string, ProjectTranslation> = {
     cardHeadline:
       "Eine einfache Aufgaben-App mit Offline-first-Zusammenarbeit im Hintergrund.",
     summary:
-      "Nudge ist ein leichtes soziales Aufgabenerlebnis für Gruppen, die wiederholt gemeinsam planen. Die Oberfläche bleibt einfach, darunter arbeitet eine lokal-first Synchronisationsarchitektur. Dieses Kundenprojekt wurde im Rahmen von ownpath Studios umgesetzt.",
+      "Nudge ist ein leichtes soziales Aufgabenerlebnis für Gruppen, die wiederholt gemeinsam planen. Die Oberfläche bleibt einfach, darunter arbeitet eine lokal-first Synchronisationsarchitektur. An diesem Kundenprojekt habe ich bei Ownpath mitgearbeitet.",
     role: "Full-Stack-Entwickler",
-    experienceContext: "Ownpath · Nov. 2025 - heute",
+    experienceContext: "Ownpath · Nov. 2025–heute",
     challenge:
       "Die App sollte sofort und einfach wirken. Gleichzeitig beeinflussten lokaler Speicher, Netzwerkstatus, Nutzerrollen, Aufgabenstatus, RLS, Storage-Zugriff und Remote-Synchronisierung, was sicher möglich war.",
     approach:
@@ -197,9 +197,9 @@ export const deProjectTranslations: Record<string, ProjectTranslation> = {
     kicker: "Globales Web-Erlebnis",
     cardHeadline: "Eine produktionsreife mehrsprachige Website aus Figma.",
     summary:
-      "Eine Corporate Website mit React und TypeScript, umgesetzt aus Figma-Designs, mit regionaler Lokalisierung, Unit-Tests und Application Performance Monitoring. Dieses Kundenprojekt wurde im Rahmen von ownpath Studios umgesetzt.",
+      "Eine Corporate Website mit React und TypeScript, umgesetzt aus Figma-Designs, mit regionaler Lokalisierung, Unit-Tests und Application Performance Monitoring. An diesem Kundenprojekt habe ich bei Ownpath mitgearbeitet.",
     role: "Softwareentwickler",
-    experienceContext: "Ownpath · Nov. 2025 - heute",
+    experienceContext: "Ownpath · Nov. 2025–heute",
     challenge:
       "Freigegebene Figma-Designs mussten in eine zuverlässige Website überführt werden, die regionale Inhalte ausliefert und Laufzeit-Performance sichtbar macht.",
     approach:
@@ -225,7 +225,7 @@ export const deProjectTranslations: Record<string, ProjectTranslation> = {
     summary:
       "Eine Full-Stack-Plattform für Anwesenheit, konfigurierbare Überstundenabrechnung, Arbeitskräfte, Standorte und Portfolio-Workflows über mehrere Baustellen hinweg, bereitgestellt auf AWS.",
     role: "Full-Stack-Entwickler",
-    experienceContext: "Sonai · Feb. - Okt. 2025",
+    experienceContext: "Sonai · Feb.–Okt. 2025",
     challenge:
       "Das Unternehmen musste Mitarbeiterdaten, Anwesenheit, Standorte und konfigurierbare Überstundenabrechnung über mehrere Baustellen hinweg verwalten.",
     approach:

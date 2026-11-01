@@ -94,8 +94,7 @@ export function HomePage({ locale }: { locale: Locale }) {
             experienceTitle: ui.home.experienceTitle,
             experienceMuted: ui.home.experienceMuted,
             technologyStackAria: ui.home.technologyStackAria,
-            collapseProjects: ui.home.collapseProjects,
-            showProjects: ui.home.showProjects,
+            clientProjects: ui.home.clientProjects,
           }}
           experience={experience}
         />

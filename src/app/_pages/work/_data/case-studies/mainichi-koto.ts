@@ -8,8 +8,8 @@ export const mainichiKoto = {
   summary:
     "Mainichi koto turns a learner's own Japanese vocabulary into several kinds of recall practice: whole words, kanji in context, and spaced review without losing the progress each card has earned.",
   role: "Sole builder",
-  experienceContext: "Personal product · Jun-Jul 2026",
-  client: "Public learning product",
+  experienceContext: "Personal product · Jun–Jul 2026",
+  client: "Personal project",
   technologies: [
     "Next.js",
     "React",

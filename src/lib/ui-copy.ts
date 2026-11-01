@@ -86,8 +86,7 @@ export type UiCopy = {
       };
     };
     technologyStackAria: string;
-    collapseProjects: string;
-    showProjects: string;
+    clientProjects: string;
     aboutDisplay: [string, string];
     aboutTitle: string;
     aboutMuted: string;
@@ -221,8 +220,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       description:
         "Software engineer building web, mobile, and backend products with TypeScript, React, Next.js, React Native, Node.js, and PostgreSQL.",
       openGraphDescription:
-        "Dependable software for complex, real-world workflows across web, mobile, backend, and data-intensive systems.",
-      twitterDescription: "Dependable software for complex, real-world workflows.",
+        "Software engineer building across web, mobile, and backend—from system design to production.",
+      twitterDescription: "Web, mobile, and backend—from system design to production.",
       keywords: [
         "Pavan Patil",
         "Software Engineer",
@@ -289,11 +288,11 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         "Experience across client products, internal platforms, cloud operations, and real-time research systems.",
       aiWorkflow: {
         eyebrow: "AI workflow",
-        title: "Check how I use AI to speed up",
+        title: "See how I use AI to speed up",
         titleMuted: "development.",
-        description: "I use AI like an engineering team around me.",
+        description: "Separate agents plan, build, test, and try to break every change.",
         descriptionEmphasis:
-          "One agent helps plan, others implement, others test, one tries to break the system, and complex work gets an orchestration loop around git and CI.",
+          "An orchestration loop keeps them in step through git and CI.",
         cta: "View my full setup",
         pipelineAria: "AI workflow from brainstorm to task planning with AO coordination, branching into three tasks. T3 fails its first test, returns through build and review, passes its second test, then all tasks merge through git and ship after GitHub Actions verification",
         testFailed: "Test failed",
@@ -333,8 +332,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         ship: { label: "Ship", tool: "GitHub Actions" },
       },
       technologyStackAria: "{name} technology stack",
-      collapseProjects: "Collapse projects",
-      showProjects: "Show projects",
+      clientProjects: "Client projects",
       aboutDisplay: ["About", "Me"],
       aboutTitle: "Curiosity became craft,",
       aboutMuted: "and craft became my work.",
@@ -367,11 +365,11 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         description:
           "A simple one-way note. No email, no registration, no reply field.",
         textareaLabel: "Message",
-        placeholder: "Type a quick note...",
+        placeholder: "Type a quick note…",
         keyboardAria: "Mechanical keyboard message input",
         helper: "Press Return to send. The keyboard responds to physical keys too.",
         send: "Send message",
-        sending: "Sending...",
+        sending: "Sending…",
         sent: "Thanks. Your message was sent.",
         emptyError: "Write a message before sending.",
         tooLongError: "Keep the message under 500 characters.",
@@ -381,14 +379,14 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         honeypotLabel: "Website",
         characterCount: "{count}/500",
       },
-      contactEyebrow: "Let’s build something dependable",
+      contactEyebrow: "Contact",
       contactTitle: "Looking for an engineer who can own the details?",
       contactDescription:
         "I’m open to software engineering roles across product, platform, web, and mobile teams.",
-      contactScheduleLabel: "Schedule a 30-minute quick chat",
+      contactScheduleLabel: "Book a 30-minute chat",
       contactScheduleHelper: "Google Meet · Times shown in your timezone",
       contactScheduleFallbackAria:
-        "Open Google Calendar to schedule a 30-minute quick chat (opens in a new tab)",
+        "Open Google Calendar to book a 30-minute chat (opens in a new tab)",
     },
     projectCard: {
       technologiesAria: "{title} technologies",
@@ -470,7 +468,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       eyebrow: "404 · Page not found",
       title: "This route doesn’t exist.",
       description:
-        "The address may have changed, or the page may never have existed. Pavan’s selected work and verified experience are still available from the portfolio.",
+        "The address may have changed, or the page may never have existed. My selected work and experience are still on the homepage.",
       viewSelectedWork: "View selected work",
       returnHome: "Return home",
     },
@@ -482,8 +480,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       description:
         "TypeScript、React、Next.js、React Native、Node.js、PostgreSQLで、Web、モバイル、バックエンドのプロダクトを作るソフトウェアエンジニアです。",
       openGraphDescription:
-        "Web、モバイル、バックエンド、データを扱う現場で、複雑な業務に使える信頼性の高いソフトウェアを作ります。",
-      twitterDescription: "複雑な現場の仕事に向けた、信頼できるソフトウェア。",
+        "Web・モバイル・バックエンドを横断し、設計から実装・リリースまで担うソフトウェアエンジニアです。",
+      twitterDescription: "Web・モバイル・バックエンド。設計からリリースまで。",
       keywords: [
         "Pavan Patil",
         "ソフトウェアエンジニア",
@@ -552,9 +550,9 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         eyebrow: "AIワークフロー",
         title: "AIで開発をどう",
         titleMuted: "速くしているか。",
-        description: "AIを、自分を支えるエンジニアリングチームのように使っています。",
+        description: "計画、実装、テスト、そして変更を壊そうとする役まで、それぞれ別のエージェントが担当します。",
         descriptionEmphasis:
-          "あるエージェントが計画を助け、ほかが実装とテストを担当し、別のエージェントがシステムを壊そうと試みます。複雑な作業はGitとCIを中心にしたオーケストレーションループで扱います。",
+          "GitとCIを中心にしたオーケストレーションループが、全体の足並みをそろえます。",
         cta: "セットアップ全体を見る",
         pipelineAria: "ブレストからAOで調整したタスク計画へ進み、3つのタスクへ分岐するAIワークフロー。T3は最初のテストに失敗し、実装とレビューに戻り、2回目のテストに合格してから、すべてのタスクをGitでマージし、GitHub Actionsの検証後に公開します",
         testFailed: "テストに失敗",
@@ -594,8 +592,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         ship: { label: "公開", tool: "GitHub Actions" },
       },
       technologyStackAria: "{name} の技術スタック",
-      collapseProjects: "プロジェクトを閉じる",
-      showProjects: "プロジェクトを見る",
+      clientProjects: "クライアント案件",
       aboutDisplay: ["私に", "ついて"],
       aboutTitle: "好奇心が技術になり、",
       aboutMuted: "技術が仕事になりました。",
@@ -628,11 +625,11 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         description:
           "シンプルな一方向のメッセージです。メール、登録、返信先は不要です。",
         textareaLabel: "メッセージ",
-        placeholder: "短いメッセージを入力...",
+        placeholder: "短いメッセージを入力…",
         keyboardAria: "メカニカルキーボードのメッセージ入力",
         helper: "Returnで送信できます。物理キーボードにも反応します。",
         send: "メッセージを送る",
-        sending: "送信中...",
+        sending: "送信中…",
         sent: "ありがとうございます。メッセージを送信しました。",
         emptyError: "送信前にメッセージを入力してください。",
         tooLongError: "メッセージは500文字以内にしてください。",
@@ -642,14 +639,14 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         honeypotLabel: "Webサイト",
         characterCount: "{count}/500",
       },
-      contactEyebrow: "信頼できるものを一緒に作りましょう",
+      contactEyebrow: "連絡",
       contactTitle: "細部まで責任を持てるエンジニアをお探しですか？",
       contactDescription:
         "プロダクト、プラットフォーム、Web、モバイルのチームで、ソフトウェアエンジニアの仕事を探しています。",
-      contactScheduleLabel: "30分のクイックチャットを予約",
+      contactScheduleLabel: "30分のチャットを予約",
       contactScheduleHelper: "Google Meet · お使いのタイムゾーンで表示",
       contactScheduleFallbackAria:
-        "Google Calendarで30分のクイックチャットを予約する（新しいタブで開きます）",
+        "Google Calendarで30分のチャットを予約する（新しいタブで開きます）",
     },
     projectCard: {
       technologiesAria: "{title} の技術",
@@ -731,7 +728,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       eyebrow: "404 · ページが見つかりません",
       title: "このページは存在しません。",
       description:
-        "URLが変わったか、ページが作成されていない可能性があります。Pavanの主な実績と経験はポートフォリオから確認できます。",
+        "URLが変わったか、ページが作成されていない可能性があります。主な実績と経験はホームページで確認できます。",
       viewSelectedWork: "主な実績を見る",
       returnHome: "ホームに戻る",
     },
@@ -813,9 +810,9 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         eyebrow: "AI-Workflow",
         title: "So beschleunige ich die",
         titleMuted: "Entwicklung mit AI.",
-        description: "Ich nutze AI wie ein Engineering-Team um mich herum.",
+        description: "Eigene Agents planen, bauen, testen und versuchen, jede Änderung zu brechen.",
         descriptionEmphasis:
-          "Ein Agent hilft bei der Planung, andere implementieren und testen, einer versucht das System zu brechen, und komplexe Arbeit bekommt eine Orchestrierungsschleife um Git und CI.",
+          "Eine Orchestrierungsschleife hält sie über Git und CI im Takt.",
         cta: "Mein vollständiges Setup ansehen",
         pipelineAria: "AI-Workflow vom Brainstorming zur Task-Planung mit AO-Koordination, der in drei Tasks verzweigt. T3 scheitert im ersten Test, kehrt zu Build und Review zurück, besteht den zweiten Test und wird dann über Git gemerged und nach GitHub-Actions-Verifikation ausgeliefert",
         testFailed: "Test fehlgeschlagen",
@@ -855,8 +852,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         ship: { label: "Ship", tool: "GitHub Actions" },
       },
       technologyStackAria: "{name} Technologie-Stack",
-      collapseProjects: "Projekte einklappen",
-      showProjects: "Projekte anzeigen",
+      clientProjects: "Kundenprojekte",
       aboutDisplay: ["Über", "mich"],
       aboutTitle: "Neugier wurde Handwerk,",
       aboutMuted: "und Handwerk wurde meine Arbeit.",
@@ -889,11 +885,11 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         description:
           "Eine einfache einseitige Nachricht. Keine E-Mail, keine Registrierung, kein Antwortfeld.",
         textareaLabel: "Nachricht",
-        placeholder: "Kurze Nachricht schreiben...",
+        placeholder: "Kurze Nachricht schreiben…",
         keyboardAria: "Mechanische Tastatur zur Nachrichteneingabe",
         helper: "Return sendet. Die Tastatur reagiert auch auf physische Tasten.",
         send: "Nachricht senden",
-        sending: "Wird gesendet...",
+        sending: "Wird gesendet…",
         sent: "Danke. Deine Nachricht wurde gesendet.",
         emptyError: "Schreibe vor dem Senden eine Nachricht.",
         tooLongError: "Bitte halte die Nachricht unter 500 Zeichen.",
@@ -903,14 +899,14 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         honeypotLabel: "Website",
         characterCount: "{count}/500",
       },
-      contactEyebrow: "Lass uns etwas Verlässliches bauen",
+      contactEyebrow: "Kontakt",
       contactTitle: "Suchen Sie einen Entwickler, der Details wirklich übernimmt?",
       contactDescription:
         "Ich bin offen für Softwareentwickler-Rollen in Produkt-, Plattform-, Web- und Mobile-Teams.",
-      contactScheduleLabel: "30-minütigen kurzen Austausch buchen",
+      contactScheduleLabel: "30-minütiges Gespräch buchen",
       contactScheduleHelper: "Google Meet · Zeiten in Ihrer Zeitzone",
       contactScheduleFallbackAria:
-        "Google Calendar öffnen, um einen 30-minütigen kurzen Austausch zu buchen (öffnet in einem neuen Tab)",
+        "Google Calendar öffnen, um ein 30-minütiges Gespräch zu buchen (öffnet in einem neuen Tab)",
     },
     projectCard: {
       technologiesAria: "{title} Technologien",
@@ -992,7 +988,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       eyebrow: "404 · Seite nicht gefunden",
       title: "Diese Route existiert nicht.",
       description:
-        "Die Adresse kann sich geändert haben oder die Seite wurde nie erstellt. Pavans ausgewählte Arbeit und geprüfte Erfahrung sind weiterhin im Portfolio verfügbar.",
+        "Die Adresse kann sich geändert haben oder die Seite wurde nie erstellt. Meine ausgewählte Arbeit und Erfahrung findest du weiterhin auf der Startseite.",
       viewSelectedWork: "Ausgewählte Arbeit ansehen",
       returnHome: "Zur Startseite",
     },

@@ -44,7 +44,7 @@ test("homepage exposes the primary portfolio journey", async ({ page }) => {
 
   await skipLaunchIntro(page);
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("You found the person");
   await expect(page.getByRole("main")).toBeVisible();
   await expect(page.getByRole("link", { name: /case study/i })).toHaveCount(3);
   await expect(page.getByRole("contentinfo")).toBeVisible();
@@ -59,7 +59,7 @@ test("homepage first load plays the terminal launch intro", async ({ page }) => 
   await expect(terminal).toBeVisible();
   await expect(terminal).toHaveCSS("background-color", "rgb(2, 2, 3)");
   await expect(terminal).toBeHidden({ timeout: 3000 });
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("You found the person");
 });
 
 test("homepage skips the terminal launch intro after it has played this session", async ({ page }) => {
@@ -67,7 +67,7 @@ test("homepage skips the terminal launch intro after it has played this session"
   await page.goto("/");
 
   await expect(page.locator("[data-launch-terminal]")).toHaveCount(0);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("dependable software");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("You found the person");
 });
 
 test("anonymous keyboard messaging sends from the homepage", async ({ page }) => {

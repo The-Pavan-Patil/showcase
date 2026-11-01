@@ -64,8 +64,7 @@ type ExperienceSceneProps = {
     | "experienceTitle"
     | "experienceMuted"
     | "technologyStackAria"
-    | "collapseProjects"
-    | "showProjects"
+    | "clientProjects"
   >;
   experience: ExperienceItem[];
 };
@@ -407,8 +406,7 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
                       {item.projects?.length ? (
                         <details className="client-projects" data-scroll-accent-details open>
                           <summary data-experience-reveal>
-                            <span className="client-project-summary-open">{copy.collapseProjects}</span>
-                            <span className="client-project-summary-closed">{copy.showProjects}</span>
+                            <span>{copy.clientProjects}</span>
                             <span className="client-project-count">{item.projects.length}</span>
                             <span className="client-project-toggle-icon" aria-hidden="true">
                               <ChevronUp size={13} />

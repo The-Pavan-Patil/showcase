@@ -92,7 +92,7 @@ Use:
 - a primary selected-work action and direct email action;
 - a factual location/availability note.
 
-The current headline, “I build dependable software for complex, real-world workflows,” is the tonal model: confident, specific, and free of exaggerated claims.
+The current headline, “You found the person who can handle it,” sets the tone: confident and direct, with the paragraph below it naming the specifics.
 
 ### Project card
 
@@ -123,6 +123,10 @@ Keep the conversion direct: open role context, anonymous one-way message, email 
 - Preserve official names: Next.js, TypeScript, React Native, PowerSync, Supabase, PostgreSQL, MongoDB, AWS, WebGL, Three.js, LiDAR, and DRDO.
 - Use “résumé” in visible copy; the download filename may use ASCII.
 - Use an en dash for ranges and a middle dot for compact metadata.
+- Write ranges without spaces around the dash: “Nov 2025–Present”, “Jun–Jul 2026”.
+- Separate a product name from its description with a colon: “Echo: Hero Design System Documentation Platform”.
+- Keep eyebrows to one to three words; they label a section rather than make a claim.
+- Use the ellipsis character (…), not three dots.
 - Write “1,000+” and “<100 ms” exactly when supported by evidence.
 
 ## Do / don’t examples

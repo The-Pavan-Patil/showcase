@@ -6,7 +6,7 @@ export const nudge = {
   kicker: "Offline-first social tasks",
   cardHeadline: "A simple task app with offline-first collaboration underneath.",
   summary:
-    "Nudge is a lightweight social task experience for repeated group planning, built with a simple gesture surface and a local-first sync architecture underneath. This client project was performed as part of ownpath Studios.",
+    "Nudge is a lightweight social task experience for repeated group planning, built with a simple gesture surface and a local-first sync architecture underneath. I worked on this client project at Ownpath.",
   role: "Full Stack Developer",
   experienceContext: "Ownpath · Nov 2025–Present",
   client: "Vendaka Pvt. Ltd.",
@@ -47,7 +47,7 @@ export const nudge = {
         blocks: [
           {
             type: "paragraph",
-            text: "This client project was performed as part of ownpath Studios. I wrote this case study from my perspective to describe my contributions within the project team.",
+            text: "I worked on this client project at Ownpath. I wrote this case study from my perspective to describe my contributions within the project team.",
           },
           {
             type: "paragraph",

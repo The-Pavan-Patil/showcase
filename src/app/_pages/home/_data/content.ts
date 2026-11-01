@@ -12,7 +12,7 @@ export const homeContent = {
     heroDescription:
       "I’m Pavan Patil, a software engineer building across web, mobile, and backend—from system design to production.",
     about:
-      "I’m Pavan Patil. My interest in computers started in childhood, when my father brought home a computer and I became curious about what was happening beneath the screen. I wrote my first code in sixth grade, and that curiosity never really left. Today I enjoy building products end to end: shaping the plan, designing the architecture, writing the software, and turning rough ideas into systems people can use. I feel lucky that the thing I kept returning to became my profession.",
+      "My interest in computers started in childhood, when my father brought home a computer and I became curious about what was happening beneath the screen. I wrote my first code in sixth grade, and that curiosity never really left. Today I enjoy building products end to end: shaping the plan, designing the architecture, writing the software, and turning rough ideas into systems people can use. I feel lucky that the thing I kept returning to became my profession.",
     education:
       "Bachelor of Engineering in Electronics and Computer Engineering · PES Modern College of Engineering · 9.4 SGPA",
   },
@@ -33,7 +33,7 @@ export const homeContent = {
     {
       company: "Ownpath Pvt. Ltd.",
       role: "Software Engineer",
-      period: "Nov 2025 - Present",
+      period: "Nov 2025–Present",
       location: "Bangalore",
       logoUrl: "https://img.logo.dev/ownpath.com?token=pk_bgxz_gwPQda2OGjDfooXyQ&size=128&retina=true&format=png",
       description:
@@ -42,7 +42,7 @@ export const homeContent = {
       projects: [
         {
           client: "Hero Vida",
-          project: "Echo - Hero Design System Documentation Platform",
+          project: "Echo: Hero Design System Documentation Platform",
           logoUrl: "https://img.logo.dev/heromotocorp.com?token=pk_bgxz_gwPQda2OGjDfooXyQ&size=128&retina=true&format=png",
           description:
             "Built a Git-backed design-system documentation platform with branch collaboration, pull-request review, RBAC permissions, immutable publishing, TipTap editing, IndexedDB caching, autosave drafts, optimistic concurrency control, and AI-assisted design-compliance analysis.",
@@ -58,7 +58,7 @@ export const homeContent = {
         },
         {
           client: "Vendaka Pvt. Ltd.",
-          project: "Nudge - Social Task Collaboration Platform",
+          project: "Nudge: Social Task Collaboration Platform",
           logoUrl: "/images/companies/nudge.png",
           description:
             "Developed a cross-platform social collaboration app with PowerSync offline-first architecture, Supabase PostgreSQL synchronization, real-time task collaboration, notifications, and end-to-end client communication.",
@@ -69,7 +69,7 @@ export const homeContent = {
     {
       company: "Sonai Engineering & Services",
       role: "Full Stack Developer",
-      period: "Feb 2025 - Oct 2025",
+      period: "Feb 2025–Oct 2025",
       location: "Pune",
       logoUrl: "/images/companies/sonai-engineering.svg",
       description:
@@ -87,9 +87,9 @@ export const homeContent = {
       ],
     },
     {
-      company: "Defence Research and Development Organization",
+      company: "Defence Research and Development Organisation",
       role: "Project Intern",
-      period: "Feb 2024 - Apr 2024",
+      period: "Feb 2024–Apr 2024",
       location: "Pune",
       logoUrl: "/images/companies/drdo.png",
       description:
