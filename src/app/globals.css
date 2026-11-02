@@ -1161,7 +1161,8 @@ a {
   color-scheme: dark;
 }
 
-/* The misty forest at night, shaded dark enough for the light copy. */
+/* The misty forest at dusk: dark at the top and foot so the swarm glows, and
+   lighter behind the copy so the trees and fog show through it. */
 .hero-backdrop {
   position: absolute;
   inset: 0;
@@ -1186,13 +1187,15 @@ a {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(140% 100% at 50% 40%, transparent 55%, rgb(4 6 9 / 55%)),
+    radial-gradient(140% 100% at 50% 40%, transparent 60%, rgb(4 6 9 / 45%)),
     linear-gradient(
       to bottom,
-      rgb(4 6 9 / 66%),
-      rgb(4 6 9 / 52%) 40%,
-      rgb(4 6 9 / 84%) 75%,
-      rgb(4 6 9 / 95%)
+      rgb(4 6 9 / 62%),
+      rgb(4 6 9 / 40%) 22%,
+      rgb(4 6 9 / 34%) 42%,
+      rgb(4 6 9 / 38%) 58%,
+      rgb(4 6 9 / 72%) 80%,
+      rgb(4 6 9 / 92%)
     );
   content: "";
 }
@@ -1273,8 +1276,8 @@ html[lang="ja"] .hero-copy {
 
 /* Two parts, one per line at every width: the upper in solid ink, the lower
    added onto the forest so its fog and shade run through the letters. Adding
-   only lightens, so the lower line never sinks below half white; without
-   plus-lighter it is plain half white, which reads the same on the night. */
+   only lightens, so the lower line never sinks below 62% white; without
+   plus-lighter it is plain 62% white, which reads much the same at dusk. */
 .hero-copy h1 {
   max-width: none;
   margin-bottom: 2.5rem;
@@ -1294,7 +1297,7 @@ html[lang="ja"] .hero-copy {
 }
 
 .hero-title-lower {
-  color: rgb(239 239 239 / 50%);
+  color: rgb(239 239 239 / 62%);
   mix-blend-mode: plus-lighter;
 }
 
