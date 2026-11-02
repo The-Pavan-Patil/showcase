@@ -6,6 +6,8 @@ import { JsonLd } from "@/components/json-ld";
 import { LaunchTerminal } from "@/components/launch-terminal";
 import { AboutScene } from "./_components/about-scene";
 import { ExperienceScene } from "./_components/experience-scene";
+import { HeroBackdrop } from "./_components/hero-backdrop";
+import { HeroSwarm } from "./_components/hero-swarm";
 import { ProjectDust } from "./_components/project-dust";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
@@ -49,7 +51,13 @@ export function HomePage({ locale }: { locale: Locale }) {
       <LaunchTerminal copy={ui.launch} />
       <ScrollAccent />
       <main id="main-content">
-        <section className="hero-section" aria-labelledby="hero-title">
+        <section
+          className="hero-section"
+          aria-labelledby="hero-title"
+          data-scroll-accent-surface="dark"
+        >
+          <HeroBackdrop />
+          <HeroSwarm />
           <Container className="hero-container">
             <div className="hero-copy">
               <span
@@ -58,11 +66,15 @@ export function HomePage({ locale }: { locale: Locale }) {
                 data-scroll-accent-phase="heading"
                 aria-hidden="true"
               />
-              <h1 id="hero-title">
-                {profile.heroTitle}{" "}
-                <span>{profile.heroAccent}</span>
+              {/* The swarm bounces off these: the heading glyph by glyph,
+                  the description line by line. */}
+              <h1 id="hero-title" data-hero-solid="glyphs">
+                <span className="hero-title-upper">{profile.heroTitle}</span>{" "}
+                <span className="hero-title-lower">{profile.heroAccent}</span>
               </h1>
-              <p className="hero-description">{profile.heroDescription}</p>
+              <p className="hero-description" data-hero-solid="lines">
+                {profile.heroDescription}
+              </p>
             </div>
           </Container>
         </section>

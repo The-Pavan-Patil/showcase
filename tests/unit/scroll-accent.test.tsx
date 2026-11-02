@@ -118,6 +118,64 @@ describe("resolveScrollAccentFrame", () => {
   });
 });
 
+describe("resolveScrollAccentFrame with sticky stages", () => {
+  // An eyebrow at document y 500 whose stage pins from scroll 400 to 1400,
+  // then a plain heading further down. The activation line is at 100.
+  const stick = { y: 500, from: 400, to: 1400 };
+  const route: ScrollAccentWaypoint[] = [
+    { id: "hero", phase: "heading", x: 300, y: 100, size: 8, magnet: true },
+    { id: "work", phase: "heading", x: 40, y: 500, size: 8, magnet: true, stick },
+    { id: "work", phase: "heading", x: 40, y: 1500, size: 8, magnet: true, stick },
+    { id: "next", phase: "heading", x: 40, y: 2200, size: 8, magnet: true },
+  ];
+
+  it("rides an eyebrow in place while its stage is pinned", () => {
+    for (const scrollY of [400, 900, 1400]) {
+      const frame = resolveScrollAccentFrame(route, scrollY, 100);
+      expect(frame).toMatchObject({ id: "work", x: 40 });
+      expect((frame?.y ?? 0) - scrollY).toBeCloseTo(100);
+    }
+  });
+
+  it("slides through the viewport to the next eyebrow without doubling back", () => {
+    const viewportYs = [1400, 1550, 1750, 1950, 2100].map((scrollY) => {
+      const frame = resolveScrollAccentFrame(route, scrollY, 100);
+      return (frame?.y ?? 0) - scrollY;
+    });
+
+    // Pinned at 100 when the stage lets go, on the activation line on arrival.
+    expect(viewportYs[0]).toBeCloseTo(100);
+    expect(viewportYs[viewportYs.length - 1]).toBeCloseTo(100);
+    viewportYs.forEach((viewportY) => {
+      expect(viewportY).toBeGreaterThanOrEqual(99.5);
+      expect(viewportY).toBeLessThanOrEqual(100.5);
+    });
+  });
+
+  it("fades the dot between visible and hidden waypoints", () => {
+    const fading: ScrollAccentWaypoint[] = [
+      { id: "workflow", phase: "heading", x: 40, y: 500, size: 8, magnet: true },
+      {
+        id: "workflow-exit",
+        phase: "hidden",
+        x: 40,
+        y: 640,
+        size: 8,
+        opacity: 0,
+        stick: { y: 500, from: 0, to: 0 },
+      },
+    ];
+
+    expect(resolveScrollAccentFrame(fading, 400, 100)?.opacity).toBeUndefined();
+    const midway = resolveScrollAccentFrame(fading, 470, 100);
+    expect(midway?.opacity).toBeGreaterThan(0);
+    expect(midway?.opacity).toBeLessThan(1);
+    // The eyebrow keeps its document place while the dot fades on it.
+    expect(midway?.y).toBeCloseTo(500);
+    expect(resolveScrollAccentFrame(fading, 600, 100)?.opacity).toBe(0);
+  });
+});
+
 describe("ScrollAccent", () => {
   it("mounts one decorative traveler and cleans up its document state", () => {
     const frames: FrameRequestCallback[] = [];
@@ -205,6 +263,12 @@ describe("ScrollAccent", () => {
             data-scroll-accent-phase="heading"
             data-test-x="20"
             data-test-y="1400"
+          />
+          <span
+            data-scroll-accent-anchor="message"
+            data-scroll-accent-phase="heading"
+            data-test-x="20"
+            data-test-y="1500"
           />
           <section
             data-scroll-accent-contact

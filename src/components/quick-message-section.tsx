@@ -19,9 +19,22 @@ import {
   QUICK_MESSAGE_MAX_LENGTH,
 } from "@/lib/quick-message";
 import { formatCopy, type UiCopy } from "@/lib/ui-copy";
+import { clamp } from "@/lib/utils";
 
 type QuickMessageCopy = UiCopy["home"]["quickMessage"];
 type SubmitState = "idle" | "sending" | "sent" | "error";
+
+/** Space (px) kept under the keyboard while the band is pinned. */
+const KEYBOARD_BOTTOM_GAP = 24;
+const KEYBOARD_MIN_ZOOM = 0.8;
+const KEYBOARD_MAX_ZOOM = 3.2;
+/** Share of the room under the composer the keyboard fills. */
+const KEYBOARD_FILL = 0.85;
+/** Largest scale the keyboard enters at before settling to its fitted size. */
+const KEYBOARD_ENTRY_SCALE = 1.15;
+/** Share of the track's progress the keyboard takes to lie flat. */
+const KEYBOARD_TILT_SPAN = 0.18;
+
 
 export function QuickMessageSection({ copy }: { copy: QuickMessageCopy }) {
   const [message, setMessage] = useState("");
@@ -115,7 +128,15 @@ export function QuickMessageSection({ copy }: { copy: QuickMessageCopy }) {
         <div ref={scrollTrackRef} className="quick-message-scroll-track">
           <form className="quick-message-band" onSubmit={handleSubmit}>
           <div className="quick-message-copy">
-            <p className="eyebrow">{copy.eyebrow}</p>
+            <p className="eyebrow scroll-accent-eyebrow">
+              <span
+                className="scroll-accent-heading-target"
+                data-scroll-accent-anchor="message"
+                data-scroll-accent-phase="heading"
+                aria-hidden="true"
+              />
+              {copy.eyebrow}
+            </p>
             <h2 id="quick-message-heading">
               {copy.title}
               <span>{copy.muted}</span>
@@ -192,7 +213,9 @@ function ScrollKeyboard({
   onVirtualKeyPress: (keyCode: string) => void;
 }) {
   const keyboardShellRef = useRef<HTMLDivElement>(null);
-  const [entryScale, setEntryScale] = useState(1.4);
+  const [entryScale, setEntryScale] = useState(1);
+  // Track progress at which the band pins, where the keyboard has settled.
+  const [settleAt, setSettleAt] = useState(0.34);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: scrollTrackRef,
@@ -207,46 +230,62 @@ function ScrollKeyboard({
   useEffect(() => {
     const shell = keyboardShellRef.current;
     const keyboardRoot = shell?.querySelector<HTMLElement>(":scope > div");
-    if (!shell || !keyboardRoot) return;
+    const camera = shell?.parentElement;
+    const band = shell?.closest<HTMLElement>(".quick-message-band");
+    const track = scrollTrackRef.current;
+    if (!shell || !keyboardRoot || !camera || !band || !track) return;
 
-    const measureEntryScale = () => {
-      const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
-      if (viewportWidth <= 760) {
-        setEntryScale(1.4);
-        return;
+    const measure = () => {
+      const viewportHeight = window.innerHeight;
+      const bandStyle = getComputedStyle(band);
+      const isPinned = bandStyle.position === "sticky";
+      const stickyTop = isPinned ? Number.parseFloat(bandStyle.top) || 0 : 0;
+
+      // On wider screens the keyboard takes most of the room left under the
+      // composer while the band is pinned, as wide as the column allows.
+      const naturalWidth = keyboardRoot.offsetWidth;
+      const naturalHeight = keyboardRoot.offsetHeight;
+      if (naturalWidth && naturalHeight) {
+        const roomBelow = isPinned
+          ? viewportHeight - stickyTop - camera.offsetTop - KEYBOARD_BOTTOM_GAP
+          : viewportHeight - 2 * KEYBOARD_BOTTOM_GAP;
+        const fit = clamp(
+          Math.min(shell.clientWidth / naturalWidth, roomBelow / naturalHeight) *
+            KEYBOARD_FILL,
+          KEYBOARD_MIN_ZOOM,
+          KEYBOARD_MAX_ZOOM,
+        );
+        shell.style.setProperty("--quick-message-keyboard-fit", fit.toFixed(3));
       }
 
       const zoom = Number.parseFloat(getComputedStyle(keyboardRoot).zoom || "1");
-      const finalWidth = keyboardRoot.offsetWidth * zoom;
-      if (!finalWidth) return;
+      const finalWidth = naturalWidth * zoom;
+      if (finalWidth) {
+        setEntryScale(clamp(shell.clientWidth / finalWidth, 1, KEYBOARD_ENTRY_SCALE));
+      }
 
-      setEntryScale(Math.min(1.6, Math.max(1, shell.clientWidth / finalWidth)));
+      setSettleAt(
+        clamp((viewportHeight - stickyTop) / (track.offsetHeight + viewportHeight)),
+      );
     };
 
-    measureEntryScale();
-    const resizeObserver = new ResizeObserver(measureEntryScale);
-    resizeObserver.observe(shell);
-    resizeObserver.observe(keyboardRoot);
+    measure();
+    const resizeObserver = new ResizeObserver(measure);
+    [shell, keyboardRoot, band, track].forEach((element) => resizeObserver.observe(element));
+    window.addEventListener("resize", measure);
 
-    return () => resizeObserver.disconnect();
-  }, []);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [scrollTrackRef]);
 
-  const transitionStart = entryScale < 1.25 ? 0.27 : 0.2;
-  const rotateX = useTransform(
-    smoothProgress,
-    [0, transitionStart, 0.6],
-    [48, 48, 0],
-  );
-  const scale = useTransform(
-    smoothProgress,
-    [0, transitionStart, 0.6],
-    [entryScale, entryScale, 1],
-  );
-  const cameraY = useTransform(
-    smoothProgress,
-    [0, transitionStart, 0.6],
-    [18, 18, 0],
-  );
+  // The keyboard rises in tilted and lies flat by the time the band pins, so
+  // it moves with the scroll instead of shrinking in place afterwards.
+  const tiltFrom = Math.max(0, settleAt - KEYBOARD_TILT_SPAN);
+  const rotateX = useTransform(smoothProgress, [tiltFrom, settleAt], [40, 0]);
+  const scale = useTransform(smoothProgress, [tiltFrom, settleAt], [entryScale, 1]);
+  const cameraY = useTransform(smoothProgress, [tiltFrom, settleAt], [18, 0]);
 
   return (
     <motion.div

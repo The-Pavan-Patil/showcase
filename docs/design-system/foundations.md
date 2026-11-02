@@ -54,7 +54,7 @@ Lato is the body and UI family (300, 400, 700). Figtree (variable 300–900) is 
 
 | Role | Family | Size | Treatment |
 | --- | --- | --- | --- |
-| Hero heading | Figtree | clamp(40px, min(5.6vw, 11svh), 96px); clamp(35.2px, min(10vw, 6.5svh), 54.4px) on mobile | 500, −0.04em, line height 1, uppercase, centred |
+| Hero heading | Figtree | clamp(44px, min(6.3vw, 12svh), 108px); clamp(24px, 7.4vw, 40px) at 760px and below | 800, −0.035em, line height 0.95, uppercase, centred; two parts on two lines at every width: the upper in solid ink, the lower 50% white with `plus-lighter` so the backdrop runs through it (the only headline that is not solid ink) |
 | Page heading | Figtree | clamp(48px, 5.25vw, 72.8px) | Case-study and Setup heroes; 500, −0.04em, line height 1, uppercase |
 | Section heading | Figtree | `--title-section`: clamp(32px, min(4vw, 7svh), 48px) | 500, −0.04em, line height 1, uppercase |
 | Stage heading | Figtree | `--title-stage`: clamp(24px, min(2.6vw, 4.6svh), 36.8px) | Section headings inside a pinned one-screen scene (Work, Experience) |

@@ -11,27 +11,35 @@ export type ScrollAccentWaypoint = {
   y: number;
   size: number;
   magnet?: boolean;
+  /** 0 hides the dot on this waypoint; it fades on the way in and out. */
+  opacity?: number;
   /**
-   * For a node inside a pinned stage: the viewport y the dot rests on. `y`
-   * then only times the waypoint, which still activates when `y` reaches the
-   * activation line.
+   * For a point that rides a sticky stage: its document y before the stage
+   * pins, and the scroll range the stage stays pinned for, during which the
+   * point keeps its place in the viewport. `y` then only times the waypoint,
+   * which still activates when `y` reaches the activation line.
    */
-  pinnedY?: number;
+  stick?: { y: number; from: number; to: number };
 };
 
 export type ScrollAccentFrame = ScrollAccentWaypoint;
 
 type ScrollAccentRoute = {
   waypoints: ScrollAccentWaypoint[];
-  globalX: number;
-  routeExitScroll: number;
-  fadeStartScroll: number;
-  fadeEndScroll: number;
+  /** Where the dot leaves the route for the global rail, then fades out. */
+  exit?: {
+    globalX: number;
+    scroll: number;
+    fadeStartScroll: number;
+    fadeEndScroll: number;
+  };
 };
 
 const DEFAULT_DOT_SIZE = 8;
 const DEFAULT_MAGNET_HOLD = 0.1;
 const HEADING_MAGNET_HOLD = 0.18;
+/** Scroll over which the dot fades in or out on an eyebrow. */
+const FADE_TRAVEL = 140;
 
 export function getScrollAccentActivationY(viewportHeight: number) {
   return clamp(viewportHeight * 0.38, 180, 360);
@@ -44,14 +52,18 @@ function magnetHold(waypoint: ScrollAccentWaypoint) {
     : DEFAULT_MAGNET_HOLD;
 }
 
-/** A pinned waypoint is drawn on its resting line, wherever the scroll is. */
+/** A sticky waypoint is drawn where its stage holds it at this scroll. */
 function placeWaypoint(
   waypoint: ScrollAccentWaypoint,
   scrollY: number,
 ): ScrollAccentFrame {
-  return waypoint.pinnedY === undefined
-    ? waypoint
-    : { ...waypoint, y: scrollY + waypoint.pinnedY };
+  const { stick } = waypoint;
+  return stick
+    ? {
+        ...waypoint,
+        y: stick.y + clamp(scrollY - stick.from, 0, stick.to - stick.from),
+      }
+    : waypoint;
 }
 
 export function resolveScrollAccentFrame(
@@ -119,12 +131,29 @@ export function resolveScrollAccentFrame(
     const progress = smoothstep((rawProgress - startHold) / travelRange);
     const fromY = placeWaypoint(current, scrollY).y;
     const toY = placeWaypoint(next, scrollY).y;
+    const tracksOnePlace = current.x === next.x && Math.abs(fromY - toY) < 0.5;
+    // Leaving or reaching a sticky point, the dot slides through the viewport
+    // from where it left the one to where it meets the other, rather than
+    // following an eyebrow off screen before turning back.
+    const viewportY =
+      (current.stick || next.stick) && !tracksOnePlace
+        ? (() => {
+            const fromViewport = placeWaypoint(current, start).y - start;
+            const toViewport = placeWaypoint(next, end).y - end;
+            return (
+              scrollY + fromViewport + (toViewport - fromViewport) * progress
+            );
+          })()
+        : null;
+    const fromOpacity = current.opacity ?? 1;
+    const toOpacity = next.opacity ?? 1;
 
     return {
       ...active,
       x: current.x + (next.x - current.x) * progress,
-      y: fromY + (toY - fromY) * progress,
+      y: viewportY ?? fromY + (toY - fromY) * progress,
       size: current.size + (next.size - current.size) * progress,
+      opacity: fromOpacity + (toOpacity - fromOpacity) * progress,
     };
   }
 
@@ -206,20 +235,155 @@ function getGlobalRailX(globalRail: HTMLElement) {
 }
 
 /**
+ * The scroll range a sticky stage stays pinned for, or null while it is not
+ * sticky. The stage must be the first in-flow child of its track, so it rests
+ * at the top of the track until it pins.
+ */
+function getPinRange(stage: HTMLElement | null) {
+  const track = stage?.parentElement;
+  if (!stage || !track) return null;
+
+  const stageStyle = getComputedStyle(stage);
+  if (stageStyle.position !== "sticky") return null;
+
+  const stickyTop = Number.parseFloat(stageStyle.top) || 0;
+  const trackBounds = track.getBoundingClientRect();
+  const trackTop =
+    trackBounds.top +
+    window.scrollY +
+    (Number.parseFloat(getComputedStyle(track).paddingTop) || 0);
+  const from = trackTop - stickyTop;
+  const to =
+    trackBounds.bottom + window.scrollY - stage.offsetHeight - stickyTop;
+
+  return { from, to: Math.max(from, to) };
+}
+
+/**
+ * A heading anchor whose eyebrow rides `stage` while it is pinned. An anchor
+ * inside the stage is measured wherever the stage holds it now; one outside
+ * it sits where the eyebrow rests before the stage pins.
+ */
+function stickyWaypointFromElement(
+  element: HTMLElement,
+  stage: HTMLElement | null,
+): ScrollAccentWaypoint {
+  const point = waypointFromElement(element);
+  const range = getPinRange(stage);
+  if (!stage || !range) return point;
+
+  const shift = stage.contains(element)
+    ? clamp(window.scrollY - range.from, 0, range.to - range.from)
+    : 0;
+  const y = point.y - shift;
+
+  return { ...point, y, stick: { y, ...range } };
+}
+
+/**
+ * `point` timed to activate at `y`, still drawn where it is: a point without
+ * a stage sticks for an empty range.
+ */
+function timed(point: ScrollAccentWaypoint, y: number): ScrollAccentWaypoint {
+  return {
+    ...point,
+    y,
+    stick: point.stick ?? { y: point.y, from: 0, to: 0 },
+  };
+}
+
+/** Where `point`'s eyebrow ends up once any stage has let it go. */
+function settledY(point: ScrollAccentWaypoint) {
+  return point.stick
+    ? point.stick.y + point.stick.to - point.stick.from
+    : point.y;
+}
+
+/**
+ * Settles the dot on an eyebrow by the time it reaches the activation line,
+ * or its stage pins, and with `hold` keeps it there until the stage lets go.
+ */
+function pushStop(
+  waypoints: ScrollAccentWaypoint[],
+  point: ScrollAccentWaypoint,
+  activationY: number,
+  hold = true,
+) {
+  const arrival = point.stick
+    ? Math.min(point.y, point.stick.from + activationY)
+    : point.y;
+
+  pushOrderedWaypoint(waypoints, timed(point, arrival));
+  if (hold && point.stick && point.stick.to + activationY > arrival) {
+    pushOrderedWaypoint(waypoints, timed(point, point.stick.to + activationY));
+  }
+}
+
+/** Fades the dot in on an eyebrow as it rises towards the activation line. */
+function pushFadeIn(
+  waypoints: ScrollAccentWaypoint[],
+  point: ScrollAccentWaypoint,
+  activationY: number,
+) {
+  const arrival = point.stick
+    ? Math.min(point.y, point.stick.from + activationY)
+    : point.y;
+
+  pushOrderedWaypoint(waypoints, {
+    ...timed(point, arrival - FADE_TRAVEL),
+    id: `${point.id}-entry`,
+    phase: "hidden",
+    opacity: 0,
+  });
+  pushStop(waypoints, point, activationY);
+}
+
+/** Fades the dot out on an eyebrow as it rises under the header. */
+function pushFadeOut(
+  waypoints: ScrollAccentWaypoint[],
+  point: ScrollAccentWaypoint,
+  activationY: number,
+) {
+  const previous = waypoints[waypoints.length - 1];
+  const start = Math.max(
+    previous?.y ?? point.y,
+    settledY(point) + activationY * 0.4,
+  );
+
+  pushOrderedWaypoint(waypoints, timed(point, start));
+  pushOrderedWaypoint(waypoints, {
+    ...timed(point, start + FADE_TRAVEL),
+    id: `${point.id}-exit`,
+    phase: "hidden",
+    opacity: 0,
+  });
+}
+
+/**
  * While the Experience scene is pinned, its timeline nodes cross a focus line.
  * Each node publishes the scroll into the track at which the dot reaches it
  * and where it is then, so its waypoint activates at that scroll and is drawn
- * there. The track publishes where its pinned range ends, so the dot rides the
- * rail until the stage releases.
+ * there until the stage releases. The track publishes where its pinned range
+ * ends, so the dot rides the rail until then.
  */
 function getPinnedExperienceWaypoints(
   track: HTMLElement,
   activationY: number,
 ): ScrollAccentWaypoint[] {
   const focusY = Number.parseFloat(track.dataset.scrollAccentFocus ?? "");
-  if (!Number.isFinite(focusY)) return [];
+  const end = Number.parseFloat(track.dataset.scrollAccentEnd ?? "");
+  if (!Number.isFinite(focusY) || !Number.isFinite(end)) return [];
 
   const trackTop = track.getBoundingClientRect().top + window.scrollY;
+  const range = getPinRange(
+    track.querySelector<HTMLElement>(".experience-stage"),
+  ) ?? { from: trackTop, to: trackTop + end };
+  const stickAt = (viewportY: number) => ({
+    y: range.from + viewportY,
+    from: range.from,
+    to: range.to,
+  });
+
   const nodes = Array.from(
     track.querySelectorAll<HTMLElement>("[data-scroll-accent-offset]"),
   )
@@ -233,92 +397,87 @@ function getPinnedExperienceWaypoints(
       return {
         ...waypointFromElement(element),
         y: trackTop + Number(element.dataset.scrollAccentOffset) + activationY,
-        pinnedY: Number.isFinite(nodeFocusY) ? nodeFocusY : focusY,
+        stick: stickAt(Number.isFinite(nodeFocusY) ? nodeFocusY : focusY),
       };
     })
     .sort((first, second) => first.y - second.y);
 
-  const end = Number.parseFloat(track.dataset.scrollAccentEnd ?? "");
   const lastMajor = [...nodes]
     .reverse()
     .find((node) => node.phase === "experience-major");
-  if (lastMajor && Number.isFinite(end) && trackTop + end + activationY > nodes[nodes.length - 1].y) {
+  if (lastMajor && trackTop + end + activationY > nodes[nodes.length - 1].y) {
     nodes.push({
       id: "experience-rail-end",
       phase: "experience-rail",
       x: lastMajor.x,
       y: trackTop + end + activationY,
       size: DEFAULT_DOT_SIZE,
-      pinnedY: focusY,
+      stick: stickAt(focusY),
     });
   }
 
   return nodes;
 }
 
+/**
+ * The homepage route. The dot slides straight from eyebrow to eyebrow and
+ * rides each one while its section is pinned: from the hero to Selected Work
+ * until its cards finish, to Experience and down its timeline, to the AI
+ * workflow. It fades out as About arrives and back in on the quick message.
+ */
 function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
-  const globalRail = document.querySelector<HTMLElement>(
-    ".scroll-accent-global-rail",
-  );
-  const hero = document.querySelector<HTMLElement>(
-    '[data-scroll-accent-anchor="hero"]',
-  );
-  const work = document.querySelector<HTMLElement>(
-    '[data-scroll-accent-anchor="work"]',
-  );
-  const experienceHeading = document.querySelector<HTMLElement>(
-    '[data-scroll-accent-anchor="experience"]',
-  );
-  const workflowHeading = document.querySelector<HTMLElement>(
-    '[data-scroll-accent-anchor="workflow"]',
-  );
-  const aboutHeading = document.querySelector<HTMLElement>(
-    '[data-scroll-accent-anchor="about"]',
-  );
+  const anchor = (id: string) =>
+    document.querySelector<HTMLElement>(`[data-scroll-accent-anchor="${id}"]`);
+  const hero = anchor("hero");
+  const work = anchor("work");
+  const experienceHeading = anchor("experience");
+  const workflowHeading = anchor("workflow");
+  const message = anchor("message");
   const experienceSection = document.querySelector<HTMLElement>(
     "[data-scroll-accent-experience]",
   );
-  const contactSection = document.querySelector<HTMLElement>(
-    "[data-scroll-accent-contact]",
-  );
 
   if (
-    !globalRail ||
     !hero ||
     !work ||
     !experienceHeading ||
     !workflowHeading ||
-    !aboutHeading ||
-    !experienceSection ||
-    !contactSection
+    !message ||
+    !experienceSection
   ) {
     return null;
   }
 
-  const globalX = getGlobalRailX(globalRail);
   const waypoints: ScrollAccentWaypoint[] = [];
 
-  const heroPoint = waypointFromElement(hero);
-  const workPoint = waypointFromElement(work);
-  const experienceHeadingPoint = waypointFromElement(experienceHeading);
-
-  pushOrderedWaypoint(waypoints, heroPoint);
-  pushGlobalBridge(waypoints, globalX, heroPoint, workPoint);
-  pushGlobalBridge(waypoints, globalX, workPoint, experienceHeadingPoint);
+  pushOrderedWaypoint(waypoints, waypointFromElement(hero));
+  pushStop(
+    waypoints,
+    stickyWaypointFromElement(
+      work,
+      work.closest(".dust-track")?.querySelector<HTMLElement>(".dust-stage") ??
+        null,
+    ),
+    activationY,
+  );
 
   const experienceTrack = experienceSection.querySelector<HTMLElement>(
     "[data-scroll-accent-track]",
   );
+  const experienceStage =
+    experienceSection.querySelector<HTMLElement>(".experience-stage");
   const pinnedExperience = experienceTrack
     ? getPinnedExperienceWaypoints(experienceTrack, activationY)
     : [];
 
-  if (pinnedExperience.length) {
-    pushGlobalBridge(waypoints, globalX, experienceHeadingPoint, pinnedExperience[0]);
-    pinnedExperience
-      .slice(1)
-      .forEach((point) => pushOrderedWaypoint(waypoints, point));
-  }
+  // The eyebrow hands the dot straight on to the first node.
+  pushStop(
+    waypoints,
+    stickyWaypointFromElement(experienceHeading, experienceStage),
+    activationY,
+    !pinnedExperience.length,
+  );
+  pinnedExperience.forEach((point) => pushOrderedWaypoint(waypoints, point));
 
   // The static timeline, traced at the nodes' document positions.
   const experienceItems = (
@@ -344,20 +503,10 @@ function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | nu
     };
   });
 
-  const firstExperienceMajor = experienceItems.find(
-    (entry) => entry.major,
-  )?.major;
-
-  if (firstExperienceMajor) {
-    pushGlobalBridge(waypoints, globalX, experienceHeadingPoint, firstExperienceMajor);
-  }
-
   experienceItems.forEach((entry, index) => {
     if (!entry.major) return;
 
-    if (entry.major !== firstExperienceMajor) {
-      pushOrderedWaypoint(waypoints, entry.major);
-    }
+    pushOrderedWaypoint(waypoints, entry.major);
 
     if (!entry.minors.length) return;
 
@@ -415,80 +564,21 @@ function buildHomeScrollAccentRoute(activationY: number): ScrollAccentRoute | nu
     }
   });
 
-  const experienceBounds = experienceSection.getBoundingClientRect();
-  const experienceBottom = experienceBounds.bottom + window.scrollY;
-  const lastWaypoint = waypoints[waypoints.length - 1];
-  const mainRailX =
-    [...waypoints]
-      .reverse()
-      .find((waypoint) => waypoint.phase === "experience-major")?.x ??
-    lastWaypoint.x;
-  const returnStartY = Math.max(lastWaypoint.y + 24, experienceBottom - 64);
-  const returnEndY = Math.max(returnStartY + 18, experienceBottom - 32);
-
-  pushOrderedWaypoint(waypoints, {
-    id: "experience-global-return-start",
-    phase: "experience-rail",
-    x: mainRailX,
-    y: returnStartY,
-    size: DEFAULT_DOT_SIZE,
-  });
-  pushOrderedWaypoint(waypoints, {
-    id: "experience-global-return-end",
-    phase: "global-rail",
-    x: globalX,
-    y: returnEndY,
-    size: DEFAULT_DOT_SIZE,
-  });
-
+  // From the timeline straight to the AI workflow eyebrow, which the dot then
+  // follows up and out as About arrives.
   const workflowPoint = waypointFromElement(workflowHeading);
-  const workflowApproachGap = Math.max(1, workflowPoint.y - returnEndY);
-  const workflowApproach = clamp(workflowApproachGap * 0.18, 56, 140);
+  pushStop(waypoints, workflowPoint, activationY);
+  pushFadeOut(waypoints, workflowPoint, activationY);
 
-  pushOrderedWaypoint(waypoints, {
-    id: "workflow-global-approach",
-    phase: "global-rail",
-    x: globalX,
-    y: workflowPoint.y - workflowApproach,
-    size: DEFAULT_DOT_SIZE,
-  });
-  pushOrderedWaypoint(waypoints, workflowPoint);
-
-  const aboutPoint = waypointFromElement(aboutHeading);
-  pushGlobalBridge(waypoints, globalX, workflowPoint, aboutPoint);
-
-  const contactTop =
-    contactSection.getBoundingClientRect().top + window.scrollY;
-  const aboutReturnTravel = clamp(
-    (contactTop - aboutPoint.y) * 0.16,
-    56,
-    140,
+  // Hidden through About, back on the quick message's eyebrow.
+  const messagePoint = stickyWaypointFromElement(
+    message,
+    message.closest<HTMLElement>(".quick-message-band"),
   );
-  pushOrderedWaypoint(waypoints, {
-    id: "about-global-return",
-    phase: "global-rail",
-    x: globalX,
-    y: aboutPoint.y + aboutReturnTravel,
-    size: DEFAULT_DOT_SIZE,
-  });
+  pushFadeIn(waypoints, messagePoint, activationY);
+  pushFadeOut(waypoints, messagePoint, activationY);
 
-  const routeExitScroll = Math.max(
-    0,
-    waypoints[waypoints.length - 1].y - activationY,
-  );
-  const fadeStartScroll = Math.max(
-    routeExitScroll,
-    contactTop - activationY - 96,
-  );
-  const fadeEndScroll = Math.max(fadeStartScroll + 1, contactTop - activationY + 64);
-
-  return {
-    waypoints,
-    globalX,
-    routeExitScroll,
-    fadeStartScroll,
-    fadeEndScroll,
-  };
+  return { waypoints };
 }
 
 function buildGenericScrollAccentRoute(activationY: number): ScrollAccentRoute | null {
@@ -531,16 +621,13 @@ function buildGenericScrollAccentRoute(activationY: number): ScrollAccentRoute |
     size: DEFAULT_DOT_SIZE,
   });
 
-  const routeExitScroll = Math.max(0, returnY - activationY);
-  const fadeStartScroll = Math.max(routeExitScroll, mainBottom - activationY - 160);
+  const exitScroll = Math.max(0, returnY - activationY);
+  const fadeStartScroll = Math.max(exitScroll, mainBottom - activationY - 160);
   const fadeEndScroll = Math.max(fadeStartScroll + 1, mainBottom - activationY);
 
   return {
     waypoints,
-    globalX,
-    routeExitScroll,
-    fadeStartScroll,
-    fadeEndScroll,
+    exit: { globalX, scroll: exitScroll, fadeStartScroll, fadeEndScroll },
   };
 }
 
@@ -588,11 +675,28 @@ export function ScrollAccent() {
     let hasStarted = false;
     let isActive = true;
     let introObserver: MutationObserver | null = null;
+    // Document spans of surfaces that keep one tone in either theme, such as
+    // the dark hero ("dark").
+    let surfaces: Array<{ tone: string; top: number; bottom: number }> = [];
 
     root.classList.add("scroll-accent-mounted");
 
     function activationY() {
       return getScrollAccentActivationY(window.innerHeight);
+    }
+
+    // The dot takes the tone of the innermost surface it rests over.
+    function setSurface(y: number) {
+      let tone = "page";
+      let span = Infinity;
+      for (const surface of surfaces) {
+        const height = surface.bottom - surface.top;
+        if (y >= surface.top && y <= surface.bottom && height < span) {
+          tone = surface.tone;
+          span = height;
+        }
+      }
+      dot.dataset.surface = tone;
     }
 
     function render() {
@@ -602,20 +706,22 @@ export function ScrollAccent() {
       const scrollY = window.scrollY;
       const activeLine = activationY();
 
-      if (scrollY >= route.routeExitScroll) {
+      const { exit } = route;
+      if (exit && scrollY >= exit.scroll) {
         const fadeProgress = clamp(
-          (scrollY - route.fadeStartScroll) /
-            (route.fadeEndScroll - route.fadeStartScroll),
+          (scrollY - exit.fadeStartScroll) /
+            (exit.fadeEndScroll - exit.fadeStartScroll),
         );
         const frame: ScrollAccentFrame = {
           id: fadeProgress > 0 ? "contact-exit" : "about-global-rail",
           phase: fadeProgress > 0 ? "contact-exit" : "global-rail",
-          x: route.globalX,
+          x: exit.globalX,
           y: scrollY + activeLine,
           size: DEFAULT_DOT_SIZE,
         };
 
         setDotFrame(dot, frame, scrollY, 1 - smoothstep(fadeProgress));
+        setSurface(frame.y);
         return;
       }
 
@@ -626,7 +732,10 @@ export function ScrollAccent() {
         reducedMotion,
       );
 
-      if (frame) setDotFrame(dot, frame, scrollY, 1);
+      if (frame) {
+        setDotFrame(dot, frame, scrollY, frame.opacity ?? 1);
+        setSurface(frame.y);
+      }
     }
 
     function scheduleRender() {
@@ -637,6 +746,17 @@ export function ScrollAccent() {
 
     function measure() {
       if (!isActive) return;
+      surfaces = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-scroll-accent-surface]"),
+        (element) => {
+          const bounds = element.getBoundingClientRect();
+          return {
+            tone: element.dataset.scrollAccentSurface ?? "page",
+            top: bounds.top + window.scrollY,
+            bottom: bounds.bottom + window.scrollY,
+          };
+        },
+      );
       route = buildScrollAccentRoute(activationY());
       scheduleRender();
     }
@@ -662,6 +782,7 @@ export function ScrollAccent() {
       dot.dataset.activeAnchor = "entry";
       dot.dataset.phase = "entry";
       dot.dataset.ready = "true";
+      setSurface(first.y);
       dot.style.opacity = "1";
       dot.style.width = `${first.size}px`;
       dot.style.height = `${first.size}px`;

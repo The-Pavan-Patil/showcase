@@ -6,6 +6,9 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? "github" : "list",
+  expect: {
+    toHaveScreenshot: { stylePath: "./tests/e2e/visual.css" },
+  },
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",

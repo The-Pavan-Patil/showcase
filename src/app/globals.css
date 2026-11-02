@@ -439,6 +439,13 @@ a {
     0 4px 16px color-mix(in srgb, var(--accent-text) 18%, transparent);
 }
 
+.scroll-accent-traveler[data-surface="dark"] {
+  background: var(--brand-white);
+  box-shadow:
+    0 0 0 4px rgb(239 239 239 / 12%),
+    0 4px 16px rgb(239 239 239 / 18%);
+}
+
 .scroll-accent-traveler[data-phase="experience-major"] {
   box-sizing: border-box;
   border: 2px solid var(--accent);
@@ -1136,11 +1143,95 @@ a {
    landing. Padding and type also scale with height for short windows. */
 .hero-section {
   position: relative;
+  isolation: isolate;
   display: grid;
   align-content: center;
   min-height: 100svh;
   overflow: hidden;
   padding: clamp(5.5rem, 14svh, 9.5rem) 0 calc(clamp(3rem, 8svh, 5rem) + 6px);
+  /* A night scene in both themes, so the swarm's dots glow against it. */
+  --foreground: var(--brand-white);
+  --accent: var(--brand-white);
+  --accent-text: var(--brand-white);
+  --hero-swarm-warm: #ffb366;
+  --hero-swarm-cool: var(--brand-main);
+  --hero-swarm-blend: additive;
+  background: #06080b;
+  color: var(--foreground);
+  color-scheme: dark;
+}
+
+/* The misty forest at night, shaded dark enough for the light copy. */
+.hero-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Oversized, so the parallax lean never uncovers an edge. */
+.hero-backdrop-layer {
+  position: absolute;
+  inset: -1.5rem;
+  will-change: transform;
+}
+
+.hero-backdrop img {
+  object-fit: cover;
+  object-position: 50% 40%;
+  filter: brightness(0.92) contrast(1.05) saturate(0.7);
+}
+
+.hero-backdrop::after {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(140% 100% at 50% 40%, transparent 55%, rgb(4 6 9 / 55%)),
+    linear-gradient(
+      to bottom,
+      rgb(4 6 9 / 66%),
+      rgb(4 6 9 / 52%) 40%,
+      rgb(4 6 9 / 84%) 75%,
+      rgb(4 6 9 / 95%)
+    );
+  content: "";
+}
+
+.hero-swarm-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* The swarm's centre, standing in for the pointer while it is over the hero.
+   It inverts what it covers, so it stays visible over the heading. */
+.hero-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 0.625rem;
+  height: 0.625rem;
+  margin: -0.3125rem 0 0 -0.3125rem;
+  border-radius: var(--radius-pill);
+  background: #fff;
+  box-shadow: 0 0 14px 3px rgb(255 255 255 / 38%);
+  opacity: 0;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  transition: opacity var(--motion-fast) ease;
+  will-change: transform;
+}
+
+.hero-section[data-cursor] {
+  cursor: none;
+}
+
+.hero-section[data-cursor] .hero-cursor {
+  opacity: 1;
 }
 
 .hero-container {
@@ -1180,14 +1271,43 @@ html[lang="ja"] .hero-copy {
   text-transform: uppercase;
 }
 
+/* Two parts, one per line at every width: the upper in solid ink, the lower
+   added onto the forest so its fog and shade run through the letters. Adding
+   only lightens, so the lower line never sinks below half white; without
+   plus-lighter it is plain half white, which reads the same on the night. */
 .hero-copy h1 {
-  max-width: 24ch;
-  font-size: clamp(2.5rem, min(5.6vw, 11svh), 6rem);
+  max-width: none;
+  margin-bottom: 2.5rem;
+  font-size: clamp(2.75rem, min(6.3vw, 12svh), 6.75rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
   text-wrap: balance;
 }
 
 .hero-copy h1 span {
   display: block;
+}
+
+.hero-title-upper {
+  color: var(--foreground);
+}
+
+.hero-title-lower {
+  color: rgb(239 239 239 / 50%);
+  mix-blend-mode: plus-lighter;
+}
+
+html[lang="ja"] .hero-copy h1 {
+  letter-spacing: 0;
+  line-height: 1.05;
+}
+
+@media (forced-colors: active) {
+  .hero-title-lower {
+    color: CanvasText;
+    mix-blend-mode: normal;
+  }
 }
 
 .hero-description,
@@ -2850,7 +2970,7 @@ html[lang="ja"] .hero-copy {
   height: 100svh;
   overflow: hidden;
   place-items: center;
-  padding: 5rem clamp(1rem, 2.5vw, 2rem) 1.5rem;
+  padding: 5.5rem clamp(1rem, 2.5vw, 2rem);
 }
 .about-scene[data-live] .about-scene-title,
 .about-scene[data-live] .about-scene-card {
@@ -2868,11 +2988,10 @@ html[lang="ja"] .hero-copy {
 .about-scene[data-live] .about-scene-word-right {
   justify-self: center;
 }
-/* Slightly shorter than the stage, with the spare room above the card so the
-   photo keeps clear of the navbar. */
+/* Centred on the screen, with the same room above and below: enough above
+   to keep the photo clear of the navbar. */
 .about-scene[data-live] .about-scene-card {
-  width: min(100%, (100svh - 6.5rem) * 0.97 * 2051 / 1538, 50rem * 2051 / 1538);
-  align-self: end;
+  width: min(100%, (100svh - 11rem) * 2051 / 1538, 50rem * 2051 / 1538);
 }
 
 /* Very short desktop screens: the card is too small for the paragraph, so it
@@ -2987,7 +3106,7 @@ html[lang="ja"] .hero-copy {
 }
 
 .quick-message-section {
-  padding: 0 0 6.5rem;
+  padding: clamp(4rem, 12svh, 7.5rem) 0 6.5rem;
   scroll-margin-top: 7rem;
 }
 
@@ -3158,9 +3277,11 @@ html[lang="ja"] .hero-copy {
 @media (min-width: 48rem) { .quick-message-keyboard { --quick-message-keyboard-zoom: 1.5; } }
 @media (min-width: 64rem) { .quick-message-keyboard { --quick-message-keyboard-zoom: 1.75; } }
 @media (min-width: 80rem) { .quick-message-keyboard { --quick-message-keyboard-zoom: 2; } }
+/* QuickMessageSection measures the room under the composer and publishes
+   the zoom that fills it; the clamp is the estimate until it does. */
 @media (min-width: 761px) {
   .quick-message-keyboard > div {
-    zoom: clamp(0.8, calc((100svh - 28rem) / 13.375rem), var(--quick-message-keyboard-zoom)) !important;
+    zoom: var(--quick-message-keyboard-fit, clamp(0.8, calc((100svh - 28rem) / 13.375rem), var(--quick-message-keyboard-zoom))) !important;
   }
 }
 
@@ -3190,7 +3311,9 @@ html[lang="ja"] .hero-copy {
   transform-style: preserve-3d;
 }
 
-.contact-section { display: grid; align-content: center; min-height: 100svh; padding: clamp(3rem, 8svh, 6rem) 0; scroll-margin-top: 7rem; }
+/* A card in the page column, straight after the quick message, with room
+   before the footer. */
+.contact-section { padding-bottom: clamp(3rem, 8svh, 6rem); scroll-margin-top: 7rem; }
 .contact-card { display: grid; grid-template-columns: 1.25fr 0.75fr; align-items: end; gap: 3rem; overflow: hidden; border-radius: var(--radius-panel); background: var(--foreground); color: var(--background); padding: clamp(2rem, 5vw, 4rem); }
 .contact-card .eyebrow { color: var(--inverse-accent); }
 .contact-card h2 { max-width: 20ch; }
@@ -4275,9 +4398,7 @@ html[lang="ja"] .hero-copy {
 
 @media (max-width: 1024px) {
   .hero-container { grid-template-columns: 1fr; gap: 1rem; }
-  .hero-copy { max-width: 47rem; margin-inline: auto; padding-bottom: 0; }
-  .hero-copy h1 { max-width: 13ch; }
-  .hero-copy h1 span { display: inline; }
+  .hero-copy { margin-inline: auto; padding-bottom: 0; }
   .experience-company-row { align-items: flex-start; }
   .experience-card-meta { flex-direction: column; align-items: flex-end; }
   .quick-message-copy h2 { max-width: 16ch; }
@@ -4323,7 +4444,7 @@ html[lang="ja"] .hero-copy {
   .case-hero h1,
   .setup-hero-copy h1,
   .not-found-main h1 { font-size: clamp(2.8rem, 14vw, 4.1rem); }
-  .hero-copy h1 { font-size: clamp(2.2rem, min(10vw, 6.5svh), 3.4rem); }
+  .hero-copy h1 { margin-bottom: 2rem; font-size: clamp(1.5rem, 7.4vw, 2.5rem); }
   .hero-description,
   .case-lede,
   .setup-lede,
@@ -4428,7 +4549,7 @@ html[lang="ja"] .hero-copy {
   .quick-message-band { top: clamp(1.5rem, 6svh, 5.25rem); }
   .quick-message-keyboard { margin-inline: 0; }
   .quick-message-keyboard > div { zoom: calc(90vw / 400px) !important; }
-  .contact-section { padding: clamp(3rem, 8svh, 4rem) 0 calc(5.5rem + env(safe-area-inset-bottom, 0px)); scroll-margin-top: 2rem; }
+  .contact-section { padding-bottom: clamp(3rem, 8svh, 4rem); scroll-margin-top: 2rem; }
   .contact-card { grid-template-columns: 1fr; gap: 2rem; border-radius: var(--radius-feature); }
   .contact-email, .schedule-call-link { font-size: 0.8125rem; }
   .footer-top { align-items: start; }
@@ -4650,7 +4771,6 @@ html[lang="ja"] .hero-copy {
 /* Short phones: tighten the homepage sections that otherwise outgrow one
    screen. */
 @media (max-width: 760px) and (max-height: 700px) {
-  .contact-section { padding-top: 1.5rem; }
   .contact-card { gap: 1rem; padding: 1.25rem; }
   .contact-actions { gap: 0.5rem; }
   .quick-message-band { top: 1rem; gap: 0.9rem; }

@@ -533,42 +533,37 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
     await expect(traveler).toHaveAttribute("data-active-anchor", anchor);
   }
 
-  await page.evaluate(() => {
-    const hero = document.querySelector<HTMLElement>(
-      '[data-scroll-accent-anchor="hero"]',
-    );
-    const work = document.querySelector<HTMLElement>(
-      '[data-scroll-accent-anchor="work"]',
-    );
-    if (!hero || !work) return;
+  async function opacity() {
+    return Number.parseFloat(await traveler.evaluate((element) => getComputedStyle(element).opacity));
+  }
 
-    const heroBounds = hero.getBoundingClientRect();
-    const workBounds = work.getBoundingClientRect();
-    const activationY = Math.min(360, Math.max(180, window.innerHeight * 0.38));
-    const heroY = heroBounds.top + window.scrollY + heroBounds.height / 2;
-    const workY = workBounds.top + window.scrollY + workBounds.height / 2;
-    window.scrollTo(0, (heroY + workY) / 2 - activationY);
-  });
-  await expect(traveler).toHaveAttribute("data-phase", "global-rail");
+  async function center() {
+    const box = await traveler.boundingBox();
+    return box ? { x: box.x + box.width / 2, y: box.y + box.height / 2 } : { x: -1, y: -1 };
+  }
 
-  const globalRailX = await page
-    .locator(".scroll-accent-global-rail")
-    .evaluate((element) => element.getBoundingClientRect().left);
-  const contentLeft = await page
-    .locator(".site-container")
-    .first()
-    .evaluate((element) => element.getBoundingClientRect().left);
-  await expect
-    .poll(async () => {
-      const box = await traveler.boundingBox();
-      return box ? box.x + box.width / 2 : -1;
-    })
-    .toBeCloseTo(globalRailX, 0);
-  expect(globalRailX).toBeGreaterThanOrEqual(8);
-  expect(globalRailX).toBeLessThan(contentLeft);
+  // Leaving the hero, the dot slides straight to the work eyebrow: no detour
+  // to the edge of the page.
+  await page.evaluate(() => window.scrollTo(0, 300));
+  await expect(traveler).toHaveAttribute("data-phase", "heading");
 
   await activate("work");
   await expect(traveler).toHaveAttribute("data-phase", "heading");
+
+  // While Selected Work is pinned, the dot stays on its eyebrow.
+  await page.locator(".dust-track").evaluate((track) => {
+    const bounds = track.getBoundingClientRect();
+    window.scrollTo(0, bounds.top + window.scrollY + (bounds.height - window.innerHeight) / 2);
+  });
+  await expect(traveler).toHaveAttribute("data-active-anchor", "work");
+  const eyebrowSlot = page.locator(".dust-stage .scroll-accent-heading-target");
+  await expect
+    .poll(async () => {
+      const slot = (await eyebrowSlot.boundingBox())!;
+      const dot = await center();
+      return Math.hypot(dot.x - (slot.x + slot.width / 2), dot.y - (slot.y + slot.height / 2));
+    })
+    .toBeLessThan(2);
 
   await activate("experience");
   await expect(traveler).toHaveAttribute("data-phase", "heading");
@@ -595,43 +590,35 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
     .poll(async () => traveler.getAttribute("data-active-anchor"))
     .not.toBe("experience-project-0-0");
 
-  await activate("about");
+  await activate("workflow");
   await expect(traveler).toHaveAttribute("data-phase", "heading");
+  await expect.poll(opacity).toBeGreaterThan(0.9);
 
-  await page.locator('[data-scroll-accent-anchor="about"]').evaluate((element) => {
+  // Hidden through About.
+  await page.locator("#about").evaluate((element) => {
     const bounds = element.getBoundingClientRect();
-    const contact = document.querySelector<HTMLElement>(
-      "[data-scroll-accent-contact]",
-    );
-    if (!contact) return;
-
-    const activationY = Math.min(360, Math.max(180, window.innerHeight * 0.38));
-    const aboutY = bounds.top + window.scrollY + bounds.height / 2;
-    const contactY = contact.getBoundingClientRect().top + window.scrollY;
-    const returnTravel = Math.min(
-      140,
-      Math.max(56, (contactY - aboutY) * 0.16),
-    );
-    window.scrollTo(0, Math.floor(aboutY + returnTravel - activationY - 1));
+    window.scrollTo(0, bounds.top + window.scrollY + bounds.height / 2);
   });
-  await expect(traveler).toHaveAttribute("data-phase", "global-rail");
-  await expect
-    .poll(async () => Number.parseFloat(await traveler.evaluate((element) => getComputedStyle(element).opacity)))
-    .toBeGreaterThan(0.9);
+  await expect(traveler).toHaveAttribute("data-phase", "hidden");
+  await expect.poll(opacity).toBeLessThan(0.1);
 
+  // Back on the quick message's eyebrow.
+  await activate("message");
+  await expect(traveler).toHaveAttribute("data-phase", "heading");
+  await expect.poll(opacity).toBeGreaterThan(0.9);
+  const messageSlot = page.locator('[data-scroll-accent-anchor="message"]');
   await expect
     .poll(async () => {
-      const box = await traveler.boundingBox();
-      return box ? box.x + box.width / 2 : 0;
+      const slot = (await messageSlot.boundingBox())!;
+      const dot = await center();
+      return Math.hypot(dot.x - (slot.x + slot.width / 2), dot.y - (slot.y + slot.height / 2));
     })
-    .toBeCloseTo(globalRailX, 0);
+    .toBeLessThan(2);
 
   await page.evaluate(() => {
     window.scrollTo(0, document.documentElement.scrollHeight);
   });
-  await expect
-    .poll(async () => Number.parseFloat(await traveler.evaluate((element) => getComputedStyle(element).opacity)))
-    .toBeLessThan(0.1);
+  await expect.poll(opacity).toBeLessThan(0.1);
 });
 
 test("the accent dot snaps between anchors with reduced motion", async ({ page }, testInfo) => {
@@ -950,20 +937,76 @@ test("about scene shows the finished composition with reduced motion", async ({ 
   await expect(page.locator(".about-scene-beyond")).toBeHidden();
 });
 
-test("the hero, AI workflow and contact sections each fill one screen", async ({ page }, testInfo) => {
+test("the hero and AI workflow sections each fill one screen", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await skipLaunchIntro(page);
   await page.goto("/");
 
   const viewportHeight = await page.evaluate(() => window.innerHeight);
-  for (const selector of [".hero-section", ".ai-workflow-band", "#contact"]) {
+  for (const selector of [".hero-section", ".ai-workflow-band"]) {
     const box = await page.locator(selector).boundingBox();
     expect(Math.abs((box?.height ?? 0) - viewportHeight), selector).toBeLessThanOrEqual(1);
   }
 
   // Nothing below the hero shows on landing.
   await expect(page.locator("#work")).not.toBeInViewport();
+});
+
+test("the hero swarm gathers on a cursor dot over the night backdrop", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  const hero = page.locator(".hero-section");
+  await expect(hero).toHaveAttribute("data-swarm", /^(ready|fallback)$/, { timeout: 15_000 });
+  // Headless Chromium only has software WebGL, which the swarm declines.
+  test.skip((await hero.getAttribute("data-swarm")) !== "ready", "No GPU-backed WebGL in this browser");
+  await expect(page.locator(".hero-swarm-canvas")).toHaveCount(1);
+
+  const box = (await hero.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.2, box.y + box.height * 0.25);
+  await page.mouse.move(box.x + box.width * 0.22, box.y + box.height * 0.27);
+  await expect(hero).toHaveAttribute("data-cursor", "");
+  await expect(hero).toHaveCSS("cursor", "none");
+  await expect(page.locator(".hero-cursor")).toHaveCSS("opacity", "1");
+
+  // Over the header the real pointer is back.
+  const brand = (await page.getByRole("banner").getByRole("link", { name: "Pavan Patil, home" }).boundingBox())!;
+  await page.mouse.move(brand.x + brand.width / 2, brand.y + brand.height / 2);
+  await expect(hero).not.toHaveAttribute("data-cursor");
+});
+
+test("the hero forest trails behind the page", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  await expect(page.locator(".hero-backdrop img")).toBeVisible();
+  // The forest keeps 40% of the scroll, so it trails behind the page.
+  await page.evaluate(() => window.scrollTo({ top: 200, behavior: "instant" }));
+  await expect
+    .poll(() =>
+      page.locator(".hero-backdrop-layer").evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).m42),
+    )
+    .toBeCloseTo(80, 0);
+});
+
+test("the hero keeps its backdrop without the swarm under reduced motion", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await skipLaunchIntro(page);
+  await page.goto("/");
+
+  await expect(page.locator(".hero-backdrop img")).toBeVisible();
+  await expect(page.locator(".hero-swarm-canvas")).toHaveCount(0);
+  await expect(page.locator(".hero-cursor")).toHaveCount(0);
+  // Nor does the forest move with the scroll.
+  await page.evaluate(() => window.scrollTo({ top: 200, behavior: "instant" }));
+  await expect(page.locator(".hero-backdrop-layer")).toHaveCSS("transform", "none");
 });
 
 async function scrollExperienceToNode(page: import("@playwright/test").Page, anchor: string) {
