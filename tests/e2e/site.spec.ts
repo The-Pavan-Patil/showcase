@@ -953,60 +953,24 @@ test("the hero and AI workflow sections each fill one screen", async ({ page }, 
   await expect(page.locator("#work")).not.toBeInViewport();
 });
 
-test("the hero swarm gathers on a cursor dot over the night backdrop", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "chromium");
+test("the hero is plain Montserrat copy on the page background", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await skipLaunchIntro(page);
   await page.goto("/");
 
   const hero = page.locator(".hero-section");
-  await expect(hero).toHaveAttribute("data-swarm", /^(ready|fallback)$/, { timeout: 15_000 });
-  // Headless Chromium only has software WebGL, which the swarm declines.
-  test.skip((await hero.getAttribute("data-swarm")) !== "ready", "No GPU-backed WebGL in this browser");
-  await expect(page.locator(".hero-swarm-canvas")).toHaveCount(1);
-
-  const box = (await hero.boundingBox())!;
-  await page.mouse.move(box.x + box.width * 0.2, box.y + box.height * 0.25);
-  await page.mouse.move(box.x + box.width * 0.22, box.y + box.height * 0.27);
-  await expect(hero).toHaveAttribute("data-cursor", "");
-  await expect(hero).toHaveCSS("cursor", "none");
-  await expect(page.locator(".hero-cursor")).toHaveCSS("opacity", "1");
-
-  // Over the header the real pointer is back.
-  const brand = (await page.getByRole("banner").getByRole("link", { name: "Pavan Patil, home" }).boundingBox())!;
-  await page.mouse.move(brand.x + brand.width / 2, brand.y + brand.height / 2);
-  await expect(hero).not.toHaveAttribute("data-cursor");
-});
-
-test("the hero forest trails behind the page", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "chromium");
-
-  await skipLaunchIntro(page);
-  await page.goto("/");
-
-  await expect(page.locator(".hero-backdrop img")).toBeVisible();
-  // The forest keeps 40% of the scroll, so it trails behind the page.
-  await page.evaluate(() => window.scrollTo({ top: 200, behavior: "instant" }));
-  await expect
-    .poll(() =>
-      page.locator(".hero-backdrop-layer").evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).m42),
-    )
-    .toBeCloseTo(80, 0);
-});
-
-test("the hero keeps its backdrop without the swarm under reduced motion", async ({ page }, testInfo) => {
-  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
-
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await skipLaunchIntro(page);
-  await page.goto("/");
-
-  await expect(page.locator(".hero-backdrop img")).toBeVisible();
-  await expect(page.locator(".hero-swarm-canvas")).toHaveCount(0);
-  await expect(page.locator(".hero-cursor")).toHaveCount(0);
-  // Nor does the forest move with the scroll.
-  await page.evaluate(() => window.scrollTo({ top: 200, behavior: "instant" }));
-  await expect(page.locator(".hero-backdrop-layer")).toHaveCSS("transform", "none");
+  await expect(hero.locator("canvas, img")).toHaveCount(0);
+  await expect(hero).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  for (const selector of ["#hero-title", ".hero-description"]) {
+    await expect(hero.locator(selector)).toHaveCSS("font-family", /Montserrat/);
+  }
+  // Both title lines are solid ink, in the heading's own colour.
+  const color = await hero.locator("#hero-title").evaluate((element) => getComputedStyle(element).color);
+  for (const line of await hero.locator("#hero-title span").all()) {
+    await expect(line).toHaveCSS("color", color);
+    await expect(line).toHaveCSS("mix-blend-mode", "normal");
+  }
 });
 
 async function scrollExperienceToNode(page: import("@playwright/test").Page, anchor: string) {

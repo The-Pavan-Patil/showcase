@@ -1,6 +1,0 @@
-/* The hero swarm is a live particle simulation that never draws the same
-   frame twice, so visual baselines show the hero without it. */
-.hero-swarm-canvas,
-.hero-cursor {
-  visibility: hidden !important;
-}
