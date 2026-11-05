@@ -967,10 +967,12 @@ a {
 /* The hero is exactly the first screen, so Selected Work never peeks in on
    landing. Padding and type also scale with height for short windows. */
 .hero-section {
+  --hero-foot: clamp(1.5rem, 4svh, 2.5rem);
+  position: relative;
   display: grid;
   align-content: center;
   min-height: 100svh;
-  padding: clamp(5.5rem, 14svh, 9.5rem) 0 calc(clamp(3rem, 8svh, 5rem) + 6px);
+  padding: clamp(5.5rem, 14svh, 9.5rem) 0 calc(var(--hero-foot) + 7.5rem);
 }
 
 .hero-container {
@@ -1009,20 +1011,134 @@ html[lang="ja"] .hero-copy {
   text-transform: uppercase;
 }
 
-/* Two parts, one per line at every width, both in solid ink. */
+/* Two parts, one per line at every width. Glyphs are stretched upward for a
+   taller, condensed feel; the second line fades from ink into the page. */
 .hero-copy h1 {
   max-width: none;
   font-family: var(--font-hero);
-  margin-bottom: 2.5rem;
-  font-size: clamp(2.75rem, min(6.3vw, 12svh), 6.75rem);
+  margin: 0.4em 0 0;
+  font-size: clamp(2.75rem, min(6.3vw, 11svh), 6.75rem);
   font-weight: 800;
   letter-spacing: -0.035em;
-  line-height: 0.95;
+  line-height: 1.12;
   text-wrap: balance;
 }
 
 .hero-copy h1 span {
   display: block;
+  transform: scaleY(1.2);
+  transform-origin: center bottom;
+}
+
+.hero-copy h1 .hero-title-lower {
+  background-image: linear-gradient(
+    180deg,
+    var(--foreground) 10%,
+    color-mix(in srgb, var(--foreground) 4%, transparent) 88%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The subheading is split across the hero's bottom corners. */
+.hero-corners {
+  position: absolute;
+  inset-inline: var(--page-gutter);
+  bottom: var(--hero-foot);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  pointer-events: none;
+}
+
+.hero-corners .hero-description {
+  max-width: 24ch;
+  margin: 0;
+  font-family: var(--font-hero);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  pointer-events: auto;
+}
+
+.hero-corners .hero-corner-end {
+  text-align: end;
+}
+
+/* Scroll cue: a cycling experience logo, a hairline, then the label. */
+/* No transform or z-index here: either would isolate the logos' blend mode. */
+.hero-scroll-cue {
+  position: absolute;
+  bottom: var(--hero-foot);
+  inset-inline: 0;
+  width: max-content;
+  margin-inline: auto;
+  display: grid;
+  justify-items: center;
+  gap: 0.65rem;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.hero-scroll-cue-logos {
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  overflow: hidden;
+}
+
+.hero-scroll-cue-logo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(0.5rem);
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+
+.hero-scroll-cue-logo[data-state="active"] {
+  opacity: 1;
+  transform: none;
+}
+
+.hero-scroll-cue-logo[data-state="idle"] {
+  transition: none;
+}
+
+.hero-scroll-cue-logo[data-state="leaving"] {
+  transform: translateY(-0.5rem);
+}
+
+.hero-scroll-cue-logo img {
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.6);
+  mix-blend-mode: multiply;
+}
+
+/* Logos ship on white; invert them so the white drops out on dark. */
+.dark .hero-scroll-cue-logo img {
+  filter: grayscale(1) contrast(1.6) invert(1);
+  mix-blend-mode: screen;
+}
+
+.hero-scroll-cue-line {
+  width: 1px;
+  height: 3rem;
+  background: color-mix(in srgb, var(--foreground) 35%, transparent);
+}
+
+.hero-scroll-cue-label {
+  font-family: var(--font-hero);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero-scroll-cue:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 0.5rem;
+  border-radius: var(--radius);
 }
 
 html[lang="ja"] .hero-copy h1 {
@@ -4158,13 +4274,26 @@ html[lang="ja"] .hero-copy h1 {
     padding-bottom: calc(6.75rem + env(safe-area-inset-bottom, 0px));
   }
   /* The bottom padding clears the floating navigation bar. */
-  .hero-section { padding: clamp(3rem, 9svh, 4.5rem) 0 calc(5.5rem + env(safe-area-inset-bottom, 0px)); }
+  .hero-section { padding: clamp(3rem, 9svh, 4.5rem) 0 calc(var(--hero-foot) + 7.5rem + env(safe-area-inset-bottom, 0px)); }
+  .hero-scroll-cue { bottom: calc(var(--hero-foot) + env(safe-area-inset-bottom, 0px)); }
   .hero-copy { padding: 2rem 0 0; }
   .hero-copy h1,
   .case-hero h1,
   .setup-hero-copy h1,
   .not-found-main h1 { font-size: clamp(2.8rem, 14vw, 4.1rem); }
-  .hero-copy h1 { margin-bottom: 2rem; font-size: clamp(1.5rem, 7.4vw, 2.5rem); }
+  .hero-section { --hero-foot: 6.5rem; }
+  .hero-copy h1 { margin-bottom: 0; font-size: clamp(1.5rem, 7.4vw, 2.5rem); line-height: 1.22; }
+  .hero-corners {
+    position: static;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 2rem;
+    padding-inline: var(--page-gutter);
+    text-align: center;
+  }
+  .hero-corners .hero-description { max-width: 32ch; }
+  .hero-corners .hero-corner-end { text-align: center; }
   .hero-description,
   .case-lede,
   .setup-lede,

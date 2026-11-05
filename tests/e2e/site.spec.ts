@@ -907,23 +907,30 @@ test("the hero and AI workflow sections each fill one screen", async ({ page }, 
   await expect(page.locator("#work")).not.toBeInViewport();
 });
 
-test("the hero is plain Montserrat copy on the page background", async ({ page }, testInfo) => {
+test("the hero is Montserrat copy with corner lines and a scroll cue", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.goto("/");
 
   const hero = page.locator(".hero-section");
-  await expect(hero.locator("canvas, img")).toHaveCount(0);
+  // The only images are the experience logos in the scroll cue.
+  await expect(hero.locator("canvas")).toHaveCount(0);
+  await expect(hero.locator("img")).toHaveCount(await hero.locator(".hero-scroll-cue img").count());
   await expect(hero).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  for (const selector of ["#hero-title", ".hero-description"]) {
+  for (const selector of ["#hero-title", ".hero-corner-start", ".hero-corner-end"]) {
     await expect(hero.locator(selector)).toHaveCSS("font-family", /Montserrat/);
+    await expect(hero.locator(selector)).toBeVisible();
   }
-  // Both title lines are solid ink, in the heading's own colour.
+  // Line one is solid ink; line two fades out through a clipped gradient.
   const color = await hero.locator("#hero-title").evaluate((element) => getComputedStyle(element).color);
-  for (const line of await hero.locator("#hero-title span").all()) {
-    await expect(line).toHaveCSS("color", color);
-    await expect(line).toHaveCSS("mix-blend-mode", "normal");
-  }
+  await expect(hero.locator(".hero-title-upper")).toHaveCSS("color", color);
+  await expect(hero.locator(".hero-title-lower")).toHaveCSS("background-clip", "text");
+  await expect(hero.locator(".hero-title-lower")).toHaveCSS("background-image", /linear-gradient/);
+
+  const cue = hero.locator(".hero-scroll-cue");
+  await expect(cue).toHaveAttribute("href", "#work");
+  await expect(cue).toContainText(/scroll down/i);
+  await expect(cue.locator('.hero-scroll-cue-logo[data-state="active"]')).toHaveCount(1);
 });
 
 async function scrollExperienceToNode(page: import("@playwright/test").Page, anchor: string) {

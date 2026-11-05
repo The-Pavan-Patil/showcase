@@ -9,8 +9,9 @@ export const homeContent = {
     email: "thepavanpatil.official@gmail.com",
     heroTitle: "You found the person",
     heroAccent: "who can handle it.",
-    heroDescription:
-      "I’m Pavan Patil, a software engineer building across web, mobile, and backend—from system design to production.",
+    heroDescriptionLead: "I’m Pavan Patil, a software engineer",
+    heroDescriptionTrail:
+      "building across web, mobile, and backend—from system design to production.",
     about:
       "My interest in computers started in childhood, when my father brought home a computer and I became curious about what was happening beneath the screen. I wrote my first code in sixth grade, and that curiosity never really left. Today I enjoy building products end to end: shaping the plan, designing the architecture, writing the software, and turning rough ideas into systems people can use. I feel lucky that the thing I kept returning to became my profession.",
     education:

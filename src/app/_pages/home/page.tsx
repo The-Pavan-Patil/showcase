@@ -5,6 +5,7 @@ import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { AboutScene } from "./_components/about-scene";
 import { ExperienceScene } from "./_components/experience-scene";
+import { HeroScrollCue } from "./_components/hero-scroll-cue";
 import { ProjectDust } from "./_components/project-dust";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
@@ -30,6 +31,19 @@ export function HomePage({ locale }: { locale: Locale }) {
   const homepageProjects = projects.filter(
     (project) => project.slug !== "workforce-management-system",
   );
+  const heroLogos = [
+    ...new Map(
+      experience
+        .flatMap((item) => [
+          { src: item.logoUrl, name: item.company },
+          ...(item.projects ?? []).map((project) => ({
+            src: project.logoUrl,
+            name: project.client,
+          })),
+        ])
+        .map((logo) => [logo.src, logo] as const),
+    ).values(),
+  ];
 
   return (
     <>
@@ -63,11 +77,17 @@ export function HomePage({ locale }: { locale: Locale }) {
                 <span className="hero-title-upper">{profile.heroTitle}</span>{" "}
                 <span className="hero-title-lower">{profile.heroAccent}</span>
               </h1>
-              <p className="hero-description">
-                {profile.heroDescription}
-              </p>
             </div>
           </Container>
+          <div className="hero-corners">
+            <p className="hero-description hero-corner-start">
+              {profile.heroDescriptionLead}
+            </p>
+            <p className="hero-description hero-corner-end">
+              {profile.heroDescriptionTrail}
+            </p>
+          </div>
+          <HeroScrollCue logos={heroLogos} label={ui.home.scrollDown} />
         </section>
 
         <section className="work-section" id="work" aria-labelledby="work-heading">

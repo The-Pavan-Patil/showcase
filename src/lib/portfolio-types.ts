@@ -123,7 +123,8 @@ export type Profile = {
   email: string;
   heroTitle: string;
   heroAccent: string;
-  heroDescription: string;
+  heroDescriptionLead: string;
+  heroDescriptionTrail: string;
   about: string;
   education: string;
 };

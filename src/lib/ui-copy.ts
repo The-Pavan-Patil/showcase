@@ -44,6 +44,7 @@ export type UiCopy = {
     stack: string;
   };
   home: {
+    scrollDown: string;
     workEyebrow: string;
     workTitle: string;
     workMuted: string;
@@ -265,6 +266,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
+      scrollDown: "Scroll down",
       workEyebrow: "Selected work",
       workTitle: "Built for real constraints.",
       workMuted: "Designed to hold up.",
@@ -520,6 +522,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
+      scrollDown: "スクロール",
       workEyebrow: "主な実績",
       workTitle: "現場の制約に向き合って作りました。",
       workMuted: "長く使えることを大切に。",
@@ -775,6 +778,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
+      scrollDown: "Nach unten scrollen",
       workEyebrow: "Ausgewählte Arbeit",
       workTitle: "Gebaut für reale Anforderungen.",
       workMuted: "Entwickelt, um stabil zu bleiben.",
