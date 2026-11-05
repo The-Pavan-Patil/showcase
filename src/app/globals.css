@@ -1026,7 +1026,7 @@ html[lang="ja"] .hero-copy {
 
 .hero-copy h1 span {
   display: block;
-  transform: scaleY(1.2);
+  transform: scaleY(var(--hero-stretch, 1.2));
   transform-origin: center bottom;
 }
 
@@ -1088,25 +1088,30 @@ html[lang="ja"] .hero-copy {
   overflow: hidden;
 }
 
+/* Opacity and motion sit on the img itself: on a wrapper they would isolate
+   the img's blend mode and flash the logo's white backing. */
 .hero-scroll-cue-logo {
   position: absolute;
   inset: 0;
+}
+
+.hero-scroll-cue-logo img {
   opacity: 0;
   transform: translateY(0.5rem);
   transition: opacity 400ms ease, transform 400ms ease;
 }
 
-.hero-scroll-cue-logo[data-state="active"] {
-  opacity: 1;
+.hero-scroll-cue-logo[data-state="active"] img {
+  opacity: var(--cue-fade, 1);
   transform: none;
 }
 
-.hero-scroll-cue-logo[data-state="idle"] {
-  transition: none;
+.hero-scroll-cue-logo[data-state="leaving"] img {
+  transform: translateY(-0.5rem);
 }
 
-.hero-scroll-cue-logo[data-state="leaving"] {
-  transform: translateY(-0.5rem);
+.hero-scroll-cue-logo[data-state="idle"] img {
+  transition: none;
 }
 
 .hero-scroll-cue-logo img {
@@ -1122,12 +1127,24 @@ html[lang="ja"] .hero-copy {
 }
 
 .hero-scroll-cue-line {
+  position: relative;
   width: 1px;
   height: 3rem;
   background: color-mix(in srgb, var(--foreground) 35%, transparent);
+  opacity: var(--cue-fade, 1);
+}
+
+/* Draws down the hairline in full ink as the hero scrolls away. */
+.hero-scroll-cue-line-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--foreground);
+  transform: scaleY(0);
+  transform-origin: top;
 }
 
 .hero-scroll-cue-label {
+  opacity: var(--cue-fade, 1);
   font-family: var(--font-hero);
   font-size: 0.7rem;
   font-weight: 600;

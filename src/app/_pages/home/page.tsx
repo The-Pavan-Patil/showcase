@@ -5,7 +5,7 @@ import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { AboutScene } from "./_components/about-scene";
 import { ExperienceScene } from "./_components/experience-scene";
-import { HeroScrollCue } from "./_components/hero-scroll-cue";
+import { HeroSection } from "./_components/hero-section";
 import { ProjectDust } from "./_components/project-dust";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
@@ -61,34 +61,14 @@ export function HomePage({ locale }: { locale: Locale }) {
       />
       <ScrollAccent />
       <main id="main-content">
-        <section
-          className="hero-section"
-          aria-labelledby="hero-title"
-        >
-          <Container className="hero-container">
-            <div className="hero-copy">
-              <span
-                className="scroll-accent-heading-target scroll-accent-fallback"
-                data-scroll-accent-anchor="hero"
-                data-scroll-accent-phase="heading"
-                aria-hidden="true"
-              />
-              <h1 id="hero-title">
-                <span className="hero-title-upper">{profile.heroTitle}</span>{" "}
-                <span className="hero-title-lower">{profile.heroAccent}</span>
-              </h1>
-            </div>
-          </Container>
-          <div className="hero-corners">
-            <p className="hero-description hero-corner-start">
-              {profile.heroDescriptionLead}
-            </p>
-            <p className="hero-description hero-corner-end">
-              {profile.heroDescriptionTrail}
-            </p>
-          </div>
-          <HeroScrollCue logos={heroLogos} label={ui.home.scrollDown} />
-        </section>
+        <HeroSection
+          title={profile.heroTitle}
+          accent={profile.heroAccent}
+          lead={profile.heroDescriptionLead}
+          trail={profile.heroDescriptionTrail}
+          logos={heroLogos}
+          scrollLabel={ui.home.scrollDown}
+        />
 
         <section className="work-section" id="work" aria-labelledby="work-heading">
           <ProjectDust

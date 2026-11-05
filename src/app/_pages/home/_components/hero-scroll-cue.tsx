@@ -1,7 +1,8 @@
 "use client";
 
+import { motion, type MotionValue } from "motion/react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 export type HeroScrollCueLogo = { src: string; name: string };
 
@@ -11,15 +12,22 @@ const CYCLE_MS = 2200;
 export function HeroScrollCue({
   logos,
   label,
+  fade,
+  draw,
 }: {
   logos: HeroScrollCueLogo[];
   label: string;
+  /** 1 → 0 as the hero scrolls away. Applied per child via --cue-fade, since
+      opacity on the link itself would isolate the logos' blend mode. */
+  fade?: MotionValue<number>;
+  /** 0 → 1: how far the hairline has drawn down. */
+  draw?: MotionValue<number>;
 }) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     if (logos.length < 2) return;
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let timer: number | undefined;
 
     const stop = () => {
@@ -28,18 +36,18 @@ export function HeroScrollCue({
     };
     const start = () => {
       stop();
-      if (motion.matches || document.hidden) return;
+      if (reducedMotion.matches || document.hidden) return;
       timer = window.setInterval(() => {
         setIndex((current) => (current + 1) % logos.length);
       }, CYCLE_MS);
     };
 
     start();
-    motion.addEventListener("change", start);
+    reducedMotion.addEventListener("change", start);
     document.addEventListener("visibilitychange", start);
     return () => {
       stop();
-      motion.removeEventListener("change", start);
+      reducedMotion.removeEventListener("change", start);
       document.removeEventListener("visibilitychange", start);
     };
   }, [logos.length]);
@@ -47,7 +55,11 @@ export function HeroScrollCue({
   const previous = (index - 1 + logos.length) % logos.length;
 
   return (
-    <a className="hero-scroll-cue" href="#work">
+    <motion.a
+      className="hero-scroll-cue"
+      href="#work"
+      style={fade ? ({ "--cue-fade": fade } as unknown as CSSProperties) : undefined}
+    >
       <span className="hero-scroll-cue-logos" aria-hidden="true">
         {logos.map((logo, logoIndex) => (
           <span
@@ -65,8 +77,15 @@ export function HeroScrollCue({
           </span>
         ))}
       </span>
-      <span className="hero-scroll-cue-line" aria-hidden="true" />
+      <span className="hero-scroll-cue-line" aria-hidden="true">
+        {draw ? (
+          <motion.span
+            className="hero-scroll-cue-line-fill"
+            style={{ scaleY: draw }}
+          />
+        ) : null}
+      </span>
       <span className="hero-scroll-cue-label">{label}</span>
-    </a>
+    </motion.a>
   );
 }
