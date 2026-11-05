@@ -37,11 +37,6 @@ export type UiCopy = {
     switchToDark: string;
     switchToLight: string;
   };
-  launch: {
-    title: string;
-    skip: string;
-    websiteLine: string;
-  };
   footer: {
     navigationAria: string;
     email: string;
@@ -262,11 +257,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     theme: {
       switchToDark: "Switch to dark theme",
       switchToLight: "Switch to light theme",
-    },
-    launch: {
-      title: "pavanpatil.dev launch",
-      skip: "Skip",
-      websiteLine: "Website: https://pavanpatil.dev",
     },
     footer: {
       navigationAria: "Footer navigation",
@@ -523,11 +513,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       switchToDark: "ダークテーマに切り替える",
       switchToLight: "ライトテーマに切り替える",
     },
-    launch: {
-      title: "pavanpatil.dev 起動",
-      skip: "スキップ",
-      websiteLine: "サイト: https://pavanpatil.dev",
-    },
     footer: {
       navigationAria: "フッターナビゲーション",
       email: "メール",
@@ -782,11 +767,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     theme: {
       switchToDark: "Zum dunklen Design wechseln",
       switchToLight: "Zum hellen Design wechseln",
-    },
-    launch: {
-      title: "pavanpatil.dev Start",
-      skip: "Überspringen",
-      websiteLine: "Website: https://pavanpatil.dev",
     },
     footer: {
       navigationAria: "Footer-Navigation",

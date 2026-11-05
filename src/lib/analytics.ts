@@ -23,10 +23,7 @@ export type AnalyticsEvent =
   | "message_sent"
   | "message_failed"
   | "theme_changed"
-  | "language_changed"
-  | "intro_completed"
-  | "intro_skipped"
-  | "intro_not_shown";
+  | "language_changed";
 
 export type AnalyticsProperties = Record<
   string,

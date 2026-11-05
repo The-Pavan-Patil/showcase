@@ -7,10 +7,8 @@ import {
   trackEvent,
   trackPageView,
 } from "@/lib/analytics";
-import { stripLocaleFromPathname } from "@/lib/i18n";
 import { resumeUrl } from "@/lib/site";
 
-const LAUNCH_INTRO_SESSION_KEY = "launch-terminal-seen";
 const POSTHOG_UI_HOST = "https://eu.posthog.com";
 
 /**
@@ -27,32 +25,6 @@ function getPageKey(url: string) {
 }
 
 let lastPageKey = getPageKey(window.location.href);
-
-/**
- * Mirrors the LaunchTerminal gate in src/components/launch-terminal.tsx. The
- * intro covers the viewport for about a second, so pageviews are tagged
- * with it — otherwise first and second pageviews in a session are not
- * comparable.
- */
-function willLaunchIntroPlay() {
-  try {
-    if (stripLocaleFromPathname(window.location.pathname).pathname !== "/") {
-      return false;
-    }
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return false;
-    }
-
-    if (new URLSearchParams(window.location.search).get("intro") === "1") {
-      return true;
-    }
-
-    return window.sessionStorage.getItem(LAUNCH_INTRO_SESSION_KEY) !== "true";
-  } catch {
-    return false;
-  }
-}
 
 function getLinkSurface(anchor: HTMLAnchorElement) {
   if (anchor.closest(".site-header")) return "header";
@@ -147,7 +119,6 @@ function captureInitialPageView() {
   trackPageView({
     url: window.location.href,
     title: document.title,
-    properties: { intro_shown: willLaunchIntroPlay() },
   });
 }
 

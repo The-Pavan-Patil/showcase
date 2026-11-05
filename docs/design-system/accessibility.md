@@ -94,7 +94,6 @@ The reduced-motion stylesheet disables smooth scrolling and collapses authored t
 - The quick-message form has a named textarea, visible submit button, adjacent live status, invalid-state exposure, and focus recovery after client-side validation.
 - Every interactive virtual key has an accessible name and native button activation. Virtual keys are intentionally removed from sequential focus order so the full visual keyboard does not add roughly 80 Tab stops; the textarea and visible submit button are the primary keyboard path.
 - The decorative Touch ID key is hidden from assistive technology, while physical key presses are mirrored on the visible keyboard.
-- The launch terminal is a short, non-modal status surface. It never hides or makes the main document inert, and reduced-motion visitors skip it.
 - Homepage section observation and case-study routing expose the current destination with aria-current="location" in desktop and mobile navigation.
 - Global focus-visible outline.
 - Matching project-card hover and focus-within elevation.

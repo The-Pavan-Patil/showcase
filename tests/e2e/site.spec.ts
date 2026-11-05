@@ -7,12 +7,6 @@ const projects = [
   ["workforce-management-system", "Workforce Management"],
 ] as const;
 
-async function skipLaunchIntro(page: import("@playwright/test").Page) {
-  await page.addInitScript(() => {
-    window.sessionStorage.setItem("launch-terminal-seen", "true");
-  });
-}
-
 async function expectLanguageOption(
   page: import("@playwright/test").Page,
   testInfo: import("@playwright/test").TestInfo,
@@ -42,7 +36,6 @@ test("homepage exposes the primary portfolio journey", async ({ page }) => {
     if (message.type() === "error") errors.push(message.text());
   });
 
-  await skipLaunchIntro(page);
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("You found the person");
   await expect(page.getByRole("main")).toBeVisible();
@@ -50,24 +43,6 @@ test("homepage exposes the primary portfolio journey", async ({ page }) => {
   await expect(page.getByRole("contentinfo")).toBeVisible();
   await expect(page.locator("html")).not.toHaveClass(/dark/);
   expect(errors).toEqual([]);
-});
-
-test("homepage first load plays the terminal launch intro", async ({ page }) => {
-  await page.goto("/");
-
-  const terminal = page.locator("[data-launch-terminal]");
-  await expect(terminal).toBeVisible();
-  await expect(terminal).toHaveCSS("background-color", "rgb(2, 2, 3)");
-  await expect(terminal).toBeHidden({ timeout: 3000 });
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("You found the person");
-});
-
-test("homepage skips the terminal launch intro after it has played this session", async ({ page }) => {
-  await skipLaunchIntro(page);
-  await page.goto("/");
-
-  await expect(page.locator("[data-launch-terminal]")).toHaveCount(0);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("You found the person");
 });
 
 test("anonymous keyboard messaging sends from the homepage", async ({ page }) => {
@@ -82,7 +57,6 @@ test("anonymous keyboard messaging sends from the homepage", async ({ page }) =>
     });
   });
 
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const quickMessage = page.locator("[data-quick-message-section]");
@@ -161,7 +135,6 @@ test("anonymous keyboard messaging shows delivery errors", async ({ page }) => {
     });
   });
 
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const textarea = page.getByRole("textbox", { name: "Message" });
@@ -173,13 +146,11 @@ test("anonymous keyboard messaging shows delivery errors", async ({ page }) => {
 });
 
 test("localized homepages render natural Japanese and German copy", async ({ page }, testInfo) => {
-  await skipLaunchIntro(page);
   await page.goto("/ja");
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("任せられる人");
   await expectLanguageOption(page, testInfo, "言語を切り替える: EN", "/");
 
-  await skipLaunchIntro(page);
   await page.goto("/de");
   await expect(page.locator("html")).toHaveAttribute("lang", "de");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("zuverlässige Software");
@@ -192,13 +163,6 @@ test("English locale prefix redirects to canonical unprefixed URLs", async ({ pa
 
   await page.goto("/en/work/nudge");
   await expect(page).toHaveURL("/work/nudge");
-});
-
-test("homepage can force replay the terminal launch intro for testing", async ({ page }) => {
-  await skipLaunchIntro(page);
-  await page.goto("/?intro=1");
-
-  await expect(page.locator("[data-launch-terminal]")).toBeVisible();
 });
 
 for (const [slug, title] of projects) {
@@ -250,7 +214,6 @@ test("unknown localized work offers localized recovery paths", async ({ page }) 
 
 test("localized pages avoid horizontal overflow on narrow screens", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await skipLaunchIntro(page);
 
   for (const route of ["/ja", "/de", "/ja/work/nudge", "/de/work/nudge"]) {
     await page.goto(route);
@@ -415,7 +378,6 @@ test("desktop navigation shrinks down and expands up without losing destinations
   test.skip(testInfo.project.name.startsWith("mobile"));
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await skipLaunchIntro(page);
   await page.goto("/");
   await page.getByRole("banner").getByRole("link", { name: "Pavan Patil, home" }).focus();
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
@@ -445,7 +407,6 @@ test("mobile bottom navigation and utility controls are keyboard-operable", asyn
   test.skip(!testInfo.project.name.startsWith("mobile"));
 
   await page.setViewportSize({ width: 390, height: 844 });
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   await expect(page.locator(".site-header-shell")).toBeHidden();
@@ -473,7 +434,6 @@ test("mobile bottom navigation and utility controls are keyboard-operable", asyn
 });
 
 test("the navigation selection bubble travels to the chosen tab", async ({ page }, testInfo) => {
-  await skipLaunchIntro(page);
   await page.goto("/work/nudge");
 
   const isMobile = testInfo.project.name.startsWith("mobile");
@@ -502,7 +462,6 @@ test("the navigation selection bubble travels to the chosen tab", async ({ page 
 test("the single accent dot follows headings and Experience timeline nodes", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
-  await skipLaunchIntro(page);
   await page.goto("/");
   await page.evaluate(() => {
     document.documentElement.style.scrollBehavior = "auto";
@@ -625,7 +584,6 @@ test("the accent dot snaps between anchors with reduced motion", async ({ page }
   test.skip(testInfo.project.name !== "chromium");
 
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const traveler = page.locator(".scroll-accent-traveler");
@@ -861,7 +819,6 @@ function translateX(element: Element) {
 test("about scene parts the title and reveals the profile copy on scroll", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const scene = page.locator("#about");
@@ -901,7 +858,6 @@ test("about scene scrolls forward when the résumé link receives keyboard focus
 
   // Tall enough that the paragraph and résumé link stay inside the card.
   await page.setViewportSize({ width: 1440, height: 900 });
-  await skipLaunchIntro(page);
   await page.goto("/");
   await expect(page.locator("#about")).toHaveAttribute("data-live", "");
 
@@ -925,7 +881,6 @@ test("about scene shows the finished composition with reduced motion", async ({ 
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const scene = page.locator("#about");
@@ -940,7 +895,6 @@ test("about scene shows the finished composition with reduced motion", async ({ 
 test("the hero and AI workflow sections each fill one screen", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const viewportHeight = await page.evaluate(() => window.innerHeight);
@@ -956,7 +910,6 @@ test("the hero and AI workflow sections each fill one screen", async ({ page }, 
 test("the hero is plain Montserrat copy on the page background", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const hero = page.locator(".hero-section");
@@ -994,7 +947,6 @@ function distanceFromFocus(page: import("@playwright/test").Page, anchor: string
 test("experience scene pins one screen and moves the timeline with the scroll", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
-  await skipLaunchIntro(page);
   await page.goto("/");
   await expect(page.locator("#experience")).toHaveAttribute("data-live", "");
   await expect(page.locator(".experience-track")).toHaveAttribute("data-scroll-accent-focus", /\d/);
@@ -1015,7 +967,6 @@ test("experience scene scrolls to a project toggle that receives keyboard focus"
   test.skip(testInfo.project.name !== "chromium");
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await skipLaunchIntro(page);
   await page.goto("/");
   await expect(page.locator("#experience")).toHaveAttribute("data-live", "");
   await expect(page.locator(".experience-track")).toHaveAttribute("data-scroll-accent-focus", /\d/);
@@ -1038,7 +989,6 @@ test("experience index jumps to a company and marks it current", async ({ page }
   test.skip(testInfo.project.name !== "chromium");
 
   await page.setViewportSize({ width: 1440, height: 900 });
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const index = page.locator(".experience-index-button");
@@ -1053,7 +1003,6 @@ test("experience shows the plain timeline with reduced motion", async ({ page },
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   await expect(page.locator("#experience")).not.toHaveAttribute("data-live", "");
@@ -1078,7 +1027,6 @@ const dustRestProgress = (index: number) => (index + 0.3) / (2 + 0.3 * 2);
 test("selected work carries portrait cards through the dust lane on scroll", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   const track = page.locator(".dust-track");
@@ -1112,7 +1060,6 @@ test("selected work shows a plain row of portrait cards with reduced motion", as
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await skipLaunchIntro(page);
   await page.goto("/");
 
   await expect(page.locator(".dust-track")).not.toHaveAttribute("data-live", "");

@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
-import { LaunchTerminal } from "@/components/launch-terminal";
 import { AboutScene } from "./_components/about-scene";
 import { ExperienceScene } from "./_components/experience-scene";
 import { ProjectDust } from "./_components/project-dust";
@@ -46,7 +45,6 @@ export function HomePage({ locale }: { locale: Locale }) {
           knowsAbout: skillGroups.flatMap((group) => [...group.skills]),
         }}
       />
-      <LaunchTerminal copy={ui.launch} />
       <ScrollAccent />
       <main id="main-content">
         <section

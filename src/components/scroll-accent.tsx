@@ -674,7 +674,6 @@ export function ScrollAccent() {
     let entryAnimation: Animation | null = null;
     let hasStarted = false;
     let isActive = true;
-    let introObserver: MutationObserver | null = null;
     // Document spans of surfaces that keep one tone in either theme, such as
     // the dark hero ("dark").
     let surfaces: Array<{ tone: string; top: number; bottom: number }> = [];
@@ -836,22 +835,6 @@ export function ScrollAccent() {
       render();
     }
 
-    function waitForIntro() {
-      if (!document.querySelector(".launch-terminal")) {
-        start();
-        return;
-      }
-
-      introObserver = new MutationObserver(() => {
-        if (!document.querySelector(".launch-terminal")) {
-          introObserver?.disconnect();
-          introObserver = null;
-          start();
-        }
-      });
-      introObserver.observe(document.body, { childList: true, subtree: true });
-    }
-
     const resizeObserver =
       typeof ResizeObserver === "undefined"
         ? null
@@ -869,7 +852,7 @@ export function ScrollAccent() {
     window.addEventListener("resize", handleResize);
     motionPreference.addEventListener("change", handleMotionPreference);
     void document.fonts?.ready.then(measure);
-    waitForIntro();
+    start();
 
     return () => {
       isActive = false;
@@ -879,7 +862,6 @@ export function ScrollAccent() {
       motionPreference.removeEventListener("change", handleMotionPreference);
       details.forEach((element) => element.removeEventListener("toggle", measure));
       resizeObserver?.disconnect();
-      introObserver?.disconnect();
       entryAnimation?.cancel();
       if (animationFrame) window.cancelAnimationFrame(animationFrame);
     };
