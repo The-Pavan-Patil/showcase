@@ -14,6 +14,7 @@ import Link from "next/link";
 import { AiWorkflowDiagram } from "@/components/ai-workflow-diagram";
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
+import { getPersonId } from "@/lib/structured-data";
 import { LoopEngineeringCards } from "@/components/loop-engineering-cards";
 import { SiteFooter } from "@/components/site-footer";
 import { ScrollAccent } from "@/components/scroll-accent";
@@ -194,8 +195,10 @@ export function SetupPage({ locale }: { locale: Locale }) {
           description:
             "Pavan Patil's AI-assisted software workflow across planning, implementation, testing, review, automation, and hardware setup.",
           url: `${siteUrl}${canonicalPath}`,
+          inLanguage: locale,
           mainEntity: {
             "@type": "Person",
+            "@id": getPersonId(siteUrl),
             name: profile.name,
             jobTitle: profile.role,
           },

@@ -214,13 +214,19 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       defaultTitle: "Pavan Patil — Software Engineer",
       titleTemplate: "%s — Pavan Patil",
       description:
-        "Software engineer building web, mobile, and backend products with TypeScript, React, Next.js, React Native, Node.js, and PostgreSQL.",
+        "Pavan Patil is a Bengaluru-based software engineer building web, mobile, and backend products with TypeScript, React, Next.js, React Native, Node.js, and PostgreSQL.",
       openGraphDescription:
         "Software engineer building across web, mobile, and backend—from system design to production.",
       twitterDescription: "Web, mobile, and backend—from system design to production.",
       keywords: [
         "Pavan Patil",
         "Software Engineer",
+        "Software Developer",
+        "Full-Stack Developer",
+        "React Native Developer",
+        "Next.js Developer",
+        "Bengaluru",
+        "India",
         "TypeScript",
         "React",
         "Next.js",
@@ -470,13 +476,17 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       defaultTitle: "Pavan Patil — ソフトウェアエンジニア",
       titleTemplate: "%s — Pavan Patil",
       description:
-        "TypeScript、React、Next.js、React Native、Node.js、PostgreSQLで、Web、モバイル、バックエンドのプロダクトを作るソフトウェアエンジニアです。",
+        "インド・ベンガルールを拠点に、TypeScript、React、Next.js、React Native、Node.js、PostgreSQLでWeb、モバイル、バックエンドのプロダクトを作るソフトウェアエンジニアです。日本でのお仕事も歓迎しています。",
       openGraphDescription:
         "Web・モバイル・バックエンドを横断し、設計から実装・リリースまで担うソフトウェアエンジニアです。",
       twitterDescription: "Web・モバイル・バックエンド。設計からリリースまで。",
       keywords: [
         "Pavan Patil",
         "ソフトウェアエンジニア",
+        "ソフトウェア開発者",
+        "フルスタックエンジニア",
+        "React Native エンジニア",
+        "日本",
         "TypeScript",
         "React",
         "Next.js",
@@ -726,13 +736,16 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       defaultTitle: "Pavan Patil — Softwareentwickler",
       titleTemplate: "%s — Pavan Patil",
       description:
-        "Softwareentwickler für Web-, Mobile- und Backend-Produkte mit TypeScript, React, Next.js, React Native, Node.js und PostgreSQL.",
+        "Pavan Patil ist Softwareentwickler aus Bengaluru, Indien, und baut Web-, Mobile- und Backend-Produkte mit TypeScript, React, Next.js, React Native, Node.js und PostgreSQL.",
       openGraphDescription:
         "Zuverlässige Software für komplexe reale Abläufe in Web, Mobile, Backend und datenintensiven Systemen.",
       twitterDescription: "Zuverlässige Software für komplexe reale Abläufe.",
       keywords: [
         "Pavan Patil",
         "Softwareentwickler",
+        "Full-Stack-Entwickler",
+        "React-Native-Entwickler",
+        "Bengaluru",
         "TypeScript",
         "React",
         "Next.js",
