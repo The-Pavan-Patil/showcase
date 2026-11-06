@@ -55,7 +55,7 @@ describe("metadata routes", () => {
     expect(robots()).toMatchObject({
       rules: { userAgent: "*", allow: "/" },
       sitemap: "https://portfolio.example/sitemap.xml",
-      host: "https://portfolio.example",
     });
+    expect(robots()).not.toHaveProperty("host");
   });
 });

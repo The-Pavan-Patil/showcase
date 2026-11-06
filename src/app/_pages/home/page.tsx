@@ -11,14 +11,22 @@ import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteFooter } from "@/components/site-footer";
-import { getSetupPath, type Locale } from "@/lib/i18n";
+import { getHomePath, getSetupPath, type Locale } from "@/lib/i18n";
 import { getPortfolioContent } from "@/lib/portfolio";
 import { getSiteUrl, resumeUrl } from "@/lib/site";
 import { getGoogleCalendarBookingUrl } from "@/lib/scheduling";
+import {
+  getPersonId,
+  getPersonSchema,
+  getWebSiteId,
+  getWebSiteSchema,
+} from "@/lib/structured-data";
 import { uiCopyByLocale } from "@/lib/ui-copy";
 
 export function HomePage({ locale }: { locale: Locale }) {
   const siteUrl = getSiteUrl();
+  const homePath = getHomePath(locale);
+  const pageUrl = `${siteUrl}${homePath === "/" ? "" : homePath}`;
   const googleCalendarBookingUrl = getGoogleCalendarBookingUrl();
   const ui = uiCopyByLocale[locale];
   const {
@@ -50,13 +58,23 @@ export function HomePage({ locale }: { locale: Locale }) {
       <JsonLd
         data={{
           "@context": "https://schema.org",
-          "@type": "Person",
-          name: profile.name,
-          jobTitle: profile.role,
-          url: siteUrl,
-          email: `mailto:${profile.email}`,
-          sameAs: socialLinks.map((link) => link.href),
-          knowsAbout: skillGroups.flatMap((group) => [...group.skills]),
+          "@graph": [
+            {
+              "@type": "ProfilePage",
+              "@id": `${siteUrl}${homePath}#profile`,
+              url: pageUrl,
+              name: ui.metadata.defaultTitle,
+              inLanguage: locale,
+              isPartOf: { "@id": getWebSiteId(siteUrl) },
+              mainEntity: { "@id": getPersonId(siteUrl) },
+            },
+            getWebSiteSchema({ locale, siteUrl }),
+            getPersonSchema({
+              locale,
+              siteUrl,
+              content: { profile, socialLinks, skillGroups, experience },
+            }),
+          ],
         }}
       />
       <ScrollAccent />

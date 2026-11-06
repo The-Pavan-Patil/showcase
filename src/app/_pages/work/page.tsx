@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
+import { getPersonReference } from "@/lib/structured-data";
 import { ProjectVisual } from "@/components/project-visual";
 import { SiteFooter } from "@/components/site-footer";
 import { ArticleMap } from "./_components/article-map";
@@ -110,7 +111,9 @@ export function WorkPage({
           name: project.title,
           description: article.oneLineSummary,
           url: canonicalUrl,
-          creator: { "@type": "Person", name: "Pavan Patil" },
+          inLanguage: locale,
+          author: getPersonReference(siteUrl),
+          creator: getPersonReference(siteUrl),
           keywords: project.technologies.join(", "),
           ...(project.media ? { image: `${siteUrl}${project.media.src}` } : {}),
         }}
