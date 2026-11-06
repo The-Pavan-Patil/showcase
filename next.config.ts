@@ -1,5 +1,6 @@
 import { networkInterfaces } from "node:os";
 
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
 const DEFAULT_POSTHOG_HOST = "https://eu.i.posthog.com";
@@ -33,6 +34,9 @@ const localNetworkHosts = Object.values(networkInterfaces())
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: localNetworkHosts,
+  // Posts under src/content/writing are .mdx modules imported by the
+  // /writing routes.
+  pageExtensions: ["ts", "tsx", "md", "mdx"],
   experimental: {
     globalNotFound: true,
   },
@@ -85,4 +89,6 @@ const nextConfig: NextConfig = {
     : {}),
 };
 
-export default nextConfig;
+const withMDX = createMDX();
+
+export default withMDX(nextConfig);
