@@ -10,6 +10,7 @@ import { Container } from "@/components/container";
 import { getWorkPath, type Locale } from "@/lib/i18n";
 import type { ProjectCaseStudy } from "@/lib/portfolio";
 import { formatCopy, type UiCopy } from "@/lib/ui-copy";
+import { whenVisitorEngages } from "@/lib/page-settled";
 import { useScrollSceneLive } from "@/lib/use-scroll-scene";
 
 import type { DustField, DustMotion } from "./dust-field";
@@ -209,9 +210,20 @@ export function ProjectDust({
     });
     resizeObserver.observe(stage);
 
+    // The work section sits right under the hero, so "close" is true on
+    // load. Waiting for the first scroll or touch as well keeps three.js
+    // (and its long setup task) off the first paint. Until then the DOM
+    // cards show, fading instead of turning to dust.
+    let engaged = false;
+    let near = false;
+    void whenVisitorEngages().then(() => {
+      engaged = true;
+      if (near && !disposed) void ensureField();
+    });
     const visibility = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) void ensureField();
+        near = Boolean(entry?.isIntersecting);
+        if (near && engaged) void ensureField();
       },
       { rootMargin: "100% 0px" },
     );

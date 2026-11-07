@@ -11,9 +11,16 @@ for (const [name, route] of routes) {
   test(`${name} light and dark visual baselines`, async ({ page }, testInfo) => {
     await page.goto(route);
     await page.evaluate(() => document.fonts.ready);
-    // The Selected Work dust loads three.js on demand; wait until it has
-    // settled on WebGL dust or the plain fallback.
-    if (route === "/") await page.locator(".dust-track[data-dust]").waitFor({ state: "attached" });
+    // The Selected Work dust loads three.js once the visitor engages (a key
+    // press counts and doesn't scroll); wait until it has settled on WebGL
+    // dust or the plain fallback. Retried, as a press before hydration is
+    // not yet heard.
+    if (route === "/") {
+      await expect(async () => {
+        await page.keyboard.press("Shift");
+        await expect(page.locator(".dust-track[data-dust]")).toBeAttached({ timeout: 1_000 });
+      }).toPass({ timeout: 15_000 });
+    }
     await expect(page).toHaveScreenshot(`${name}-light.png`, { fullPage: true, animations: "disabled" });
 
     if (testInfo.project.name === "mobile-chromium") {
