@@ -23,7 +23,14 @@ import {
 } from "@/lib/structured-data";
 import { uiCopyByLocale } from "@/lib/ui-copy";
 
-export function HomePage({ locale }: { locale: Locale }) {
+export function HomePage({
+  locale,
+  mainClassName,
+}: {
+  locale: Locale;
+  /** Lets a route attach a preloaded font (see hero-font.ts). */
+  mainClassName?: string;
+}) {
   const siteUrl = getSiteUrl();
   const homePath = getHomePath(locale);
   const pageUrl = `${siteUrl}${homePath === "/" ? "" : homePath}`;
@@ -78,7 +85,7 @@ export function HomePage({ locale }: { locale: Locale }) {
         }}
       />
       <ScrollAccent />
-      <main id="main-content">
+      <main id="main-content" className={mainClassName}>
         <HeroSection
           title={profile.heroTitle}
           accent={profile.heroAccent}
