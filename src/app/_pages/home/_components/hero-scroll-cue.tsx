@@ -84,6 +84,12 @@ export function HeroScrollCue({
             style={{ scaleY: draw }}
           />
         ) : null}
+        {/* The accent dot starts here, at the hairline's bottom end. */}
+        <span
+          className="scroll-accent-heading-target scroll-accent-fallback hero-scroll-cue-dot"
+          data-scroll-accent-anchor="hero"
+          data-scroll-accent-phase="heading"
+        />
       </span>
       <span className="hero-scroll-cue-label">{label}</span>
     </motion.a>

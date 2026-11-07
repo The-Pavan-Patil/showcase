@@ -2,36 +2,20 @@ import { act, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
-  resolveScrollAccentFrame,
+  floatBelow,
+  isSpringAtRest,
+  launchSpring,
+  resolveScrollAccentStop,
   ScrollAccent,
-  type ScrollAccentWaypoint,
+  stepSpring,
+  stopViewportPoint,
+  type ScrollAccentStop,
 } from "@/components/scroll-accent";
 
-const waypoints: ScrollAccentWaypoint[] = [
-  {
-    id: "hero",
-    phase: "heading",
-    x: 40,
-    y: 100,
-    size: 8,
-    magnet: true,
-  },
-  {
-    id: "work",
-    phase: "heading",
-    x: 40,
-    y: 500,
-    size: 8,
-    magnet: true,
-  },
-  {
-    id: "company",
-    phase: "experience-major",
-    x: 80,
-    y: 900,
-    size: 28,
-    magnet: true,
-  },
+const stops: ScrollAccentStop[] = [
+  { id: "hero", phase: "heading", x: 400, y: 700, size: 8, activateAt: -Infinity },
+  { id: "work", phase: "heading", x: 40, y: 1100, size: 8, activateAt: 300 },
+  { id: "company", phase: "experience-major", x: 80, y: 1900, size: 28, activateAt: 1500 },
 ];
 
 afterEach(() => {
@@ -40,139 +24,76 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("resolveScrollAccentFrame", () => {
-  it("holds at magnetic anchors before easing toward the next waypoint", () => {
-    expect(resolveScrollAccentFrame(waypoints, 0, 100)).toEqual(waypoints[0]);
-    expect(resolveScrollAccentFrame(waypoints, 20, 100)).toMatchObject({
-      id: "hero",
-      x: 40,
-      y: 100,
-      size: 8,
-    });
-
-    const midpoint = resolveScrollAccentFrame(waypoints, 200, 100);
-    expect(midpoint).toMatchObject({ id: "work", phase: "heading" });
-    expect(midpoint?.x).toBeCloseTo(40);
-    expect(midpoint?.y).toBeCloseTo(300);
-    expect(midpoint?.size).toBeCloseTo(8);
-  });
-
-  it("holds eyebrow headings for eighteen percent of each transition edge", () => {
-    const departureHold = resolveScrollAccentFrame(waypoints, 64, 100);
-    const arrivalHold = resolveScrollAccentFrame(waypoints, 336, 100);
-
-    expect(departureHold).toMatchObject({ id: "hero", y: 100 });
-    expect(arrivalHold).toMatchObject({ id: "work", y: 500 });
-  });
-
-  it("morphs the dot size while moving into a suitcase node", () => {
-    const frame = resolveScrollAccentFrame(waypoints, 600, 100);
-
-    expect(frame).toMatchObject({
-      id: "company",
-      phase: "experience-major",
-    });
-    expect(frame?.x).toBeGreaterThan(40);
-    expect(frame?.x).toBeLessThan(80);
-    expect(frame?.size).toBeGreaterThan(8);
-    expect(frame?.size).toBeLessThan(28);
-  });
-
-  it("snaps between waypoints when reduced motion is enabled", () => {
-    expect(resolveScrollAccentFrame(waypoints, 180, 100, true)).toBe(
-      waypoints[0],
-    );
-    expect(resolveScrollAccentFrame(waypoints, 220, 100, true)).toBe(
-      waypoints[1],
-    );
-  });
-
-  it("skips non-magnetic rail waypoints when reduced motion is enabled", () => {
-    const routeWithRail: ScrollAccentWaypoint[] = [
-      waypoints[0],
-      {
-        id: "hero-global-departure",
-        phase: "global-rail",
-        x: 8,
-        y: 180,
-        size: 8,
-        magnet: false,
-      },
-      {
-        id: "work-global-approach",
-        phase: "global-rail",
-        x: 8,
-        y: 420,
-        size: 8,
-        magnet: false,
-      },
-      waypoints[1],
-    ];
-
-    expect(resolveScrollAccentFrame(routeWithRail, 180, 100, true)).toBe(
-      waypoints[0],
-    );
-    expect(resolveScrollAccentFrame(routeWithRail, 220, 100, true)).toBe(
-      waypoints[1],
-    );
+describe("resolveScrollAccentStop", () => {
+  it("targets the last stop whose section has entered", () => {
+    expect(resolveScrollAccentStop(stops, 0)).toBe(0);
+    expect(resolveScrollAccentStop(stops, 299)).toBe(0);
+    expect(resolveScrollAccentStop(stops, 300)).toBe(1);
+    expect(resolveScrollAccentStop(stops, 1499)).toBe(1);
+    expect(resolveScrollAccentStop(stops, 5000)).toBe(2);
   });
 });
 
-describe("resolveScrollAccentFrame with sticky stages", () => {
-  // An eyebrow at document y 500 whose stage pins from scroll 400 to 1400,
-  // then a plain heading further down. The activation line is at 100.
-  const stick = { y: 500, from: 400, to: 1400 };
-  const route: ScrollAccentWaypoint[] = [
-    { id: "hero", phase: "heading", x: 300, y: 100, size: 8, magnet: true },
-    { id: "work", phase: "heading", x: 40, y: 500, size: 8, magnet: true, stick },
-    { id: "work", phase: "heading", x: 40, y: 1500, size: 8, magnet: true, stick },
-    { id: "next", phase: "heading", x: 40, y: 2200, size: 8, magnet: true },
-  ];
+describe("stopViewportPoint", () => {
+  it("moves a plain target with the page", () => {
+    expect(stopViewportPoint(stops[1], 400)).toEqual({ x: 40, y: 700 });
+  });
 
-  it("rides an eyebrow in place while its stage is pinned", () => {
-    for (const scrollY of [400, 900, 1400]) {
-      const frame = resolveScrollAccentFrame(route, scrollY, 100);
-      expect(frame).toMatchObject({ id: "work", x: 40 });
-      expect((frame?.y ?? 0) - scrollY).toBeCloseTo(100);
+  it("holds a sticky target in place while its stage is pinned", () => {
+    const pinned: ScrollAccentStop = { ...stops[1], stick: { from: 800, to: 1600 } };
+    const atPin = stopViewportPoint(pinned, 800).y;
+
+    expect(stopViewportPoint(pinned, 1200).y).toBe(atPin);
+    expect(stopViewportPoint(pinned, 1600).y).toBe(atPin);
+    expect(stopViewportPoint(pinned, 1700).y).toBe(atPin - 100);
+  });
+});
+
+describe("floatBelow", () => {
+  it("leaves targets well below the float line alone", () => {
+    expect(floatBelow(600, 100)).toBeCloseTo(600, 3);
+  });
+
+  it("follows a target exactly until it nears the line", () => {
+    expect(floatBelow(116, 100)).toBe(116);
+  });
+
+  it("eases a target into the line instead of stopping it dead", () => {
+    expect(floatBelow(-400, 100)).toBeCloseTo(100, 3);
+    const nearLine = floatBelow(100, 100);
+    expect(nearLine).toBeGreaterThan(100);
+    expect(nearLine).toBeLessThan(116);
+    // Monotonic: scrolling further never moves the dot back down.
+    expect(floatBelow(90, 100)).toBeLessThan(nearLine);
+    // Smooth at the knee: the slope is 1 on both sides.
+    expect(floatBelow(116, 100) - floatBelow(115.99, 100)).toBeCloseTo(0.01, 4);
+  });
+});
+
+describe("spring flight", () => {
+  it("lands within about a second, without a large overshoot", () => {
+    let state = launchSpring({ x: 0, y: 0, vx: 0, vy: 0 }, { x: 0, y: 400 });
+    let lowest = 0;
+    let time = 0;
+    while (!isSpringAtRest(state) && time < 3) {
+      state = stepSpring(state, 1 / 60);
+      lowest = Math.min(lowest, state.y);
+      time += 1 / 60;
     }
+
+    expect(time).toBeLessThan(1.2);
+    expect(lowest).toBeGreaterThan(-400 * 0.08);
   });
 
-  it("slides through the viewport to the next eyebrow without doubling back", () => {
-    const viewportYs = [1400, 1550, 1750, 1950, 2100].map((scrollY) => {
-      const frame = resolveScrollAccentFrame(route, scrollY, 100);
-      return (frame?.y ?? 0) - scrollY;
-    });
-
-    // Pinned at 100 when the stage lets go, on the activation line on arrival.
-    expect(viewportYs[0]).toBeCloseTo(100);
-    expect(viewportYs[viewportYs.length - 1]).toBeCloseTo(100);
-    viewportYs.forEach((viewportY) => {
-      expect(viewportY).toBeGreaterThanOrEqual(99.5);
-      expect(viewportY).toBeLessThanOrEqual(100.5);
-    });
+  it("kicks sideways at take-off so the flight curves", () => {
+    const state = launchSpring({ x: 0, y: 0, vx: 0, vy: 0 }, { x: 0, y: 400 });
+    expect(Math.abs(state.vx)).toBeGreaterThan(0);
+    expect(state.vy).toBe(0);
   });
 
-  it("fades the dot between visible and hidden waypoints", () => {
-    const fading: ScrollAccentWaypoint[] = [
-      { id: "workflow", phase: "heading", x: 40, y: 500, size: 8, magnet: true },
-      {
-        id: "workflow-exit",
-        phase: "hidden",
-        x: 40,
-        y: 640,
-        size: 8,
-        opacity: 0,
-        stick: { y: 500, from: 0, to: 0 },
-      },
-    ];
-
-    expect(resolveScrollAccentFrame(fading, 400, 100)?.opacity).toBeUndefined();
-    const midway = resolveScrollAccentFrame(fading, 470, 100);
-    expect(midway?.opacity).toBeGreaterThan(0);
-    expect(midway?.opacity).toBeLessThan(1);
-    // The eyebrow keeps its document place while the dot fades on it.
-    expect(midway?.y).toBeCloseTo(500);
-    expect(resolveScrollAccentFrame(fading, 600, 100)?.opacity).toBe(0);
+  it("keeps the dot's current speed when re-aimed mid-flight", () => {
+    const state = launchSpring({ x: 10, y: 10, vx: 50, vy: -20 }, { x: 0, y: 0 });
+    expect(state).toEqual({ x: 0, y: 0, vx: 50, vy: -20 });
   });
 });
 
@@ -186,10 +107,7 @@ describe("ScrollAccent", () => {
     vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => undefined);
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
       function getBounds(this: HTMLElement) {
-        const x = Number(
-          this.dataset.testX ??
-            (this.classList.contains("scroll-accent-global-rail") ? 8 : 0),
-        );
+        const x = Number(this.dataset.testX ?? 0);
         const y = Number(this.dataset.testY ?? 0);
         const size = Number(this.dataset.testSize ?? 8);
         const height = Number(this.dataset.testHeight ?? size);
@@ -214,14 +132,14 @@ describe("ScrollAccent", () => {
           <span
             data-scroll-accent-anchor="hero"
             data-scroll-accent-phase="heading"
-            data-test-x="20"
-            data-test-y="100"
+            data-test-x="400"
+            data-test-y="600"
           />
           <span
             data-scroll-accent-anchor="work"
             data-scroll-accent-phase="heading"
             data-test-x="20"
-            data-test-y="400"
+            data-test-y="1000"
           />
           <section
             data-scroll-accent-experience
@@ -287,6 +205,10 @@ describe("ScrollAccent", () => {
     const traveler = view.container.querySelector(".scroll-accent-traveler");
     expect(traveler).toHaveAttribute("aria-hidden", "true");
     expect(traveler).toHaveAttribute("data-ready", "true");
+    // It starts at rest on the hero's scroll cue.
+    expect(traveler).toHaveAttribute("data-active-anchor", "hero");
+    expect(traveler).toHaveAttribute("data-landed", "true");
+    expect(document.querySelectorAll(".scroll-accent-global-rail")).toHaveLength(0);
     expect(document.querySelectorAll(".scroll-accent-traveler")).toHaveLength(1);
     expect(document.documentElement).toHaveClass("scroll-accent-mounted");
 

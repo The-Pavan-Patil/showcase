@@ -87,12 +87,6 @@ export function HeroSection({
     >
       <Container className="hero-container">
         <div className="hero-copy">
-          <span
-            className="scroll-accent-heading-target scroll-accent-fallback"
-            data-scroll-accent-anchor="hero"
-            data-scroll-accent-phase="heading"
-            aria-hidden="true"
-          />
           <motion.h1
             id="hero-title"
             style={
