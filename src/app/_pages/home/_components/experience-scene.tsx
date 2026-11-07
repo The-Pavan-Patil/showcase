@@ -30,20 +30,43 @@ const RISE_REM = 2;
 /** Share of the window, from its bottom edge, over which blocks rise. */
 const RISE_SPAN = 0.25;
 
+/*
+ * Pin hold: tune these to change how the accent dot meets the timeline.
+ *
+ * When the stage pins, it holds still for HOLD_VIEWPORTS × the viewport
+ * height of scroll before the timeline starts travelling, so the dot has
+ * time to fly from the eyebrow to the first company. After the hold the
+ * timeline moves one-to-one with the scroll and the dot steps down node by
+ * node as each one reaches the focus line.
+ *
+ * HOLD_VIEWPORTS     length of the hold. 0 = no hold (the old behaviour);
+ *                    0.5 = half a screen of scroll.
+ * HOLD_MIN_PX        floor for the hold on short viewports (phones).
+ * FIRST_NODE_AT      when, within the hold, the dot is sent to the first
+ *                    company: 0 = the moment the stage pins, 1 = the end of
+ *                    the hold (no time left to fly). Keep it low so the dot
+ *                    lands before the timeline starts moving.
+ */
+const HOLD_VIEWPORTS = 0.45;
+const HOLD_MIN_PX = 240;
+const FIRST_NODE_AT = 0;
+
 type TimelineNode = {
   anchor: string;
   /** Node centre from the top of the list. */
   y: number;
-  /** Scroll into the track at which the accent dot reaches the node. */
+  /** Timeline travel (after the hold) at which the node reaches the focus line. */
   offset: number;
   /** Where the node is then, from the top of the pinned stage. */
   focusY: number;
 };
 
 type SceneLayout = {
+  /** Scroll into the track spent pinned and still before the timeline moves. */
+  hold: number;
   /** How far the timeline travels before its end is in view. */
   travel: number;
-  /** Scroll into the track the stage stays pinned for. */
+  /** Scroll into the track the stage stays pinned for, hold included. */
   range: number;
   /** Focus line, from the top of the pinned stage (the viewport). */
   focusY: number;
@@ -52,7 +75,7 @@ type SceneLayout = {
   rise: number;
   trackHeight: number;
   nodes: TimelineNode[];
-  /** Where each company's node crosses the focus line. */
+  /** Timeline travel at which each company's node crosses the focus line. */
   companyOffsets: number[];
   reveals: { element: HTMLElement; top: number }[];
 };
@@ -131,11 +154,13 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
         focusY: Math.round(windowTop + centres[index] - Math.min(offset, travel)),
       };
     });
-    const range = Math.max(travel, nodes[nodes.length - 1].offset);
+    const hold = Math.round(Math.max(HOLD_MIN_PX, window.innerHeight * HOLD_VIEWPORTS));
+    const range = hold + Math.max(travel, nodes[nodes.length - 1].offset);
     const rem =
       Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
 
     setLayout({
+      hold,
       travel,
       range,
       focusY: Math.round(windowTop + firstCentre),
@@ -162,7 +187,12 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
     const stage = stageRef.current;
     if (!current || !track || !stage) return;
 
-    const scrolled = clamp(-track.getBoundingClientRect().top, 0, current.range);
+    // Nothing moves during the hold; after it, `scrolled` is timeline travel.
+    const scrolled = clamp(
+      -track.getBoundingClientRect().top - current.hold,
+      0,
+      current.range - current.hold,
+    );
     const travelled = Math.min(scrolled, current.travel);
     listY.set(-travelled);
 
@@ -185,7 +215,7 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
       .querySelectorAll<HTMLElement>("[data-experience-index]")
       .forEach((item, index) => {
         const start = offsets[index] ?? 0;
-        const end = offsets[index + 1] ?? current.range;
+        const end = offsets[index + 1] ?? current.range - current.hold;
         const fill = item.querySelector<HTMLElement>(".experience-index-fill");
         if (fill) {
           fill.style.transform = `scaleY(${clamp((scrolled - start) / Math.max(1, end - start))})`;
@@ -233,7 +263,8 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
   function scrollToOffset(offset: number, behavior: ScrollBehavior) {
     const track = trackRef.current;
     if (!track) return;
-    const top = track.getBoundingClientRect().top + window.scrollY + offset;
+    const hold = layoutRef.current?.hold ?? 0;
+    const top = track.getBoundingClientRect().top + window.scrollY + hold + offset;
     window.scrollTo({ top, behavior });
   }
 
@@ -260,9 +291,18 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
 
   const liveLayout = isLive ? layout : null;
   const placed = new Map(liveLayout?.nodes.map((node) => [node.anchor, node]));
-  // Live nodes publish when and where the accent dot reaches them.
+  // Live nodes publish when (scroll into the track) and where the accent dot
+  // reaches them. The first is called during the hold; the rest as they
+  // reach the focus line once the timeline moves.
+  const accentOffset = (anchor: string) => {
+    const node = placed.get(anchor);
+    if (!node || !liveLayout) return undefined;
+    return node.offset === 0
+      ? Math.round(liveLayout.hold * FIRST_NODE_AT)
+      : liveLayout.hold + node.offset;
+  };
   const accentProps = (anchor: string) => ({
-    "data-scroll-accent-offset": placed.get(anchor)?.offset,
+    "data-scroll-accent-offset": accentOffset(anchor),
     "data-scroll-accent-focus": placed.get(anchor)?.focusY,
   });
 

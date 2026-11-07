@@ -10,6 +10,7 @@ import { getPersonReference } from "@/lib/structured-data";
 import { ProjectVisual } from "@/components/project-visual";
 import { SiteFooter } from "@/components/site-footer";
 import { ArticleMap } from "./_components/article-map";
+import { CaseReveal } from "./_components/case-reveal";
 import { WorkTechnologyChip } from "./_components/work-technology-chip";
 import {
   getAlternateLanguages,
@@ -126,7 +127,6 @@ export function WorkPage({
                 <p className="eyebrow">{project.kicker}</p>
                 <h1 id="case-title">{project.title}</h1>
                 <p className="case-lede">{article.oneLineSummary}</p>
-                <p className="case-summary">{project.summary}</p>
                 <div
                   className="case-tags"
                   aria-label={formatCopy(ui.work.technologiesAria, { title: project.title })}
@@ -137,60 +137,49 @@ export function WorkPage({
                 </div>
               </div>
 
-              <dl className="case-facts">
-                <div>
-                  <dt>{ui.work.role}</dt>
-                  <dd>{project.role}</dd>
-                </div>
-                <div>
-                  <dt>{ui.work.experienceContext}</dt>
-                  <dd>{project.experienceContext}</dd>
-                </div>
-                <div>
-                  <dt>{ui.work.clientCompany}</dt>
-                  <dd>{project.client}</dd>
-                </div>
-                <div>
-                  <dt>{ui.work.articleLengthLabel}</dt>
-                  <dd>{formatCopy(ui.work.articleLength, { count: article.sections.length })}</dd>
-                </div>
-              </dl>
+              <div className="case-hero-visual">
+                {project.media ? (
+                  <figure className="case-media">
+                    <Image
+                      src={project.media.src}
+                      alt={project.media.alt}
+                      fill
+                      priority
+                      sizes="(max-width: 900px) 100vw, 52vw"
+                    />
+                    {project.media.caption ? <figcaption>{project.media.caption}</figcaption> : null}
+                  </figure>
+                ) : (
+                  <ProjectVisual
+                    copy={ui.projectVisual}
+                    type={project.visual}
+                    label={project.visualLabel}
+                  />
+                )}
+              </div>
             </div>
 
-            {project.media ? (
-              <figure className="case-media">
-                <Image
-                  src={project.media.src}
-                  alt={project.media.alt}
-                  fill
-                  priority
-                  sizes="(max-width: 760px) 100vw, 72rem"
-                />
-                {project.media.caption ? <figcaption>{project.media.caption}</figcaption> : null}
-              </figure>
-            ) : (
-              <ProjectVisual
-                copy={ui.projectVisual}
-                type={project.visual}
-                label={project.visualLabel}
-              />
-            )}
-          </Container>
-        </section>
-
-        <section
-          className="case-metrics"
-          aria-label={formatCopy(ui.work.factsAria, { title: project.title })}
-        >
-          <Container>
-            <div className="case-metrics-grid">
-              {project.metrics.map((metric) => (
-                <div key={metric.label}>
-                  <strong>{metric.value}</strong>
-                  <span>{metric.label}</span>
-                </div>
-              ))}
-            </div>
+            <dl
+              className="case-facts"
+              aria-label={formatCopy(ui.work.factsAria, { title: project.title })}
+            >
+              <div>
+                <dt>{ui.work.role}</dt>
+                <dd>{project.role}</dd>
+              </div>
+              <div>
+                <dt>{ui.work.experienceContext}</dt>
+                <dd>{project.experienceContext}</dd>
+              </div>
+              <div>
+                <dt>{ui.work.clientCompany}</dt>
+                <dd>{project.client}</dd>
+              </div>
+              <div>
+                <dt>{ui.work.articleLengthLabel}</dt>
+                <dd>{formatCopy(ui.work.articleLength, { count: article.sections.length })}</dd>
+              </div>
+            </dl>
           </Container>
         </section>
 
@@ -205,7 +194,7 @@ export function WorkPage({
               ))}
 
               {article.closingQuote ? (
-                <blockquote className="case-closing-quote">
+                <blockquote className="case-closing-quote" data-reveal>
                   <Quote aria-hidden="true" size={24} />
                   <p>{article.closingQuote}</p>
                 </blockquote>
@@ -227,7 +216,7 @@ export function WorkPage({
 
         <section className="contribution-section">
           <Container>
-            <div className="contribution-card">
+            <div className="contribution-card" data-reveal>
               <div>
                 <p className="eyebrow">{ui.work.contributionEyebrow}</p>
                 <h2>{ui.work.contributionTitle}</h2>
@@ -244,16 +233,42 @@ export function WorkPage({
           </Container>
         </section>
 
-        <section className="next-project-section">
+        <section className="next-project-section" aria-labelledby="next-project-title">
           <Container>
-            <p className="eyebrow">{ui.work.nextCaseStudy}</p>
-            <Link href={getWorkPath(locale, nextProject.slug)}>
-              <span>{nextProject.title}</span>
-              <strong>{nextProject.cardHeadline}</strong>
-              <ArrowRight aria-hidden="true" size={26} />
+            <Link
+              className="next-project-card"
+              href={getWorkPath(locale, nextProject.slug)}
+              data-reveal
+            >
+              <div className="next-project-copy">
+                <p className="eyebrow">{ui.work.nextCaseStudy}</p>
+                <h2 id="next-project-title">{nextProject.title}</h2>
+                <p className="next-project-headline">{nextProject.cardHeadline}</p>
+                <span className="next-project-arrow" aria-hidden="true">
+                  <ArrowRight size={22} />
+                </span>
+              </div>
+              <div className="next-project-media">
+                {nextProject.media ? (
+                  <Image
+                    src={nextProject.media.src}
+                    alt=""
+                    fill
+                    sizes="(max-width: 900px) 100vw, 40vw"
+                  />
+                ) : (
+                  <ProjectVisual
+                    copy={ui.projectVisual}
+                    type={nextProject.visual}
+                    label={nextProject.visualLabel}
+                    compact
+                  />
+                )}
+              </div>
             </Link>
           </Container>
         </section>
+        <CaseReveal />
       </main>
       <SiteFooter
         copy={{ ...ui.footer, brandAria: ui.header.brandAria, navigation: ui.header.navigation }}
@@ -314,10 +329,14 @@ function CaseArticleSection({
 }) {
   return (
     <section className="case-article-section" id={section.id} aria-labelledby={`${section.id}-heading`}>
-      <span className="case-section-number">{String(index + 1).padStart(2, "0")}</span>
+      <span className="case-section-number" data-reveal>
+        {String(index + 1).padStart(2, "0")}
+      </span>
       <div className="case-section-body">
-        {section.eyebrow ? <p className="eyebrow">{section.eyebrow}</p> : null}
-        <h2 id={`${section.id}-heading`}>{section.title}</h2>
+        <header className="case-section-head" data-reveal>
+          {section.eyebrow ? <p className="eyebrow">{section.eyebrow}</p> : null}
+          <h2 id={`${section.id}-heading`}>{section.title}</h2>
+        </header>
         <div className="case-block-stack">
           {section.blocks.map((block, blockIndex) => (
             <CaseBlock block={block} key={`${section.id}-block-${blockIndex}`} />
@@ -328,7 +347,7 @@ function CaseArticleSection({
           <div className="case-subsections">
             {section.subsections.map((subsection) => (
               <section className="case-subsection" key={`${section.id}-${subsection.title}`}>
-                <h3>{subsection.title}</h3>
+                <h3 data-reveal>{subsection.title}</h3>
                 <div className="case-block-stack">
                   {subsection.blocks.map((block, blockIndex) => (
                     <CaseBlock block={block} key={`${section.id}-${subsection.title}-${blockIndex}`} />
@@ -344,11 +363,11 @@ function CaseArticleSection({
 }
 
 function CaseBlock({ block }: { block: CaseStudyTextBlock }) {
-  if (block.type === "paragraph") return <p>{block.text}</p>;
+  if (block.type === "paragraph") return <p data-reveal>{block.text}</p>;
 
   if (block.type === "quote") {
     return (
-      <blockquote className="case-inline-quote">
+      <blockquote className="case-inline-quote" data-reveal>
         <Quote aria-hidden="true" size={18} />
         <p>{block.text}</p>
       </blockquote>
@@ -357,7 +376,7 @@ function CaseBlock({ block }: { block: CaseStudyTextBlock }) {
 
   if (block.type === "callout") {
     return (
-      <aside className="case-callout">
+      <aside className="case-callout" data-reveal>
         <Sparkles aria-hidden="true" size={18} />
         <div>
           <strong>{block.title}</strong>
@@ -369,7 +388,7 @@ function CaseBlock({ block }: { block: CaseStudyTextBlock }) {
 
   if (block.type === "orderedList") {
     return (
-      <ol className="case-ordered-list">
+      <ol className="case-ordered-list" data-reveal>
         {block.items.map((item) => (
           <li key={item}>{item}</li>
         ))}
@@ -378,7 +397,7 @@ function CaseBlock({ block }: { block: CaseStudyTextBlock }) {
   }
 
   return (
-    <ul className="case-block-list">
+    <ul className="case-block-list" data-reveal>
       {block.items.map((item) => (
         <li key={item}>
           <CheckCircle2 aria-hidden="true" size={17} />

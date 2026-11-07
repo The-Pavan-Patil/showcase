@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   DUST_HOLD,
+  isDustStagePinned,
   NEIGHBOUR_SCALE,
   resolveActiveIndex,
   resolveCardPose,
@@ -54,5 +55,21 @@ describe("project dust timeline", () => {
     expect(left.side).toBe(-1);
     expect(right.side).toBe(1);
     expect(resolveCardPose(2).dissolve).toBe(1);
+  });
+
+  it("shows only the centre card until the neighbours gather", () => {
+    expect(resolveCardPose(0, undefined, 0).dissolve).toBe(0);
+    expect(resolveCardPose(1, undefined, 0).dissolve).toBe(1);
+    expect(resolveCardPose(-1, undefined, 0).dissolve).toBe(1);
+    expect(resolveCardPose(1, undefined, 1)).toEqual(resolveCardPose(1));
+    const half = resolveCardPose(1, undefined, 0.5).dissolve;
+    expect(half).toBeGreaterThan(resolveCardPose(1).dissolve);
+    expect(half).toBeLessThan(1);
+  });
+
+  it("treats only the stretch between the ends as pinned", () => {
+    expect(isDustStagePinned(0)).toBe(false);
+    expect(isDustStagePinned(0.5)).toBe(true);
+    expect(isDustStagePinned(1)).toBe(false);
   });
 });

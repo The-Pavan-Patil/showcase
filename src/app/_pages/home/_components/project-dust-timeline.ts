@@ -59,17 +59,34 @@ export const PHONE_DISSOLVE_END = 1.1;
  * Pose of a card `offset` cards away from the centre (negative = left).
  * `dissolve` runs 0 (solid) to 1 (all dust); `side` is the edge the dust
  * leaves from, which is always the one facing away from the centre.
+ * `presence` (0-1) is how far the neighbours have gathered: at 0 only the
+ * centre card exists and everything beside it is already dust, which is how
+ * the scene looks before the stage pins and after it lets go.
  */
-export function resolveCardPose(offset: number, dissolveEnd = DISSOLVE_END) {
+export function resolveCardPose(
+  offset: number,
+  dissolveEnd = DISSOLVE_END,
+  presence = 1,
+) {
   const distance = Math.abs(offset);
   const toNeighbour = smoothstep(0, 1, distance);
+  const resting = Math.min(
+    1,
+    Math.max(0, (distance - DISSOLVE_START) / (dissolveEnd - DISSOLVE_START)),
+  );
+  const absent = (1 - Math.min(1, Math.max(0, presence))) * toNeighbour;
 
   return {
     scale: 1 + (NEIGHBOUR_SCALE - 1) * toNeighbour,
-    dissolve: Math.min(
-      1,
-      Math.max(0, (distance - DISSOLVE_START) / (dissolveEnd - DISSOLVE_START)),
-    ),
+    dissolve: resting + (1 - resting) * absent,
     side: offset < 0 ? -1 : 1,
   };
+}
+
+/**
+ * Whether the stage is pinned. Outside the pinned stretch the neighbours are
+ * dust; crossing in or out gathers or scatters them.
+ */
+export function isDustStagePinned(progress: number) {
+  return progress > 0.001 && progress < 0.999;
 }

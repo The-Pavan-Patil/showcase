@@ -3,7 +3,14 @@
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useSpring, useTransform } from "motion/react";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 
 import { Container } from "@/components/container";
@@ -16,6 +23,7 @@ import { useScrollSceneLive } from "@/lib/use-scroll-scene";
 import type { DustField, DustMotion } from "./dust-field";
 import {
   DISSOLVE_END,
+  isDustStagePinned,
   PHONE_DISSOLVE_END,
   resolveActiveIndex,
   resolveCardPose,
@@ -95,6 +103,10 @@ export function ProjectDust({
     damping: 24,
     mass: 0.6,
   });
+  // How far the neighbouring cards have gathered. Time-driven, so crossing
+  // into the pinned stretch plays the whole gather even if the visitor stops
+  // scrolling, and crossing out (either end) scatters them back to dust.
+  const presence = useMotionValue(0);
   const counter = useTransform(position, (value) =>
     String(resolveActiveIndex(value, count) + 1).padStart(2, "0"),
   );
@@ -137,7 +149,11 @@ export function ProjectDust({
       const { laneX, laneY, spacing } = metrics;
       const states = cards.map((card, index) => {
         const offset = index - current;
-        const pose = resolveCardPose(offset, metrics.dissolveEnd);
+        const pose = resolveCardPose(
+          offset,
+          metrics.dissolveEnd,
+          presence.get(),
+        );
         const shift = offset * spacing;
 
         card.style.transform = `translate3d(${shift.toFixed(2)}px, 0, 0) scale(${pose.scale.toFixed(4)})`;
@@ -161,6 +177,19 @@ export function ProjectDust({
       });
     };
     const unsubscribe = position.on("change", schedule);
+    const unsubscribePresence = presence.on("change", schedule);
+
+    let pinned = isDustStagePinned(scrollYProgress.get());
+    presence.jump(pinned ? 1 : 0);
+    const unsubscribeProgress = scrollYProgress.on("change", (value) => {
+      const next = isDustStagePinned(value);
+      if (next === pinned) return;
+      pinned = next;
+      animate(presence, pinned ? 1 : 0, {
+        duration: pinned ? 1.1 : 0.8,
+        ease: [0.22, 1, 0.36, 1],
+      });
+    });
 
     const resample = () => {
       if (!field) return;
@@ -245,6 +274,9 @@ export function ProjectDust({
       disposed = true;
       delete track.dataset.dust;
       unsubscribe();
+      unsubscribePresence();
+      unsubscribeProgress();
+      presence.stop();
       cancelAnimationFrame(frame);
       window.clearTimeout(resampleTimer);
       visibility.disconnect();
@@ -260,7 +292,7 @@ export function ProjectDust({
         card.style.pointerEvents = "";
       }
     };
-  }, [isLive, position]);
+  }, [isLive, position, presence, scrollYProgress]);
 
   // Tabbing to a card that is off to the side scrolls it to the centre.
   function centreCardForFocus(index: number) {
