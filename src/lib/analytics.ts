@@ -47,6 +47,26 @@ declare global {
 let posthogClient: AnalyticsClient | null = null;
 
 /**
+ * PostHog loads after the page settles, so events from the first moments
+ * (the initial pageview, an early click) wait here until it is ready.
+ */
+const MAX_PENDING_CAPTURES = 50;
+let pendingCaptures: Array<[string, Record<string, unknown>]> | null = null;
+
+/** Starts holding PostHog events until `setAnalyticsClient` is called. */
+export function holdAnalyticsEvents() {
+  pendingCaptures ??= [];
+}
+
+function capture(event: string, properties: Record<string, unknown>) {
+  if (posthogClient) {
+    posthogClient.capture(event, properties);
+  } else if (pendingCaptures && pendingCaptures.length < MAX_PENDING_CAPTURES) {
+    pendingCaptures.push([event, properties]);
+  }
+}
+
+/**
  * Public project key and ingestion origin for PostHog, or null when analytics
  * is not configured. Env vars are read as literal member access so Next can
  * inline them into the client bundle.
@@ -87,9 +107,15 @@ export function getPostHogAssetsHost(host: string) {
   return host.replace("//eu.i.", "//eu-assets.i.").replace("//us.i.", "//us-assets.i.");
 }
 
-/** Registers the initialized PostHog instance. Called once, from instrumentation-client. */
+/**
+ * Registers the initialized PostHog instance (or null when it failed to load)
+ * and flushes any held events. Called once, from instrumentation-client.
+ */
 export function setAnalyticsClient(client: AnalyticsClient | null) {
   posthogClient = client;
+  const held = pendingCaptures;
+  pendingCaptures = null;
+  held?.forEach(([event, properties]) => client?.capture(event, properties));
 }
 
 /**
@@ -179,7 +205,7 @@ export function trackEvent(
 ) {
   const payload = compactProperties(properties);
 
-  posthogClient?.capture(event, payload);
+  capture(event, payload);
   getGtag()?.("event", event, payload);
 }
 
@@ -199,7 +225,7 @@ export function trackPageView({
   const pageLocation = normalizeAnalyticsUrl(url);
   const payload = compactProperties(properties);
 
-  posthogClient?.capture("$pageview", {
+  capture("$pageview", {
     $current_url: pageLocation,
     ...payload,
   });

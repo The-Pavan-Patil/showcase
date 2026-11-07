@@ -99,7 +99,7 @@
   --color-accent-text: var(--accent-text);
   --font-sans: var(--font-lato), Lato, ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-figtree), Figtree, ui-sans-serif, system-ui, sans-serif;
-  --font-hero: var(--font-montserrat), Montserrat, var(--font-noto-sans-jp), ui-sans-serif, system-ui, sans-serif;
+  --font-hero: var(--font-montserrat), Montserrat, var(--font-jp), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-figtree), Figtree, ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -126,12 +126,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Japanese text paints first in the device's own gothic face (no download),
+   then switches to Noto Sans JP once the page has settled: its ~700 KiB of
+   subset files would otherwise hold back the first paint on /ja. The class
+   is added by <JapaneseWebFont />. */
+:root {
+  --font-jp-device: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", YuGothic, Meiryo, "Noto Sans CJK JP";
+  --font-jp: var(--font-jp-device);
+}
+
+html.jp-webfont {
+  --font-jp: var(--font-noto-sans-jp), var(--font-jp-device);
+}
+
 html[lang="ja"] body {
-  font-family: var(--font-noto-sans-jp), var(--font-sans);
+  font-family: var(--font-jp), var(--font-sans);
 }
 
 html[lang="ja"] :where(h1, h2, h3, h4, .brand-link, .section-heading, .dust-card-title, .case-section-body h2, .next-project-section a strong) {
-  font-family: var(--font-noto-sans-jp), var(--font-display);
+  font-family: var(--font-jp), var(--font-display);
 }
 
 :where(h1, h2) {

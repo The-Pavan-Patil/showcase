@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Figtree, Lato, Michroma, Montserrat, Noto_Sans_JP } from "next/font/google";
 
 import { GoogleAnalytics } from "@/components/google-analytics";
+import { JapaneseWebFont } from "@/components/japanese-web-font";
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
 import type { Locale } from "@/lib/i18n";
@@ -22,11 +23,13 @@ const figtree = Figtree({
   preload: false,
 });
 
+// The hero title is the page's largest paint, so its font is the one
+// preloaded; the others stay off the critical path.
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
   display: "swap",
-  preload: false,
+  preload: true,
 });
 
 const michroma = Michroma({
@@ -71,6 +74,7 @@ export function RootShell({
           {children}
         </Providers>
         <GoogleAnalytics />
+        {locale === "ja" ? <JapaneseWebFont /> : null}
       </body>
     </html>
   );
