@@ -2,11 +2,13 @@ import {
   ANALYTICS_INGEST_PATH,
   ensureGoogleAnalytics,
   getPostHogConfig,
+  holdAnalyticsEvents,
   normalizeAnalyticsUrl,
   setAnalyticsClient,
   trackEvent,
   trackPageView,
 } from "@/lib/analytics";
+import { whenPageSettled } from "@/lib/page-settled";
 import { resumeUrl } from "@/lib/site";
 
 const POSTHOG_UI_HOST = "https://eu.posthog.com";
@@ -134,9 +136,12 @@ try {
   }
 
   if (posthogConfig) {
-    // Imported lazily: instrumentation-client runs before hydration, and a
-    // static import would put the SDK on the critical path.
-    void import("posthog-js")
+    // Loaded only once the page has settled (first interaction, or idle
+    // after load): the SDK is ~70 KiB of script that would otherwise compete
+    // with hydration and the hero's paint. Events until then are held.
+    holdAnalyticsEvents();
+    void whenPageSettled()
+      .then(() => import("posthog-js"))
       .then(({ default: posthog }) => {
         posthog.init(posthogConfig.key, {
           api_host: ANALYTICS_INGEST_PATH,
@@ -167,13 +172,14 @@ try {
         });
 
         setAnalyticsClient(posthog);
-        captureInitialPageView();
       })
       .catch(() => {
         // Analytics must never break the page.
-        captureInitialPageView();
+        setAnalyticsClient(null);
       });
-  } else if (isAnalyticsEnabled) {
+  }
+
+  if (isAnalyticsEnabled) {
     captureInitialPageView();
   }
 } catch {

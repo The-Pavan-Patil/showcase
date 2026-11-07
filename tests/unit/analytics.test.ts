@@ -5,6 +5,7 @@ import {
   getGoogleAnalyticsId,
   getPostHogAssetsHost,
   getPostHogConfig,
+  holdAnalyticsEvents,
   normalizeAnalyticsUrl,
   setAnalyticsClient,
   trackEvent,
@@ -164,6 +165,26 @@ describe("event dispatch", () => {
     expect(() =>
       trackPageView({ url: "https://example.com/" }),
     ).not.toThrow();
+  });
+
+  it("holds PostHog events until the client registers, then flushes them in order", () => {
+    holdAnalyticsEvents();
+    trackPageView({ url: "https://example.com/" });
+    trackEvent("nav_clicked", { target: "work" });
+    expect(capture).not.toHaveBeenCalled();
+
+    setAnalyticsClient({ capture });
+
+    expect(capture.mock.calls.map(([event]) => event)).toEqual(["$pageview", "nav_clicked"]);
+  });
+
+  it("drops held events when PostHog fails to load", () => {
+    holdAnalyticsEvents();
+    trackEvent("nav_clicked", { target: "work" });
+    setAnalyticsClient(null);
+    setAnalyticsClient({ capture });
+
+    expect(capture).not.toHaveBeenCalled();
   });
 
   it("sends named events to PostHog and Google Analytics", () => {
