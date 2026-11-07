@@ -284,6 +284,13 @@ function createRandom(seed: number) {
   };
 }
 
+/** Resolves after the next frame has painted. */
+function nextFrame() {
+  return new Promise<void>((resolve) =>
+    requestAnimationFrame(() => window.setTimeout(resolve, 0)),
+  );
+}
+
 /** Rasterises a card at device resolution (untransformed CSS size). */
 function rasterizeCard(card: HTMLElement, ratio: number) {
   const width = Math.max(1, Math.round(card.offsetWidth));
@@ -451,81 +458,112 @@ export class DustField {
   /** (Re)builds every card from the DOM; call after resizes and image loads. */
   setCards(cards: HTMLElement[], step: number) {
     this.clearCards();
+    this.layers = cards.map((card, index) => this.createLayer(card, index, step));
+  }
+
+  /**
+   * The first build: one card per task with a painted frame between, then
+   * the shaders compiled without blocking where the driver allows, so
+   * starting the scene never freezes a scroll. Resolves false if cancelled.
+   */
+  async setCardsInSlices(
+    cards: HTMLElement[],
+    step: number,
+    isCancelled: () => boolean,
+  ) {
+    this.clearCards();
+    // Decoding the screenshots off the main thread first keeps the first
+    // card's draw from decoding one synchronously.
+    await Promise.all(
+      cards
+        .flatMap((card) => [...card.querySelectorAll("img")])
+        .filter((image) => image.complete && image.naturalWidth > 0)
+        .map((image) => image.decode().catch(() => undefined)),
+    );
+    for (const [index, card] of cards.entries()) {
+      await nextFrame();
+      if (isCancelled()) return false;
+      this.layers.push(this.createLayer(card, index, step));
+    }
+    await nextFrame();
+    if (isCancelled()) return false;
+    await this.renderer.compileAsync(this.scene, this.camera);
+    return !isCancelled();
+  }
+
+  private createLayer(card: HTMLElement, index: number, step: number): CardLayer {
     const three = this.three;
     const ratio = this.ratio;
+    const { canvas, width, height } = rasterizeCard(card, ratio);
+    const texture = new three.CanvasTexture(canvas);
+    texture.premultiplyAlpha = true;
+    texture.minFilter = three.LinearMipmapLinearFilter;
+    texture.anisotropy = 4;
 
-    this.layers = cards.map((card, index) => {
-      const { canvas, width, height } = rasterizeCard(card, ratio);
-      const texture = new three.CanvasTexture(canvas);
-      texture.premultiplyAlpha = true;
-      texture.minFilter = three.LinearMipmapLinearFilter;
-      texture.anisotropy = 4;
+    // Both materials share these by reference, so one write moves both.
+    const shared = {
+      uDissolve: { value: 0 },
+      uSide: { value: 1 },
+    };
 
-      // Both materials share these by reference, so one write moves both.
-      const shared = {
-        uDissolve: { value: 0 },
-        uSide: { value: 1 },
-      };
+    const mesh = new three.Mesh(
+      new three.PlaneGeometry(1, 1),
+      new three.ShaderMaterial({
+        vertexShader: CARD_VERTEX,
+        fragmentShader: CARD_FRAGMENT,
+        transparent: true,
+        premultipliedAlpha: true,
+        depthTest: false,
+        depthWrite: false,
+        uniforms: { ...shared, uMap: { value: texture } },
+      }),
+    );
 
-      const mesh = new three.Mesh(
-        new three.PlaneGeometry(1, 1),
-        new three.ShaderMaterial({
-          vertexShader: CARD_VERTEX,
-          fragmentShader: CARD_FRAGMENT,
-          transparent: true,
-          premultipliedAlpha: true,
-          depthTest: false,
-          depthWrite: false,
-          uniforms: { ...shared, uMap: { value: texture } },
-        }),
-      );
-
-      const sample = sampleParticles(canvas, width, height, step, index + 1);
-      const geometry = new three.BufferGeometry();
-      // `position` is unused by the shader but sizes the draw call.
-      geometry.setAttribute(
-        "position",
-        new three.BufferAttribute(
-          new Float32Array((sample.uvs.length / 2) * 3),
-          3,
-        ),
-      );
-      geometry.setAttribute("aUv", new three.BufferAttribute(sample.uvs, 2));
-      geometry.setAttribute(
-        "aColor",
-        new three.BufferAttribute(sample.colors, 3),
-      );
-      geometry.setAttribute(
-        "aSeed",
-        new three.BufferAttribute(sample.seeds, 4),
-      );
-      const dust = new three.Points(
-        geometry,
-        new three.ShaderMaterial({
-          vertexShader: DUST_VERTEX,
-          fragmentShader: DUST_FRAGMENT,
-          transparent: true,
-          premultipliedAlpha: true,
-          depthTest: false,
-          depthWrite: false,
-          uniforms: {
-            ...shared,
-            uCenter: { value: new three.Vector2() },
-            uSize: { value: new three.Vector2(width, height) },
-            uScale: { value: 1 },
-            uDrift: { value: 0 },
-            uSpread: { value: 0 },
-            uSwirl: { value: 0 },
-            uPointSize: { value: step * 1.1 },
-            uRatio: { value: ratio },
-          },
-        }),
-      );
-      mesh.frustumCulled = false;
-      dust.frustumCulled = false;
-      this.scene.add(mesh, dust);
-      return { mesh, dust, texture, width, height };
-    });
+    const sample = sampleParticles(canvas, width, height, step, index + 1);
+    const geometry = new three.BufferGeometry();
+    // `position` is unused by the shader but sizes the draw call.
+    geometry.setAttribute(
+      "position",
+      new three.BufferAttribute(
+        new Float32Array((sample.uvs.length / 2) * 3),
+        3,
+      ),
+    );
+    geometry.setAttribute("aUv", new three.BufferAttribute(sample.uvs, 2));
+    geometry.setAttribute(
+      "aColor",
+      new three.BufferAttribute(sample.colors, 3),
+    );
+    geometry.setAttribute(
+      "aSeed",
+      new three.BufferAttribute(sample.seeds, 4),
+    );
+    const dust = new three.Points(
+      geometry,
+      new three.ShaderMaterial({
+        vertexShader: DUST_VERTEX,
+        fragmentShader: DUST_FRAGMENT,
+        transparent: true,
+        premultipliedAlpha: true,
+        depthTest: false,
+        depthWrite: false,
+        uniforms: {
+          ...shared,
+          uCenter: { value: new three.Vector2() },
+          uSize: { value: new three.Vector2(width, height) },
+          uScale: { value: 1 },
+          uDrift: { value: 0 },
+          uSpread: { value: 0 },
+          uSwirl: { value: 0 },
+          uPointSize: { value: step * 1.1 },
+          uRatio: { value: ratio },
+        },
+      }),
+    );
+    mesh.frustumCulled = false;
+    dust.frustumCulled = false;
+    this.scene.add(mesh, dust);
+    return { mesh, dust, texture, width, height };
   }
 
   update(states: DustCardState[], motion: DustMotion) {

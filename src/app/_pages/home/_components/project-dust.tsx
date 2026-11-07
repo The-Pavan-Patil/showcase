@@ -195,8 +195,16 @@ export function ProjectDust({
         created.dispose();
         return;
       }
+      const box = fieldBox.getBoundingClientRect();
+      created.setSize(box.width, box.height);
+      if (
+        !(await created.setCardsInSlices(cards, particleStep(), () => disposed))
+      ) {
+        created.dispose();
+        return;
+      }
       field = created;
-      resample();
+      apply();
       track.dataset.dust = "ready";
     };
 
@@ -211,13 +219,14 @@ export function ProjectDust({
     resizeObserver.observe(stage);
 
     // The work section sits right under the hero, so "close" is true on
-    // load. three.js and its setup (~500ms of main thread) wait until the
-    // visitor has scrolled and paused, so they neither delay the first paint
-    // nor freeze the first scroll (or the accent dot's flight). Until then
-    // the DOM cards show, fading instead of turning to dust.
+    // load. three.js waits for the visitor's first scroll, then a short
+    // pause or one second at most, so it neither delays the first paint nor
+    // lands on the first flick (or the accent dot's flight); the cards are
+    // then built a slice per frame. Until then the DOM cards show, fading
+    // instead of turning to dust.
     let paused = false;
     let near = false;
-    void whenVisitorPauses().then(() => {
+    void whenVisitorPauses({ quiet: 250, maxWait: 1000 }).then(() => {
       paused = true;
       if (near && !disposed) void ensureField();
     });
