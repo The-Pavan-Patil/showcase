@@ -5,6 +5,7 @@ import {
   floatBelow,
   isSpringAtRest,
   launchSpring,
+  nextVisitIndex,
   resolveScrollAccentStop,
   ScrollAccent,
   stepSpring,
@@ -31,6 +32,41 @@ describe("resolveScrollAccentStop", () => {
     expect(resolveScrollAccentStop(stops, 300)).toBe(1);
     expect(resolveScrollAccentStop(stops, 1499)).toBe(1);
     expect(resolveScrollAccentStop(stops, 5000)).toBe(2);
+  });
+});
+
+describe("nextVisitIndex", () => {
+  const route: ScrollAccentStop[] = [
+    { id: "heading", phase: "heading", x: 0, y: 0, size: 8, activateAt: -Infinity },
+    ...[1, 2, 3, 4, 5, 6].map((n) => ({
+      id: `node-${n}`, phase: "experience-minor", x: 0, y: 0, size: 8, activateAt: n * 100,
+    })),
+    { id: "about-hidden", phase: "hidden", x: 0, y: 0, size: 8, activateAt: 800, hidden: true },
+    { id: "message", phase: "heading", x: 0, y: 0, size: 8, activateAt: 900 },
+  ];
+  const allOnScreen = () => true;
+
+  it("visits each skipped stop on screen, one at a time, once it arrives", () => {
+    expect(nextVisitIndex(route, 0, 6, false, allOnScreen)).toBe(0);
+    expect(nextVisitIndex(route, 0, 6, true, allOnScreen)).toBe(1);
+    expect(nextVisitIndex(route, 1, 6, true, allOnScreen)).toBe(2);
+    expect(nextVisitIndex(route, 5, 6, true, allOnScreen)).toBe(6);
+  });
+
+  it("steps back through stops when scrolling up", () => {
+    expect(nextVisitIndex(route, 3, 1, true, allOnScreen)).toBe(2);
+  });
+
+  it("passes over stops that have left the screen", () => {
+    const onScreen = (stop: ScrollAccentStop) => stop.id === "node-4";
+    expect(nextVisitIndex(route, 0, 6, true, onScreen)).toBe(4);
+    expect(nextVisitIndex(route, 0, 3, true, onScreen)).toBe(3);
+    // Heading for a stop that has gone, it moves on without arriving.
+    expect(nextVisitIndex(route, 2, 6, false, onScreen)).toBe(4);
+  });
+
+  it("goes direct across a hidden stretch", () => {
+    expect(nextVisitIndex(route, 5, 8, false, allOnScreen)).toBe(8);
   });
 });
 
@@ -89,6 +125,19 @@ describe("spring flight", () => {
     const state = launchSpring({ x: 0, y: 0, vx: 0, vy: 0 }, { x: 0, y: 400 });
     expect(Math.abs(state.vx)).toBeGreaterThan(0);
     expect(state.vy).toBe(0);
+  });
+
+  it("catches up faster with a boost", () => {
+    const settle = (boost: number) => {
+      let state = launchSpring({ x: 0, y: 0, vx: 0, vy: 0 }, { x: 0, y: 200 }, 0);
+      let time = 0;
+      while (Math.hypot(state.x, state.y) > 6 && time < 3) {
+        state = stepSpring(state, 1 / 60, boost);
+        time += 1 / 60;
+      }
+      return time;
+    };
+    expect(settle(4)).toBeLessThan(settle(1) * 0.6);
   });
 
   it("keeps the dot's current speed when re-aimed mid-flight", () => {

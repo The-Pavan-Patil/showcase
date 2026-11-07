@@ -50,6 +50,26 @@ const ARC = 2;
 /** The float line sits this far under the header; the dot eases into it over FLOAT_SOFTNESS. */
 const FLOAT_GAP = 14;
 const FLOAT_SOFTNESS = 16;
+/**
+ * The dot visits stops in order: if scrolling runs ahead of it, it touches
+ * each skipped stop that is still on screen (within ARRIVE_DISTANCE) before
+ * moving on. Behind by n stops, its spring stiffens by 1 + 3n² (capped), so
+ * a 30px hop between timeline nodes takes ~120ms one behind and ~30ms four
+ * behind. Stops already gone from view, and hidden stretches, are passed
+ * straight over.
+ */
+const ARRIVE_DISTANCE = 8;
+/**
+ * While catching up, the dot rests this long on each stop that looks
+ * different from the last (a company ring after a project dot, say), so the
+ * change reads. Stops that look the same, such as a company's project dots,
+ * which share a spot on the focus line, pass at once.
+ */
+const TOUR_DWELL_MS = 30;
+/** ω = √(120·60) ≈ 85/s, stable at the 1/120 s integration step. */
+const MAX_BOOST = 60;
+/** Kick for catch-up hops: none, they go straight; only the final flight curves. */
+const TOUR_ARC = 0;
 const REST_DISTANCE = 0.3;
 const REST_SPEED = 6;
 const MAX_STEP = 1 / 120;
@@ -85,13 +105,18 @@ export function floatBelow(y: number, line: number, softness = FLOAT_SOFTNESS) {
   return y >= knee ? y : line + softness * Math.exp((y - knee) / softness);
 }
 
-/** Advances the offset spring towards zero by `dt` seconds. */
-export function stepSpring(state: SpringState, dt: number): SpringState {
+/**
+ * Advances the offset spring towards zero by `dt` seconds. `boost` stiffens
+ * it (at the same damping ratio) when the dot is catching up.
+ */
+export function stepSpring(state: SpringState, dt: number, boost = 1): SpringState {
+  const stiffness = STIFFNESS * boost;
+  const damping = DAMPING * Math.sqrt(boost);
   let { x, y, vx, vy } = state;
   for (let left = dt; left > 0; left -= MAX_STEP) {
     const h = Math.min(MAX_STEP, left);
-    vx += (-STIFFNESS * x - DAMPING * vx) * h;
-    vy += (-STIFFNESS * y - DAMPING * vy) * h;
+    vx += (-stiffness * x - damping * vx) * h;
+    vy += (-stiffness * y - damping * vy) * h;
     x += vx * h;
     y += vy * h;
   }
@@ -109,9 +134,44 @@ export function isSpringAtRest(state: SpringState) {
  * Re-aims the spring from the dot's current offset to a new target: the dot
  * keeps its place and speed, and gets a sideways kick so the flight curves.
  */
-export function launchSpring(state: SpringState, offset: { x: number; y: number }): SpringState {
+export function launchSpring(
+  state: SpringState,
+  offset: { x: number; y: number },
+  arc = ARC,
+): SpringState {
   const { x, y } = offset;
-  return { x, y, vx: state.vx - y * ARC, vy: state.vy + x * ARC };
+  return { x, y, vx: state.vx - y * arc, vy: state.vy + x * arc };
+}
+
+/** How much stiffer the spring is when the dot is `backlog` stops behind. */
+export function catchUpBoost(backlog: number) {
+  return Math.min(MAX_BOOST, 1 + 3 * backlog * backlog);
+}
+
+/**
+ * The stop the dot should head for next, given the one it is heading for
+ * (`visit`), the one scrolling has reached (`target`), and whether it has
+ * arrived at `visit`. It steps through the stops in between one at a time,
+ * so none still on screen is skipped; across a hidden stretch it goes
+ * direct.
+ */
+export function nextVisitIndex(
+  stops: ScrollAccentStop[],
+  visit: number,
+  target: number,
+  arrived: boolean,
+  isOnScreen: (stop: ScrollAccentStop) => boolean,
+) {
+  if (visit === target) return visit;
+  const step = Math.sign(target - visit);
+  const from = Math.min(visit, target);
+  const to = Math.max(visit, target);
+  if (stops.slice(from, to + 1).some((stop) => stop.hidden)) return target;
+  if (!arrived && isOnScreen(stops[visit])) return visit;
+  for (let next = visit + step; next !== target; next += step) {
+    if (isOnScreen(stops[next])) return next;
+  }
+  return target;
 }
 
 const REST: SpringState = { x: 0, y: 0, vx: 0, vy: 0 };
@@ -340,8 +400,18 @@ export function ScrollAccent() {
     let lastDrawn: { x: number; y: number } | null = null;
     let frame = 0;
     let lastTime = 0;
+    /** When the dot came within ARRIVE_DISTANCE of its current stop. */
+    let arrivedAt: number | null = null;
+    /** Whether reaching the current stop changes what is on screen. */
+    let visibleHop = false;
 
     root.classList.add("scroll-accent-mounted");
+
+    /** `stop`'s index, or for a stop no longer on the page, the one before it. */
+    function stopIndexOf(stop: ScrollAccentStop) {
+      const index = stops.indexOf(stop);
+      return index >= 0 ? index : resolveScrollAccentStop(stops, stop.activateAt);
+    }
 
     /** The last visible stop at or before `index`, which hidden stops hold. */
     function anchorStop(index: number) {
@@ -376,7 +446,18 @@ export function ScrollAccent() {
       if (!stops.length) return;
 
       const scrollY = window.scrollY;
-      const index = resolveScrollAccentStop(stops, scrollY);
+      const reached = resolveScrollAccentStop(stops, scrollY);
+      const visiting = current ? stopIndexOf(current) : reached;
+      if (Math.hypot(spring.x, spring.y) < ARRIVE_DISTANCE) arrivedAt ??= now;
+      const arrived =
+        arrivedAt !== null && (!visibleHop || now - arrivedAt >= TOUR_DWELL_MS);
+      const index = reducedMotion
+        ? reached
+        : nextVisitIndex(stops, visiting, reached, arrived, (stop) => {
+            const y = stopViewportPoint(stop, scrollY).y;
+            return y >= floatLine && y <= window.innerHeight;
+          });
+      const backlog = Math.abs(reached - index);
       const stop = stops[index];
       const anchor = anchorStop(index);
       if (!anchor) return;
@@ -396,6 +477,10 @@ export function ScrollAccent() {
         const offset = lastDrawn
           ? { x: lastDrawn.x - target.x, y: lastDrawn.y - target.y }
           : { x: 0, y: 0 };
+        visibleHop =
+          Math.hypot(offset.x, offset.y) >= ARRIVE_DISTANCE ||
+          current?.phase !== stop.phase ||
+          current?.size !== stop.size;
         if (reducedMotion || !lastDrawn || (fromHidden && !stop.hidden)) {
           // Snap, or reappear on the target after being hidden.
           spring = REST;
@@ -403,16 +488,17 @@ export function ScrollAccent() {
           // Fade out where it is, drifting on with the motion it has.
           spring = { ...spring, ...offset };
         } else {
-          // Fly from here, curving.
-          spring = launchSpring(spring, offset);
+          // Fly from here, curving; hops on the way to a later stop curve less.
+          spring = launchSpring(spring, offset, backlog ? TOUR_ARC : ARC);
         }
         current = stop;
+        arrivedAt = null;
       }
 
       const dt = lastTime ? Math.min((now - lastTime) / 1000, 1 / 30) : 1 / 60;
       lastTime = now;
-      if (!reducedMotion) spring = stepSpring(spring, dt);
-      const atRest = reducedMotion || isSpringAtRest(spring);
+      if (!reducedMotion) spring = stepSpring(spring, dt, catchUpBoost(backlog));
+      const atRest = reducedMotion || (!backlog && isSpringAtRest(spring));
       if (atRest) spring = REST;
 
       const x = target.x + spring.x;
@@ -447,11 +533,13 @@ export function ScrollAccent() {
           };
         },
       );
-      const previousId = current?.id;
+      const previous = current;
       stops = buildHomeStops() ?? buildGenericStops() ?? [];
       // Re-measured stops are new objects; keep the current one if it still
-      // exists so a resize is not mistaken for a new flight.
-      current = stops.find((stop) => stop.id === previousId) ?? current;
+      // exists so a resize is not mistaken for a new flight. If it is gone
+      // (its project list was closed), the old object stays and the dot
+      // flies on from there.
+      current = stops.find((stop) => stop.id === previous?.id) ?? previous;
       schedule();
     }
 
