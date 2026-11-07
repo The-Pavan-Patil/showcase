@@ -22,6 +22,33 @@ export function whenVisitorEngages(): Promise<void> {
   });
 }
 
+/**
+ * Resolves once the visitor has engaged and then paused: `quiet` ms with no
+ * scrolling. For heavy setup that would otherwise freeze the first scroll.
+ */
+export function whenVisitorPauses({ quiet = 700 }: { quiet?: number } = {}): Promise<void> {
+  return whenVisitorEngages().then(
+    () =>
+      new Promise((resolve) => {
+        let timer = 0;
+        const wait = () => {
+          window.clearTimeout(timer);
+          timer = window.setTimeout(done, quiet);
+        };
+        const done = () => {
+          ENGAGEMENT_EVENTS.forEach((type) =>
+            window.removeEventListener(type, wait, LISTENER_OPTIONS),
+          );
+          resolve();
+        };
+        ENGAGEMENT_EVENTS.forEach((type) =>
+          window.addEventListener(type, wait, LISTENER_OPTIONS),
+        );
+        wait();
+      }),
+  );
+}
+
 /** Resolves once the page has loaded and the main thread is idle. */
 export function whenPageIdle({ timeout = 3000 }: { timeout?: number } = {}): Promise<void> {
   return new Promise((resolve) => {
