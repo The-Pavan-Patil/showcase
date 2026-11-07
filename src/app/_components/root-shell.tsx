@@ -23,13 +23,13 @@ const figtree = Figtree({
   preload: false,
 });
 
-// The hero title is the page's largest paint, so its font is the one
-// preloaded; the others stay off the critical path.
+// Preloaded only where it is the largest paint: see heroFont, rendered by
+// the English home page. Elsewhere a preload would compete with the CSS.
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
   display: "swap",
-  preload: true,
+  preload: false,
 });
 
 const michroma = Michroma({
