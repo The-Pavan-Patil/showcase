@@ -7,9 +7,9 @@ import { usePathname } from "next/navigation";
 import { trackEvent } from "@/lib/analytics";
 import {
   getPathForLocale,
-  navbarLocales,
+  getToggleLocales,
+  localeCookieName,
   type Locale,
-  type NavbarLocale,
 } from "@/lib/i18n";
 import type { UiCopy } from "@/lib/ui-copy";
 import { cn } from "@/lib/utils";
@@ -39,7 +39,7 @@ export function LanguageToggle({
     >
       <Languages aria-hidden="true" size={presentation === "menu" ? 17 : 15} />
       <div className="language-toggle-options">
-        {navbarLocales.map((targetLocale: NavbarLocale) => (
+        {getToggleLocales(locale).map((targetLocale) => (
           <Link
             aria-current={locale === targetLocale ? "true" : undefined}
             aria-label={`${copy.switchLanguageLabel}: ${copy.languageOptionLabels[targetLocale]}`}
@@ -48,6 +48,7 @@ export function LanguageToggle({
             key={targetLocale}
             lang={targetLocale}
             onClick={() => {
+              rememberLocale(targetLocale);
               trackEvent("language_changed", {
                 from: locale,
                 to: targetLocale,
@@ -61,4 +62,12 @@ export function LanguageToggle({
       </div>
     </div>
   );
+}
+
+function rememberLocale(locale: Locale) {
+  try {
+    document.cookie = `${localeCookieName}=${locale}; path=/; max-age=31536000; samesite=lax`;
+  } catch {
+    // Cookies can be blocked; the link still navigates.
+  }
 }

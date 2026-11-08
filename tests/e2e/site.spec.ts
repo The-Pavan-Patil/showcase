@@ -1078,3 +1078,49 @@ test("selected work shows a plain row of portrait cards with reduced motion", as
     await expect(card.getByRole("link")).toBeVisible();
   }
 });
+
+test("first visits from Japan and Germany land on their language", async ({ request }) => {
+  const visit = (path: string, country: string, extra: Record<string, string> = {}) =>
+    request.get(path, {
+      headers: {
+        accept: "text/html",
+        "sec-fetch-dest": "document",
+        "user-agent": "Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/130 Safari/537.36",
+        "x-vercel-ip-country": country,
+        ...extra,
+      },
+      maxRedirects: 0,
+    });
+
+  const japan = await visit("/", "JP");
+  expect(japan.status()).toBe(307);
+  expect(japan.headers().location).toBe("/ja");
+
+  const germany = await visit("/work/nudge", "DE");
+  expect(germany.status()).toBe(307);
+  expect(germany.headers().location).toBe("/de/work/nudge");
+
+  for (const country of ["US", "IN", "AT", "CH"]) {
+    expect((await visit("/", country)).status(), country).toBe(200);
+  }
+
+  expect((await visit("/", "DE", { cookie: "site-locale=en" })).status()).toBe(200);
+  expect((await visit("/writing", "DE")).status()).toBe(200);
+  expect((await visit("/", "DE", { "user-agent": "Googlebot/2.1" })).status()).toBe(200);
+});
+
+test("german pages toggle between German and English and remember the choice", async ({ page, context }, testInfo) => {
+  await page.goto("/de/work/nudge");
+
+  if (testInfo.project.name.startsWith("mobile")) {
+    await page.locator(".mobile-utility-trigger").click();
+  }
+
+  const toggle = page.locator(".language-toggle:visible a");
+  await expect(toggle).toHaveText(["EN", "DE"]);
+  await expect(toggle.nth(1)).toHaveAttribute("aria-current", "true");
+
+  await toggle.nth(0).click();
+  await expect(page).toHaveURL(/\/work\/nudge$/);
+  expect((await context.cookies()).find((cookie) => cookie.name === "site-locale")?.value).toBe("en");
+});

@@ -4,8 +4,19 @@ export const supportedLocales = ["en", "ja", "de"] as const;
 export const prefixedLocales = ["ja", "de"] as const;
 export const navbarLocales = ["en", "ja"] as const;
 
+// Remembers the language a visitor picked, so the country redirect in
+// src/proxy.ts never overrides it. The proxy matcher repeats this name.
+export const localeCookieName = "site-locale";
+
 export type Locale = (typeof supportedLocales)[number];
 export type NavbarLocale = (typeof navbarLocales)[number];
+
+// German is only offered to visitors already on /de (Germany lands there
+// automatically), so its toggle pairs German with English. Everyone else
+// sees English and Japanese.
+export function getToggleLocales(locale: Locale): readonly Locale[] {
+  return locale === "de" ? ["en", "de"] : navbarLocales;
+}
 
 const localePattern = /^\/(en|ja|de)(?=\/|$)/;
 

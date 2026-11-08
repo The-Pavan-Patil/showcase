@@ -30,7 +30,7 @@ export type UiCopy = {
     utilitiesDialog: string;
     utilitiesHeading: string;
     languageLabel: string;
-    languageOptionLabels: Record<"en" | "ja", string>;
+    languageOptionLabels: Record<"en" | "ja" | "de", string>;
     switchLanguageLabel: string;
   };
   theme: {
@@ -258,6 +258,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       languageOptionLabels: {
         en: "EN",
         ja: "日本語",
+        de: "DE",
       },
       switchLanguageLabel: "Switch language",
     },
@@ -518,6 +519,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       languageOptionLabels: {
         en: "EN",
         ja: "日本語",
+        de: "DE",
       },
       switchLanguageLabel: "言語を切り替える",
     },
@@ -777,6 +779,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       languageOptionLabels: {
         en: "EN",
         ja: "日本語",
+        de: "DE",
       },
       switchLanguageLabel: "Sprache wechseln",
     },
