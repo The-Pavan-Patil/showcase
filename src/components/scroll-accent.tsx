@@ -17,11 +17,15 @@ import { clamp } from "@/lib/utils";
  * details). Each frame does arithmetic on cached stops and writes one
  * transform; the loop stops while the dot is at rest.
  *
- * At rest on a target that moves with the page, the dot is docked: placed
- * in document coordinates so the browser scrolls it with the eyebrow. A
- * fixed dot placed from script trails a compositor scroll by a frame, which
- * on phones made it shake against its eyebrow. In flight, floating under
- * the header, or on a pinned target, it is fixed and placed per frame.
+ * Wherever its target moves with the page, the dot is docked, in flight as
+ * much as at rest. The dock is a rail placed on the target in document
+ * coordinates, with a sticky pin that pins for the same scroll range as the
+ * target's stage, so the browser scrolls and pins the dot itself; script
+ * only writes the flight's offset from the pin. A fixed dot placed from
+ * script trails a compositor scroll, and freezes outright while the main
+ * thread is busy (three.js building the dust cards on the first scroll
+ * down), which on phones made it shake and jump. Floating under the header,
+ * or on a target that script moves, it is fixed and placed per frame.
  */
 
 export type ScrollAccentStop = {
@@ -109,9 +113,9 @@ export function stopViewportPoint(stop: ScrollAccentStop, scrollY: number) {
 }
 
 /**
- * Whether a target drawn at `viewportY` moves with the page at `scrollY`:
- * below the float line's ease, not held by a pinned stage, and not moved by
- * script. Only then can the resting dot dock to the document.
+ * Whether the dot can ride its dock to a target drawn at `viewportY`: the
+ * target sits below the float line's ease and is not moved by script. The
+ * dock follows the page, and a pinned stage, on its own.
  */
 export function ridesPage(
   stop: ScrollAccentStop,
@@ -120,8 +124,23 @@ export function ridesPage(
   floatLine: number,
 ) {
   if (viewportY < floatLine + FLOAT_SOFTNESS) return false;
-  if (stop.stick && scrollY > stop.stick.from && scrollY < stop.stick.to) return false;
   return stop.scriptedUntil === undefined || scrollY >= stop.scriptedUntil;
+}
+
+/**
+ * The dock for `stop`: the rail's top-left at the target's unpinned
+ * document point and, for a target on a pinned stage, the rail's length
+ * (the pin's run) and the viewport line the pin sticks to. Sticking at that
+ * line over that run is exactly how the stage holds the target.
+ */
+export function dockFor(stop: ScrollAccentStop) {
+  if (!stop.stick) return { x: stop.x, y: stop.y, run: 0, stickAt: null };
+  return {
+    x: stop.x,
+    y: stop.y,
+    run: Math.max(0, stop.stick.to - stop.stick.from),
+    stickAt: stop.y - stop.stick.from,
+  };
 }
 
 /**
@@ -429,11 +448,15 @@ function ordered(stops: ScrollAccentStop[]) {
 /* ---------------------------------------------------------------- component */
 
 export function ScrollAccent() {
+  const dockRef = useRef<HTMLSpanElement>(null);
+  const pinRef = useRef<HTMLSpanElement>(null);
   const dotRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    const dock = dockRef.current;
+    const pin = pinRef.current;
     const dot = dotRef.current;
-    if (!dot) return;
+    if (!dock || !pin || !dot) return;
 
     const root = document.documentElement;
     const main = document.getElementById("main-content");
@@ -447,9 +470,12 @@ export function ScrollAccent() {
     // The dot is drawn at target + offset; the spring takes the offset to 0.
     let spring = REST;
     let current: ScrollAccentStop | null = null;
-    /** Where the dot was placed: document coordinates if docked, else viewport. */
+    /** Where the dot was placed: its offset from the pin if docked, else viewport. */
     let drawn: { x: number; y: number; docked: boolean } | null = null;
     let drawnTransform = "";
+    /** The stop the dock was last placed on, and that placement. */
+    let dockStop: ScrollAccentStop | null = null;
+    let dockKey = "";
     let frame = 0;
     let lastTime = 0;
     /** When the dot came within ARRIVE_DISTANCE of its current stop. */
@@ -481,10 +507,25 @@ export function ScrollAccent() {
       return { x: point.x - window.scrollX, y: floatBelow(point.y, floatLine) };
     }
 
-    /** Where the dot is on screen now; a docked dot has scrolled with the page. */
+    /** Where the dot is on screen now; a docked dot has moved with its pin. */
     function drawnOnScreen(scrollY: number) {
       if (!drawn) return null;
-      return drawn.docked ? { x: drawn.x - window.scrollX, y: drawn.y - scrollY } : drawn;
+      if (!drawn.docked || !dockStop) return drawn;
+      const point = stopViewportPoint(dockStop, scrollY);
+      return { x: point.x - window.scrollX + drawn.x, y: point.y + drawn.y };
+    }
+
+    /** Moves the dock onto `stop`; layout is touched only when it changes. */
+    function placeDock(stop: ScrollAccentStop) {
+      dockStop = stop;
+      const { x, y, run, stickAt } = dockFor(stop);
+      const key = `${x}|${y}|${run}|${stickAt}`;
+      if (key === dockKey) return;
+      dockKey = key;
+      dock!.style.left = `${x}px`;
+      dock!.style.top = `${y}px`;
+      dock!.style.height = `${run}px`;
+      pin!.style.top = stickAt === null ? "" : `${stickAt}px`;
     }
 
     function setData(key: string, value: string) {
@@ -572,13 +613,18 @@ export function ScrollAccent() {
 
       const x = target.x + spring.x;
       const y = target.y + spring.y;
-      const docked = atRest && ridesPage(anchor, scrollY, target.y, floatLine);
-      const place = docked ? { x: x + window.scrollX, y: y + scrollY } : { x, y };
+      // Docked, the dot is drawn at its offset from the pin, which the
+      // browser keeps on the target; fixed, at its point in the viewport.
+      const docked = ridesPage(anchor, scrollY, target.y, floatLine);
+      if (docked) placeDock(anchor);
+      const place = docked ? { x: spring.x, y: spring.y } : { x, y };
       // The trailing translate centres the dot on the point at its live size.
-      // Docked, the same transform holds while the page scrolls, so it is
-      // written only when it changes.
+      // At rest on the dock the transform holds while the page scrolls, so
+      // it is written only when it changes.
       const transform = `translate3d(${place.x.toFixed(2)}px, ${place.y.toFixed(2)}px, 0) translate(-50%, -50%)`;
-      setData("docked", docked ? "true" : "false");
+      const mode = docked ? "true" : "false";
+      if (dock!.dataset.docked !== mode) dock!.dataset.docked = mode;
+      setData("docked", mode);
       if (transform !== drawnTransform) {
         dot!.style.transform = transform;
         drawnTransform = transform;
@@ -679,5 +725,11 @@ export function ScrollAccent() {
     };
   }, []);
 
-  return <span ref={dotRef} className="scroll-accent-traveler" aria-hidden="true" />;
+  return (
+    <span ref={dockRef} className="scroll-accent-dock" aria-hidden="true">
+      <span ref={pinRef} className="scroll-accent-pin">
+        <span ref={dotRef} className="scroll-accent-traveler" aria-hidden="true" />
+      </span>
+    </span>
+  );
 }

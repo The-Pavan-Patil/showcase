@@ -2,6 +2,7 @@ import { act, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  dockFor,
   floatBelow,
   isSpringAtRest,
   launchSpring,
@@ -95,11 +96,11 @@ describe("ridesPage", () => {
     expect(ridesPage(stops[1], 400, floatBelow(60, 76), 76)).toBe(false);
   });
 
-  it("keeps the dot fixed while the target's stage is pinned, and docks it either side", () => {
+  it("docks before, during and after the target's stage is pinned", () => {
     const pinned: ScrollAccentStop = { ...stops[1], stick: { from: 800, to: 1600 } };
 
     expect(ridesPage(pinned, 700, 400, 76)).toBe(true);
-    expect(ridesPage(pinned, 1200, 300, 76)).toBe(false);
+    expect(ridesPage(pinned, 1200, 300, 76)).toBe(true);
     expect(ridesPage(pinned, 1700, 200, 76)).toBe(true);
   });
 
@@ -108,6 +109,24 @@ describe("ridesPage", () => {
 
     expect(ridesPage(node, 1700, 400, 76)).toBe(false);
     expect(ridesPage(node, 1800, 400, 76)).toBe(true);
+  });
+});
+
+describe("dockFor", () => {
+  it("rests a plain target's dock on its document point, with no run", () => {
+    expect(dockFor(stops[1])).toEqual({ x: 40, y: 1100, run: 0, stickAt: null });
+  });
+
+  it("sticks a pinned target's dock where the stage holds it, for the pin's run", () => {
+    const pinned: ScrollAccentStop = { ...stops[1], stick: { from: 800, to: 1600 } };
+    const dock = dockFor(pinned);
+
+    expect(dock).toEqual({ x: 40, y: 1100, run: 800, stickAt: 300 });
+    // The pin starts sticking as the stage pins, holds the stage's line, and
+    // ends where the stage lets go: the same points stopViewportPoint gives.
+    expect(dock.y - pinned.stick!.from).toBe(stopViewportPoint(pinned, 800).y);
+    expect(dock.stickAt).toBe(stopViewportPoint(pinned, 1200).y);
+    expect(dock.y + dock.run - 1700).toBe(stopViewportPoint(pinned, 1700).y);
   });
 });
 

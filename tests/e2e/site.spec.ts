@@ -684,9 +684,10 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
   await expect(traveler).toHaveAttribute("data-phase", "heading");
   await expect.poll(opacity).toBeGreaterThan(0.9);
 
-  // At rest on an eyebrow that scrolls with the page, the dot is docked to
-  // the document: it moves with the eyebrow in the same frame as a scroll,
-  // not a frame behind it (which shook on phones).
+  // Landed on an eyebrow that scrolls with the page, the dot is docked: it
+  // moves with the eyebrow in the same frame as a scroll, not a frame
+  // behind it (which shook on phones).
+  await expect(traveler).toHaveAttribute("data-landed", "true");
   await expect(traveler).toHaveAttribute("data-docked", "true");
   const sameFrameGap = await page
     .locator('[data-scroll-accent-anchor="workflow"]')
@@ -726,6 +727,56 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
     window.scrollTo(0, document.documentElement.scrollHeight);
   });
   await expect.poll(opacity).toBeLessThan(0.1);
+});
+
+test("the accent dot rides the page and the pinned Work stage without script frames", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium", "mobile-webkit"].includes(testInfo.project.name));
+
+  await page.goto("/");
+  await expect(page.locator("#about")).toHaveAttribute("data-live", "");
+  await page.evaluate(() => {
+    document.documentElement.style.scrollBehavior = "auto";
+  });
+  const traveler = page.locator(".scroll-accent-traveler");
+  await expect(traveler).toHaveAttribute("data-ready", "true");
+
+  // Each check scrolls and reads positions in one task, so no animation
+  // frame runs in between: what it sees is what the browser alone does,
+  // as when the main thread is busy (three.js building the dust cards).
+  const centreY = (element: Element) => {
+    const bounds = element.getBoundingClientRect();
+    return bounds.top + bounds.height / 2;
+  };
+
+  // Mid-flight to the Work eyebrow, the dot moves with the page.
+  await page.locator('[data-scroll-accent-anchor="work"]').evaluate((work) => {
+    const section = work.closest("section")!;
+    window.scrollTo(0, section.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.7 + 20);
+  });
+  await expect(traveler).toHaveAttribute("data-active-anchor", "work");
+  await expect(traveler).toHaveAttribute("data-docked", "true");
+  const moved = await traveler.evaluate(
+    (dot, source) => {
+      const measure = new Function(`return (${source})`)() as (element: Element) => number;
+      const before = measure(dot);
+      window.scrollBy(0, 60);
+      return measure(dot) - before;
+    },
+    centreY.toString(),
+  );
+  expect(moved).toBeCloseTo(-60, 0);
+
+  // Landed, it pins with the stage: no overshoot past the pinned eyebrow.
+  await expect(traveler).toHaveAttribute("data-landed", "true");
+  const gap = await page.locator(".dust-stage").evaluate((stage, source) => {
+    const measure = new Function(`return (${source})`)() as (element: Element) => number;
+    const slot = stage.querySelector(".scroll-accent-heading-target")!;
+    const dot = document.querySelector(".scroll-accent-traveler")!;
+    const from = stage.parentElement!.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo(0, from + 300);
+    return Math.abs(measure(dot) - measure(slot));
+  }, centreY.toString());
+  expect(gap).toBeLessThan(2);
 });
 
 test("the accent dot snaps between anchors with reduced motion", async ({ page }, testInfo) => {

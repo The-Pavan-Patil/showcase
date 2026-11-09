@@ -256,9 +256,31 @@ a {
   will-change: transform;
 }
 
-/* At rest on a target that moves with the page, the dot is placed in
-   document coordinates (its parent is the body) and scrolls natively. */
-.scroll-accent-traveler[data-docked="true"] {
+/* The dot's dock (scroll-accent.tsx): a rail on the target in document
+   coordinates (its parent is the body), whose pin sticks for the run its
+   target's stage is pinned, so the browser carries the docked dot. No
+   transform or will-change here, either would trap the fixed dot. */
+.scroll-accent-dock {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.scroll-accent-pin {
+  display: block;
+  width: 0;
+  height: 0;
+}
+/* Sticky only while docked: a fixed dot inside a sticky box can be carried
+   by the box in WebKit. The z-index keeps the dot's layer under About's
+   stage (41) and the header (50). */
+.scroll-accent-dock[data-docked="true"] .scroll-accent-pin {
+  position: sticky;
+  z-index: 40;
+}
+.scroll-accent-dock[data-docked="true"] .scroll-accent-traveler {
   position: absolute;
 }
 
