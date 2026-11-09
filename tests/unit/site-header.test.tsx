@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -10,11 +10,13 @@ import { uiCopyByLocale } from "@/lib/ui-copy";
 const testState = vi.hoisted(() => ({
   pathname: "/",
   resolvedTheme: "light",
+  router: { push: vi.fn() },
   setTheme: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => testState.pathname,
+  useRouter: () => testState.router,
 }));
 
 vi.mock("next-themes", () => ({
@@ -85,6 +87,16 @@ describe("SiteHeader", () => {
   });
 
   it("expands at the top and whenever keyboard focus enters the header", () => {
+    // jsdom never matches :focus-visible; treat the focus below as keyboard
+    // focus, which is what expands the header (a click does not).
+    const matches = Element.prototype.matches;
+    const focusVisible = vi
+      .spyOn(Element.prototype, "matches")
+      .mockImplementation(function (this: Element, selector: string) {
+        return selector === ":focus-visible"
+          ? this === document.activeElement
+          : matches.call(this, selector);
+      });
     renderSiteHeader();
     const header = screen.getByRole("banner");
 
@@ -106,6 +118,7 @@ describe("SiteHeader", () => {
       window.dispatchEvent(new Event("scroll"));
     });
     expect(header).toHaveAttribute("data-density", "expanded");
+    focusVisible.mockRestore();
   });
 
   it("resets compact presentation after a route change and marks Work current", () => {
@@ -139,30 +152,38 @@ describe("SiteHeader", () => {
     expect(within(backLink).getByText("Pavan Patil")).toBeVisible();
   });
 
-  it("scrolls an on-page navigation target to the accent activation line", async () => {
+  it("jumps an on-page navigation link to where the section's scene starts", async () => {
     const user = userEvent.setup();
-    const accentTarget = document.createElement("span");
-    accentTarget.dataset.scrollAccentAnchor = "experience";
-    vi.spyOn(accentTarget, "getBoundingClientRect").mockReturnValue({
-      x: 20,
+    const section = document.createElement("section");
+    section.id = "experience";
+    const sceneStart = document.createElement("div");
+    sceneStart.dataset.sectionStart = "";
+    vi.spyOn(sceneStart, "getBoundingClientRect").mockReturnValue({
+      x: 0,
       y: 900,
       top: 900,
-      right: 28,
-      bottom: 908,
-      left: 20,
-      width: 8,
-      height: 8,
+      right: 1000,
+      bottom: 1900,
+      left: 0,
+      width: 1000,
+      height: 1000,
       toJSON: () => undefined,
     });
-    document.body.append(accentTarget);
+    section.append(sceneStart);
+    document.body.append(section);
     Object.defineProperty(window, "innerHeight", { configurable: true, value: 1000 });
+    Object.defineProperty(document.documentElement, "scrollHeight", { configurable: true, value: 5000 });
     const scrollTo = vi.spyOn(window, "scrollTo").mockImplementation(() => undefined);
 
     renderSiteHeader();
     await user.click(screen.getAllByRole("link", { name: "Experience" })[0]);
 
-    expect(window.location.hash).toBe("#experience");
-    expect(scrollTo).toHaveBeenCalledWith({ top: 544, behavior: "smooth" });
+    // One step to the scene's start, and the URL keeps no hash.
+    await waitFor(() => expect(scrollTo).toHaveBeenCalledWith({ top: 900, behavior: "instant" }));
+    expect(window.location.hash).toBe("");
+
+    section.remove();
+    Reflect.deleteProperty(document.documentElement, "scrollHeight");
   });
 
   it("opens the mobile utility popover and exposes its actions", async () => {
@@ -190,18 +211,18 @@ describe("SiteHeader", () => {
     expect(screen.queryByRole("menu", { name: "Navigation utilities" })).not.toBeInTheDocument();
   });
 
-  it("shows only English and Japanese language options, even on German routes", () => {
+  it("toggles between English and German on German routes", () => {
     testState.pathname = "/de/work/nudge";
     renderSiteHeader("de");
 
-    expect(screen.getByRole("link", { name: "Sprache wechseln: EN" })).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "Sprache wechseln: EN" })[0]).toHaveAttribute(
       "href",
       "/work/nudge",
     );
-    expect(screen.getByRole("link", { name: "Sprache wechseln: 日本語" })).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "Sprache wechseln: DE" })[0]).toHaveAttribute(
       "href",
-      "/ja/work/nudge",
+      "/de/work/nudge",
     );
-    expect(screen.queryByText("Deutsch")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Sprache wechseln: 日本語" })).not.toBeInTheDocument();
   });
 });

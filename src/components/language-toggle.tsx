@@ -217,6 +217,8 @@ export function LanguageToggle({
     window.clearTimeout(switchTimer.current);
     select(target, true);
     fadeContent(target === locale ? "back" : "out");
+    // Saved at once; changing your mind saves this page's language again.
+    rememberLocale(target);
 
     // Changing your mind before the page swaps slides back and stays.
     if (target === locale) return;
@@ -224,8 +226,6 @@ export function LanguageToggle({
     trackEvent("language_changed", { from: locale, to: target });
     switchTimer.current = window.setTimeout(
       () => {
-        // Saved only once the page switches, so a change of mind isn't kept.
-        rememberLocale(target);
         onNavigate?.();
         router.push(href);
       },

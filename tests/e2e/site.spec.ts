@@ -1169,6 +1169,7 @@ test("german pages toggle between German and English and remember the choice", a
   await expect(toggle.nth(1)).toHaveAttribute("aria-current", "true");
 
   await toggle.nth(0).click();
-  await expect(page).toHaveURL(/\/work\/nudge$/);
+  // The page swaps once the thumb arrives; /de/work/nudge must not count.
+  await expect(page).toHaveURL((url) => url.pathname === "/work/nudge");
   expect((await context.cookies()).find((cookie) => cookie.name === "site-locale")?.value).toBe("en");
 });
