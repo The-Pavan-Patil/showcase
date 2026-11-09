@@ -45,7 +45,7 @@ test("homepage exposes the primary portfolio journey", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("anonymous keyboard messaging sends from the homepage", async ({ page }) => {
+test("anonymous keyboard messaging sends from the homepage", async ({ page }, testInfo) => {
   let postedBody = "";
 
   await page.route("**/api/message", async (route) => {
@@ -58,6 +58,8 @@ test("anonymous keyboard messaging sends from the homepage", async ({ page }) =>
   });
 
   await page.goto("/");
+  // Hydrated first: a page scrolled before then is put back at the top.
+  await expect(page.locator("#about")).toHaveAttribute("data-live", "");
 
   const quickMessage = page.locator("[data-quick-message-section]");
   await expect(quickMessage).toBeVisible();
@@ -84,6 +86,11 @@ test("anonymous keyboard messaging sends from the homepage", async ({ page }) =>
   await textarea.focus();
   await page.keyboard.type("hello");
   await expect(textarea).toHaveValue("hello");
+  if (testInfo.project.name.startsWith("mobile")) {
+    // Phones fold the band into its compact layout first.
+    await expect(page.locator(".quick-message-band")).toHaveAttribute("data-compose", "native");
+    await expectBandSettled(page);
+  }
 
   const keyboardShell = page.locator(".quick-message-keyboard > div");
   const keyboardBeforePress = await keyboardShell.boundingBox();
@@ -126,6 +133,129 @@ test("anonymous keyboard messaging sends from the homepage", async ({ page }) =>
   expect(JSON.parse(postedBody)).toMatchObject({ message: "helloh", website: "" });
 });
 
+function heightOf(element: Element) {
+  return element.getBoundingClientRect().height;
+}
+
+/** Waits out the band's fold or unfold (CSS transitions). */
+async function expectBandSettled(page: import("@playwright/test").Page) {
+  await expect.poll(() =>
+    page.locator(".quick-message-band").evaluate((band) =>
+      band.getAnimations({ subtree: true }).filter((animation) => animation instanceof CSSTransition).length,
+    ),
+  ).toBe(0);
+}
+
+/** Stands in for the visual viewport so a test can open a "device keyboard". */
+function fakeVisualViewport() {
+  const viewport = new EventTarget();
+  let height: number | null = null;
+  let offsetTop = 0;
+  Object.defineProperties(viewport, {
+    height: { get: () => height ?? window.innerHeight },
+    width: { get: () => window.innerWidth },
+    offsetTop: { get: () => offsetTop },
+    offsetLeft: { get: () => 0 },
+    scale: { get: () => 1 },
+  });
+  Object.defineProperty(window, "visualViewport", { get: () => viewport, configurable: true });
+  Object.assign(window, {
+    setDeviceKeyboard(visibleHeight: number | null) {
+      height = visibleHeight;
+      offsetTop = 0;
+      viewport.dispatchEvent(new Event("resize"));
+    },
+  });
+}
+
+/** Scrolls until the message band is pinned (the scenes above may still be laying out). */
+async function pinQuickMessageBand(page: import("@playwright/test").Page) {
+  // Scrolled before hydration, the page would be put back at the top.
+  await expect(page.locator("#about")).toHaveAttribute("data-live", "");
+  await expect.poll(() =>
+    page.locator(".quick-message-band").evaluate((band) => {
+      const track = band.parentElement!;
+      window.scrollTo({ top: track.getBoundingClientRect().top + window.scrollY + 40, behavior: "instant" });
+      return Math.abs(band.getBoundingClientRect().top - Number.parseFloat(getComputedStyle(band).top));
+    }),
+  ).toBeLessThan(1);
+}
+
+test("phones compose the anonymous message above the device keyboard", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("mobile"));
+
+  await page.addInitScript(fakeVisualViewport);
+  await page.goto("/");
+  await pinQuickMessageBand(page);
+
+  const band = page.locator(".quick-message-band");
+  const heading = page.locator("#quick-message-heading");
+  const textarea = page.getByRole("textbox", { name: "Message" });
+  const keyboard = page.locator(".quick-message-keyboard > div");
+  // 16px text, or iOS zooms the page into the field.
+  await expect(textarea).toHaveCSS("font-size", "16px");
+
+  // Focusing the field (the device keyboard opens) folds the title away.
+  await textarea.tap();
+  await expect(band).toHaveAttribute("data-compose", "native");
+  await expectBandSettled(page);
+  expect(await heading.evaluate(heightOf)).toBe(0);
+  // A device keyboard leaves a little over half the screen.
+  const visible = await page.evaluate(() => {
+    const height = Math.round(window.innerHeight * 0.55);
+    (window as unknown as { setDeviceKeyboard(height: number): void }).setDeviceKeyboard(height);
+    return height;
+  });
+
+  // The eyebrow, the message and the on-screen keyboard all fit above it.
+  await expect.poll(() => keyboard.evaluate((element) => element.getBoundingClientRect().bottom)).toBeLessThanOrEqual(visible);
+  const eyebrow = await band.locator(".eyebrow").boundingBox();
+  const field = await textarea.boundingBox();
+  expect(eyebrow?.y).toBeGreaterThanOrEqual(0);
+  expect((field?.y ?? 0) + (field?.height ?? 0)).toBeLessThan(visible);
+  const keyboardAbove = await keyboard.boundingBox();
+
+  // An on-screen key takes over: the device keyboard closes, the key types,
+  // and nothing moves under the finger.
+  await page.locator('[data-key-code="KeyH"]').tap();
+  await page.evaluate(() => (window as unknown as { setDeviceKeyboard(height: null): void }).setDeviceKeyboard(null));
+  await expect(band).toHaveAttribute("data-compose", "virtual");
+  await expect(textarea).not.toBeFocused();
+  await expect(textarea).toHaveValue("h");
+  await page.locator('[data-key-code="KeyI"]').tap();
+  await expect(textarea).toHaveValue("hi");
+  const keyboardAfter = await keyboard.boundingBox();
+  expect(keyboardAfter?.y).toBeCloseTo(keyboardAbove?.y ?? 0, 1);
+  expect(keyboardAfter?.height).toBeCloseTo(keyboardAbove?.height ?? 0, 1);
+
+  // The field brings the device keyboard back; a tap elsewhere unfolds.
+  await textarea.tap();
+  await expect(band).toHaveAttribute("data-compose", "native");
+  await page.mouse.click(4, 4);
+  await expect(band).not.toHaveAttribute("data-compose");
+  await expect(heading).toBeVisible();
+  await expect(textarea).toHaveValue("hi");
+});
+
+test("the phone keyboard rises on the scroll and lies flat as the message band pins", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("mobile"));
+
+  await page.goto("/");
+  await expect(page.locator("#about")).toHaveAttribute("data-live", "");
+  const camera = page.locator(".quick-message-keyboard-camera");
+  await expect(camera).toHaveCSS("animation-name", "quick-message-keyboard-rise");
+
+  // Still below the tab bar: tilted.
+  await page.locator(".quick-message-scroll-track").evaluate((track) => {
+    window.scrollTo({ top: track.getBoundingClientRect().top + window.scrollY - window.innerHeight, behavior: "instant" });
+  });
+  const isFlat = (element: Element) => new DOMMatrix(getComputedStyle(element).transform).isIdentity;
+  await expect.poll(() => camera.evaluate(isFlat)).toBe(false);
+
+  await pinQuickMessageBand(page);
+  await expect.poll(() => camera.evaluate(isFlat)).toBe(true);
+});
+
 test("anonymous keyboard messaging shows delivery errors", async ({ page }) => {
   await page.route("**/api/message", async (route) => {
     await route.fulfill({
@@ -136,6 +266,8 @@ test("anonymous keyboard messaging shows delivery errors", async ({ page }) => {
   });
 
   await page.goto("/");
+  // Hydrated first, or React resets the typed value to its empty state.
+  await expect(page.locator("#about")).toHaveAttribute("data-live", "");
 
   const textarea = page.getByRole("textbox", { name: "Message" });
   await textarea.fill("hello");
