@@ -10,6 +10,9 @@ const routes = [
   "/de/work/nudge",
   "/work/philips-greenheart",
   "/work/workforce-management-system",
+  "/setup",
+  "/ja/setup",
+  "/de/setup",
 ];
 
 for (const route of routes) {

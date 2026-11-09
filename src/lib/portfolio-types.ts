@@ -5,7 +5,9 @@ export type ProjectMetric = {
   label: string;
 };
 
-/** Colours for the homepage card (#rrggbb), from the project's own brand. */
+/** Colours for the homepage card (#rrggbb): a deep, low-chroma ink in the
+    project's brand hue. All cards share one lightness (OKLCH L ≈ 0.36) so they
+    read as a set; glow and deep sit just above and below the base. */
 export type ProjectCardPalette = {
   base: string;
   /** Soft light in the top-right corner. */
@@ -17,7 +19,9 @@ export type ProjectCardPalette = {
 export type ProjectMedia = {
   src: string;
   alt: string;
-  caption?: string;
+  /** Intrinsic pixel size; the case-study hero takes this aspect ratio. */
+  width: number;
+  height: number;
   /** CSS object-position for the portrait homepage card crop. */
   focus?: string;
 };
@@ -82,6 +86,8 @@ export type ProjectCaseStudy = {
   visual: ProjectVisual;
   visualLabel: string;
   media?: ProjectMedia;
+  /** Public URL of the shipped product, shown on the case-study hero. */
+  liveUrl?: string;
   cardPalette?: ProjectCardPalette;
   caseStudy?: CaseStudyArticle;
 };

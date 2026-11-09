@@ -14,6 +14,7 @@ import {
 
 import { Keyboard } from "@/components/ui/keyboard";
 import { Container } from "@/components/container";
+import { onSectionJumpEnd } from "@/lib/section-jump";
 import {
   applyKeyboardInput,
   QUICK_MESSAGE_MAX_LENGTH,
@@ -226,6 +227,11 @@ function ScrollKeyboard({
     damping: 30,
     mass: 0.18,
   });
+  // After a header jump the keyboard is already where the scroll puts it.
+  useEffect(
+    () => onSectionJumpEnd(() => smoothProgress.jump(scrollYProgress.get())),
+    [scrollYProgress, smoothProgress],
+  );
 
   useEffect(() => {
     const shell = keyboardShellRef.current;

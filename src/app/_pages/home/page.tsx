@@ -1,5 +1,4 @@
-import { ArrowRight, ArrowUpRight, CalendarDays, Mail } from "lucide-react";
-import Link from "next/link";
+import { ArrowUpRight, CalendarDays, Mail } from "lucide-react";
 
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
@@ -7,6 +6,7 @@ import { AboutScene } from "./_components/about-scene";
 import { ExperienceScene } from "./_components/experience-scene";
 import { HeroSection } from "./_components/hero-section";
 import { ProjectDust } from "./_components/project-dust";
+import { WorkflowScene } from "./_components/workflow-scene";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
 import { SectionHeading } from "@/components/section-heading";
@@ -22,6 +22,23 @@ import {
   getWebSiteSchema,
 } from "@/lib/structured-data";
 import { uiCopyByLocale } from "@/lib/ui-copy";
+
+/**
+ * The scroll cue uses transparent, ink-only copies of the logos (built from
+ * the originals with their white backing removed), so they fade without a
+ * blend mode and never flash white.
+ */
+const heroCueLogoSrc: Record<string, string> = {
+  "https://img.logo.dev/ownpath.com?token=pk_bgxz_gwPQda2OGjDfooXyQ&size=128&retina=true&format=png":
+    "/images/companies/cue/ownpath.png",
+  "https://img.logo.dev/heromotocorp.com?token=pk_bgxz_gwPQda2OGjDfooXyQ&size=128&retina=true&format=png":
+    "/images/companies/cue/heromotocorp.png",
+  "https://img.logo.dev/philips.co.in?token=pk_bgxz_gwPQda2OGjDfooXyQ&size=128&retina=true&format=png":
+    "/images/companies/cue/philips.png",
+  "/images/companies/nudge.png": "/images/companies/cue/nudge.png",
+  "/images/companies/sonai-engineering.svg": "/images/companies/cue/sonai-engineering.png",
+  "/images/companies/drdo.png": "/images/companies/cue/drdo.png",
+};
 
 export function HomePage({ locale }: { locale: Locale }) {
   const siteUrl = getSiteUrl();
@@ -51,7 +68,7 @@ export function HomePage({ locale }: { locale: Locale }) {
         ])
         .map((logo) => [logo.src, logo] as const),
     ).values(),
-  ];
+  ].map((logo) => ({ ...logo, src: heroCueLogoSrc[logo.src] ?? logo.src }));
 
   return (
     <>
@@ -120,28 +137,7 @@ export function HomePage({ locale }: { locale: Locale }) {
           experience={experience}
         />
 
-        <section
-          className="ai-workflow-band"
-          aria-labelledby="ai-workflow-heading"
-        >
-          <Container className="ai-workflow-container">
-            <div className="ai-workflow-copy">
-              <SectionHeading
-                id="ai-workflow-heading"
-                eyebrow={ui.home.aiWorkflow.eyebrow}
-                title={ui.home.aiWorkflow.title}
-                muted={ui.home.aiWorkflow.titleMuted}
-                description={`${ui.home.aiWorkflow.description} ${ui.home.aiWorkflow.descriptionEmphasis}`}
-                accentAnchor="workflow"
-              />
-            </div>
-
-            <Link className="ai-workflow-cta" href={getSetupPath(locale)}>
-              {ui.home.aiWorkflow.cta}
-              <ArrowRight aria-hidden="true" size={16} />
-            </Link>
-          </Container>
-        </section>
+        <WorkflowScene copy={ui.home.aiWorkflow} setupHref={getSetupPath(locale)} />
 
         <AboutScene
           displayWords={ui.home.aboutDisplay}
@@ -166,9 +162,17 @@ export function HomePage({ locale }: { locale: Locale }) {
           data-scroll-accent-contact
         >
           <Container>
-            <div className="contact-card">
+            <div className="contact-card" data-scroll-accent-surface="inverse">
               <div>
-                <p className="eyebrow">{ui.home.contactEyebrow}</p>
+                <p className="eyebrow scroll-accent-eyebrow">
+                  <span
+                    className="scroll-accent-heading-target"
+                    data-scroll-accent-anchor="contact"
+                    data-scroll-accent-phase="heading"
+                    aria-hidden="true"
+                  />
+                  {ui.home.contactEyebrow}
+                </p>
                 <h2 id="contact-heading">{ui.home.contactTitle}</h2>
                 <p>{ui.home.contactDescription}</p>
               </div>

@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Quote, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CheckCircle2, Quote, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -55,7 +55,12 @@ export async function generateWorkMetadata({
   const pathname = `/work/${project.slug}`;
   const canonical = getWorkPath(locale, project.slug);
   const image = project.media
-    ? { url: project.media.src, width: 1800, height: 1300, alt: project.media.alt }
+    ? {
+        url: project.media.src,
+        width: project.media.width,
+        height: project.media.height,
+        alt: project.media.alt,
+      }
     : {
         url: "/og.png",
         width: 1200,
@@ -135,19 +140,32 @@ export function WorkPage({
                     <WorkTechnologyChip key={technology} label={technology} />
                   ))}
                 </div>
+                {project.liveUrl ? (
+                  <a
+                    className="case-live-link"
+                    href={project.liveUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={formatCopy(ui.work.liveSiteAria, { title: project.title })}
+                  >
+                    <span>{ui.work.liveSite}</span>
+                    <ArrowUpRight aria-hidden="true" size={15} />
+                  </a>
+                ) : null}
               </div>
 
               <div className="case-hero-visual">
                 {project.media ? (
                   <figure className="case-media">
+                    {/* Sized from the image itself, so the frame follows its aspect ratio. */}
                     <Image
                       src={project.media.src}
                       alt={project.media.alt}
-                      fill
+                      width={project.media.width}
+                      height={project.media.height}
                       priority
                       sizes="(max-width: 900px) 100vw, 52vw"
                     />
-                    {project.media.caption ? <figcaption>{project.media.caption}</figcaption> : null}
                   </figure>
                 ) : (
                   <ProjectVisual

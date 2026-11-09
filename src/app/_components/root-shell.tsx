@@ -4,8 +4,10 @@ import { Figtree, Lato, Michroma, Montserrat, Noto_Sans_JP } from "next/font/goo
 import { GoogleAnalytics } from "@/components/google-analytics";
 import { JapaneseWebFont } from "@/components/japanese-web-font";
 import { Providers } from "@/components/providers";
+import { ScrollMemory } from "@/components/scroll-memory";
 import { SiteHeader } from "@/components/site-header";
-import type { Locale } from "@/lib/i18n";
+import { getHomePath, type Locale } from "@/lib/i18n";
+import { scrollStartScript } from "@/lib/scroll-start";
 import { uiCopyByLocale } from "@/lib/ui-copy";
 
 const lato = Lato({
@@ -64,6 +66,9 @@ export function RootShell({
       className={`${lato.variable} ${figtree.variable} ${michroma.variable} ${montserrat.variable} ${notoSansJp.variable}`}
     >
       <body>
+        <script
+          dangerouslySetInnerHTML={{ __html: scrollStartScript(getHomePath(locale)) }}
+        />
         <a className="skip-link" href="#main-content">{ui.header.skipToMain}</a>
         <Providers>
           <SiteHeader
@@ -72,6 +77,8 @@ export function RootShell({
             themeCopy={ui.theme}
           />
           {children}
+          {/* After the page, so its effects run once the page has mounted. */}
+          <ScrollMemory homePath={getHomePath(locale)} />
         </Providers>
         <GoogleAnalytics />
         {locale === "ja" ? <JapaneseWebFont /> : null}

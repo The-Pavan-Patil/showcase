@@ -1,157 +1,54 @@
 import {
+  ArrowDown,
   ArrowRight,
-  ClipboardCheck,
-  Code2,
-  FileText,
-  GitBranch,
+  CalendarClock,
+  Check,
+  CheckCircle2,
+  CircleDashed,
+  GitMerge,
   Laptop,
+  ListTodo,
+  Mail,
   Monitor,
-  Network,
-  Workflow,
+  Sunrise,
+  X,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import type { CSSProperties, ReactNode } from "react";
 
 import { AiWorkflowDiagram } from "@/components/ai-workflow-diagram";
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { getPersonId } from "@/lib/structured-data";
-import { LoopEngineeringCards } from "@/components/loop-engineering-cards";
 import { SiteFooter } from "@/components/site-footer";
 import { ScrollAccent } from "@/components/scroll-accent";
-import { getHomePath, getSetupPath, type Locale } from "@/lib/i18n";
+import { getHashHref, getSetupPath, type Locale } from "@/lib/i18n";
 import { getPortfolioContent } from "@/lib/portfolio";
+import { richText } from "@/lib/rich-text";
 import { getSiteUrl } from "@/lib/site";
 import { uiCopyByLocale } from "@/lib/ui-copy";
 
-/** Wrap any phrase in **double asterisks** to render it bold. */
-function richText(input: string) {
-  return input.split(/(\*\*[^*]+\*\*)/g).map((part, index) =>
-    part.startsWith("**") && part.endsWith("**") ? (
-      <strong key={index}>{part.slice(2, -2)}</strong>
-    ) : (
-      part
-    ),
-  );
+import { ChaosLiveLog } from "./_components/chaos-live-log";
+import { PrdTypewriter } from "./_components/prd-typewriter";
+import { SetupIndexNav } from "./_components/setup-index-nav";
+import { SetupReveal } from "./_components/setup-reveal";
+import type { SetupCiState } from "./_data/content";
+import { setupCopyByLocale } from "./_data/locales";
+
+/** Sets the custom properties the entrance animations read (order, level). */
+function cssVars(vars: Record<`--${string}`, number>) {
+  return vars as CSSProperties;
 }
 
-const workflowStats = [
-  { value: "01", label: "Master PRD" },
-  { value: "04+", label: "agents per feature" },
-  { value: "Manual", label: "git control" },
-  { value: "CI/CD", label: "deployment checks" },
-] as const;
-
-const workflowSteps = [
-  {
-    title: "Brainstorm the system",
-    text:
-      "I start with **Claude Opus** for planning and architecture. The first pass is a brainstorming session around the problem, constraints, architecture options, goals, acceptance criteria, and test cases.",
-  },
-  {
-    title: "Shape the Master PRD",
-    text:
-      "I use **Spec Kit** and **Beads** on top of the brainstorming work to turn the idea into a Master PRD. That document becomes the source of truth for what we are building, why it matters, and how it will be accepted.",
-  },
-  {
-    title: "Break work into tasks",
-    text:
-      "For large projects and small features, I use **Beads** to split the work into clear tasks. It keeps features from turning into one vague brief and makes progress easier to review.",
-  },
-  {
-    title: "Run agents by role",
-    text:
-      "Once the plan is ready, I run **multiple agents** over the feature. Two agents usually implement, other agents check tests, linting, edge cases, and documentation.",
-  },
-] as const;
-
-const agentRoles = [
-  {
-    icon: Code2,
-    title: "Frontend agent",
-    label: "Codex",
-    text:
-      "I use **Codex** especially for frontend work: building interfaces, refining layouts, checking responsive behavior, and keeping implementation close to the existing design system.",
-  },
-  {
-    icon: Network,
-    title: "Backend agent",
-    label: "Opus terminal",
-    text:
-      "For backend-heavy work, I use an **Opus terminal** where the agent can stay focused on architecture, APIs, data models, and service-level tradeoffs.",
-  },
-  {
-    icon: ClipboardCheck,
-    title: "Testing agent",
-    label: "Sonnet",
-    text:
-      "I use **Sonnet** for testing-focused passes: checking acceptance criteria, test coverage, linting, and edge cases that should be verified before the feature is considered done.",
-  },
-  {
-    icon: FileText,
-    title: "Documentation agent",
-    label: "Docs pass",
-    text:
-      "One agent can focus on documentation so the implementation notes, handover files, and repo context stay readable after the coding pass is finished.",
-  },
-] as const;
-
-const orchestrationPoints = [
-  {
-    label: "AO / Python",
-    title: "Orchestrate the loop",
-    text:
-      "For very complex workflows, I use **Agent Orchestrator (AO)** or **Python scripting** when I need tighter control over agent order, retries, handoffs, and checkpoints.",
-  },
-  {
-    label: "wrap",
-    title: "Run and coordinate agents",
-    text:
-      "I use **wrap** to manage agents around the work: starting them, coordinating them, and keeping each role connected to the current plan.",
-  },
-  {
-    label: "Git + Actions",
-    title: "Keep one source of truth",
-    text:
-      "**Git** stays the source of consistency, while **GitHub Actions** handles automated verification after changes move through the workflow.",
-  },
-  {
-    label: "LangGraph / Temporal",
-    title: "Scale beyond simple coordination",
-    text:
-      "When a feature becomes too large for a simple agent loop, I use **LangGraph**. **Temporal** is also a strong option when reliability and durable orchestration matter.",
-  },
-] as const;
-
-const controlPoints = [
-  "I do not like agents raising PRs and auto-merging code for me.",
-  "I review uncommitted features manually before committing or merging.",
-  "If I am not satisfied, I rerun the agent, make manual fixes, or code the missing parts directly.",
-  "Cursor is my primary IDE for git review, small fixes, quick agents, and manual control.",
-] as const;
-
-const repoSyncNotes = [
-  "When a project spans multiple directories or repositories, I create handover markdown files.",
-  "The handover files explain what changed, what still needs to be done, and which assumptions are shared.",
-  "This keeps frontend, backend, tests, documentation, and parallel repo work from drifting apart.",
-] as const;
-
-const deskSetup = [
-  {
-    icon: Laptop,
-    title: "Primary machine",
-    text: "MacBook Air M5 for development, AI-assisted coding, planning, review, and shipping work.",
-  },
-  {
-    icon: Laptop,
-    title: "Secondary machine",
-    text: "MacBook M1 for personal work and a separate secondary environment.",
-  },
-  {
-    icon: Monitor,
-    title: "Desk",
-    text: "BenQ 27-inch 2790Q monitor with a Logitech Pebble 2 for the everyday setup.",
-  },
-] as const;
+const deskIcons = [Laptop, Laptop, Monitor] as const;
+const routineIcons = [Sunrise, Mail, CalendarClock, ListTodo] as const;
+const ciIcons: Record<SetupCiState, typeof GitMerge> = {
+  merged: GitMerge,
+  progress: CircleDashed,
+  failed: XCircle,
+  completed: CheckCircle2,
+};
 
 function SetupEyebrow({
   anchor,
@@ -179,11 +76,56 @@ function SetupEyebrow({
   );
 }
 
+function SetupHeading({
+  anchor,
+  eyebrow,
+  id,
+  title,
+  intro,
+}: {
+  anchor: string;
+  eyebrow: string;
+  id: string;
+  title: string;
+  intro?: string;
+}) {
+  return (
+    <div className="setup-section-heading">
+      <SetupEyebrow anchor={anchor}>{eyebrow}</SetupEyebrow>
+      <h2 id={id}>{title}</h2>
+      {intro ? <p>{richText(intro)}</p> : null}
+    </div>
+  );
+}
+
+/** Title bar of a file or terminal window. The dots are decoration. */
+function WindowBar({ title, tag }: { title: string; tag?: string }) {
+  return (
+    <div className="window-bar">
+      <span aria-hidden="true" />
+      <span aria-hidden="true" />
+      <span aria-hidden="true" />
+      <p translate="no">{title}</p>
+      {tag ? <strong translate="no">{tag}</strong> : null}
+    </div>
+  );
+}
+
+function Code({ children }: { children: ReactNode }) {
+  return <code translate="no">{children}</code>;
+}
+
 export function SetupPage({ locale }: { locale: Locale }) {
   const siteUrl = getSiteUrl();
   const ui = uiCopyByLocale[locale];
+  const copy = setupCopyByLocale[locale];
   const { profile, socialLinks } = getPortfolioContent(locale);
   const canonicalPath = getSetupPath(locale);
+  const { hero, pipeline, plan, team, chaos, orchestration, handover, automation, desk, closing } =
+    copy;
+  // Handover rows appear one by one: the file's name and blocks, then each rule.
+  const dontStart = 1 + handover.file.sections.length;
+  const doStart = dontStart + 1 + handover.rules.dont.length;
 
   return (
     <>
@@ -191,9 +133,8 @@ export function SetupPage({ locale }: { locale: Locale }) {
         data={{
           "@context": "https://schema.org",
           "@type": "AboutPage",
-          name: "Setup and AI Workflow",
-          description:
-            "Pavan Patil's AI-assisted software workflow across planning, implementation, testing, review, automation, and hardware setup.",
+          name: copy.schema.name,
+          description: copy.schema.description,
           url: `${siteUrl}${canonicalPath}`,
           inLanguage: locale,
           mainEntity: {
@@ -211,285 +152,361 @@ export function SetupPage({ locale }: { locale: Locale }) {
             <div className="setup-hero-grid">
               <div className="setup-hero-copy">
                 <SetupEyebrow anchor="hero" fallback>
-                  AI workflow and setup
+                  {hero.eyebrow}
                 </SetupEyebrow>
                 <h1 id="setup-title">
-                  I use AI like an{" "}
-                  <span className="heading-muted">
-                    engineering team around me.
-                  </span>
+                  {hero.title}{" "}
+                  <span className="heading-muted">{hero.titleMuted}</span>
                 </h1>
-                <p className="setup-lede">
-                  One agent helps plan, others implement, others test, one tries
-                  to break the system, and I keep final control over review, git,
-                  and shipping.
-                </p>
+                <p className="setup-lede">{hero.lede}</p>
                 <div className="hero-actions setup-hero-actions">
-                  <Link className="primary-cta" href="#workflow">
-                    View workflow
-                    <ArrowRight aria-hidden="true" size={17} />
-                  </Link>
-                  <Link className="secondary-cta" href={getHomePath(locale)}>
-                    Back home
+                  <a className="primary-cta" href="#pipeline">
+                    {hero.primaryCta}
+                    <ArrowDown aria-hidden="true" size={17} />
+                  </a>
+                  <Link className="secondary-cta" href={getHashHref(locale, "#work")}>
+                    {hero.secondaryCta}
                     <ArrowRight aria-hidden="true" size={17} />
                   </Link>
                 </div>
               </div>
 
-              <div className="setup-command-panel" aria-label="AI workflow summary">
-                <div className="window-bar">
-                  <span />
-                  <span />
-                  <span />
-                  <p>ai-workflow.md</p>
-                  <strong>merge</strong>
-                </div>
-                <div className="setup-command-body">
-                  <p>
-                    <span>plan</span>
-                    Claude Opus + Spec Kit
-                  </p>
-                  <p>
-                    <span>tasks</span>
-                    Beads breakdown
-                  </p>
-                  <p>
-                    <span>build</span>
-                    Codex + Opus agents
-                  </p>
-                  <p>
-                    <span>verify</span>
-                    Sonnet + chaos pass
-                  </p>
-                  <p>
-                    <span>ship</span>
-                    manual git + CI/CD agents
-                  </p>
-                </div>
-              </div>
+              <SetupIndexNav className="setup-index" aria-label={hero.indexAria}>
+                <WindowBar title={hero.indexPath} />
+                <ol className="setup-index-list">
+                  {hero.index.map((item) => (
+                    <li key={item.target}>
+                      <a href={`#${item.target}`}>
+                        <Code>{item.file}</Code>
+                        <span>{item.label}</span>
+                        <ArrowDown aria-hidden="true" size={15} />
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </SetupIndexNav>
             </div>
           </Container>
         </section>
 
-        <section className="setup-stats" aria-label="AI workflow facts">
+        <section className="setup-section" id="pipeline" aria-labelledby="pipeline-heading">
           <Container>
-            <div className="setup-stats-grid">
-              {workflowStats.map((stat) => (
-                <div key={stat.label}>
-                  <strong>{stat.value}</strong>
-                  <span>{stat.label}</span>
-                </div>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        <section className="setup-section" id="workflow" aria-labelledby="workflow-heading">
-          <Container>
-            <div className="setup-section-heading">
-              <SetupEyebrow anchor="workflow">
-                Planning pipeline
-              </SetupEyebrow>
-              <h2 id="workflow-heading">The work starts before code.</h2>
-              <p>
-                I use AI most heavily at the beginning of a feature, when the
-                architecture, acceptance criteria, and test cases need to become
-                clear enough for multiple agents to work without losing the
-                original intent.
-              </p>
-            </div>
-
+            <SetupHeading
+              anchor="pipeline"
+              eyebrow={pipeline.eyebrow}
+              id="pipeline-heading"
+              title={pipeline.title}
+              intro={pipeline.intro}
+            />
             <div className="setup-workflow-diagram">
               <AiWorkflowDiagram workflow={ui.home.aiWorkflow} />
-            </div>
-
-            <div className="setup-timeline">
-              {workflowSteps.map((step, index) => (
-                <article key={step.title} className="setup-timeline-item">
-                  <span className="setup-step-number">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <div>
-                    <h3>{step.title}</h3>
-                    <p>{richText(step.text)}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        <section className="setup-section setup-section-muted" aria-labelledby="agents-heading">
-          <Container>
-            <div className="setup-section-heading">
-              <SetupEyebrow anchor="agents">
-                Multi-agent setup
-              </SetupEyebrow>
-              <h2 id="agents-heading">Agents have roles, not unlimited control.</h2>
-              <p>
-                I split agent work by responsibility. That keeps each agent close
-                to a domain while the PRD, Beads tasks, and acceptance criteria
-                keep the overall system aligned.
-              </p>
-            </div>
-
-            <div className="setup-agent-grid">
-              {agentRoles.map((role) => {
-                const Icon = role.icon;
-
-                return (
-                  <article key={role.title} className="setup-agent-card">
-                    <div className="setup-agent-icon">
-                      <Icon aria-hidden="true" size={20} />
-                    </div>
-                    <p>{role.label}</p>
-                    <h3>{role.title}</h3>
-                    <span>{richText(role.text)}</span>
-                  </article>
-                );
-              })}
             </div>
           </Container>
         </section>
 
         <section
-          className="setup-section setup-orchestration-section"
+          className="setup-section setup-section-muted setup-stage"
+          id="plan"
+          aria-labelledby="plan-heading"
+        >
+          <Container>
+            <SetupHeading
+              anchor="plan"
+              eyebrow={plan.eyebrow}
+              id="plan-heading"
+              title={plan.title}
+              intro={plan.intro}
+            />
+
+            <div className="setup-artifacts">
+              <div className="setup-window" role="group" aria-label={plan.prd.file}>
+                <WindowBar title={plan.prd.file} tag={plan.prd.tool} />
+                <PrdTypewriter prd={plan.prd} />
+              </div>
+
+              <SetupReveal
+                className="setup-window setup-tasks-window"
+                role="group"
+                aria-label={plan.tasks.aria}
+              >
+                <WindowBar title="terminal" tag={plan.tasks.tool} />
+                <div className="setup-tasks">
+                  <p className="setup-tasks-prompt">
+                    <span aria-hidden="true">$</span>
+                    <code
+                      translate="no"
+                      style={cssVars({ "--chars": plan.tasks.command.length })}
+                    >
+                      {plan.tasks.command}
+                    </code>
+                  </p>
+                  <ul>
+                    {plan.tasks.rows.map((row, index) => (
+                      <li key={row.id} data-status={row.status} style={cssVars({ "--i": index })}>
+                        <Code>{row.id}</Code>
+                        <span className="setup-task-title">
+                          {row.title}
+                          {row.after ? (
+                            <small>
+                              {plan.tasks.afterLabel} <Code>{row.after}</Code>
+                            </small>
+                          ) : null}
+                        </span>
+                        <span className="setup-task-status">
+                          {plan.tasks.statusLabels[row.status]}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </SetupReveal>
+            </div>
+          </Container>
+        </section>
+
+        <section className="setup-section setup-stage" id="team" aria-labelledby="team-heading">
+          <Container>
+            <SetupHeading
+              anchor="team"
+              eyebrow={team.eyebrow}
+              id="team-heading"
+              title={team.title}
+              intro={team.intro}
+            />
+
+            <SetupReveal className="setup-team">
+              <table className="setup-team-table">
+              <caption className="sr-only">{team.caption}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{team.columns.role}</th>
+                  <th scope="col">{team.columns.agent}</th>
+                  <th scope="col">{team.columns.stage}</th>
+                  <th scope="col">{team.columns.focus}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {team.rows.map((row, index) => (
+                  <tr
+                    key={row.role}
+                    style={cssVars({ "--row": index, "--rows": team.rows.length })}
+                  >
+                    <th scope="row">{row.role}</th>
+                    <td>
+                      <span className="setup-chip" translate="no">
+                        {row.agent}
+                      </span>
+                    </td>
+                    <td>{row.stage}</td>
+                    <td>{row.focus}</td>
+                  </tr>
+                ))}
+              </tbody>
+              </table>
+            </SetupReveal>
+          </Container>
+        </section>
+
+        <section
+          className="setup-chaos-section setup-stage"
+          id="chaos"
+          aria-labelledby="chaos-heading"
+        >
+          <Container>
+            <div className="setup-chaos-grid">
+              <div className="setup-chaos-copy">
+                <SetupEyebrow anchor="chaos">{chaos.eyebrow}</SetupEyebrow>
+                <h2 id="chaos-heading">{chaos.title}</h2>
+                {chaos.body.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+
+              <ChaosLiveLog log={chaos.log} />
+            </div>
+          </Container>
+        </section>
+
+        <section
+          className="setup-section setup-section-muted setup-stage"
+          id="orchestration"
           aria-labelledby="orchestration-heading"
         >
           <Container>
-            <div className="setup-orchestration-grid">
-              <div className="setup-section-heading">
-                <SetupEyebrow anchor="orchestration">
-                  Loop engineering
-                </SetupEyebrow>
-                <h2 id="orchestration-heading">
-                  Complex workflows need orchestration, not just more agents.
-                </h2>
-                <p>
-                  For bigger systems, I add a loop engineering layer so the work
-                  keeps moving through planning, implementation, review, and
-                  verification without losing consistency.
-                </p>
-              </div>
+            <SetupHeading
+              anchor="orchestration"
+              eyebrow={orchestration.eyebrow}
+              id="orchestration-heading"
+              title={orchestration.title}
+              intro={orchestration.intro}
+            />
 
-              <LoopEngineeringCards points={orchestrationPoints} />
-            </div>
-          </Container>
-        </section>
-
-        <section className="setup-chaos-section" aria-labelledby="chaos-heading">
-          <Container>
-            <div className="setup-chaos-grid">
-              <div>
-                <SetupEyebrow anchor="chaos">
-                  Chaos engineer
-                </SetupEyebrow>
-                <h2 id="chaos-heading">An agent built to break code.</h2>
-              </div>
-              <div className="setup-chaos-copy">
-                {/* <ShieldAlert aria-hidden="true" size={24} /> */}
-                <p>
-                  {richText(
-                    "The **chaos engineering agent** breaks the code intentionally and looks for broken assumptions, missing edge cases, weak recovery paths, bad states, race conditions, unclear user flows, and places where the system works only when everything goes perfectly.",
-                  )}
-                </p>
-                <p>
-                  I like this role because it adds pressure to the design before
-                  users do. It turns AI from only a builder into a reviewer that
-                  actively searches for failure.
-                </p>
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        <section className="setup-section" aria-labelledby="control-heading">
-          <Container>
-            <div className="setup-two-column">
-              <div className="setup-section-heading">
-                <SetupEyebrow anchor="control">
-                  Git and review
-                </SetupEyebrow>
-                <h2 id="control-heading">Manual control stays with me.</h2>
-                <p>
-                  Agents can move quickly, but the final engineering decision
-                  should still be mine. I use AI to increase leverage, not to
-                  hand over the merge button.
-                </p>
-              </div>
-
-              <ol className="setup-check-list">
-                {controlPoints.map((point) => (
-                  <li key={point}>
-                    <span>{richText(point)}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </Container>
-        </section>
-
-        <section className="setup-section setup-section-muted" aria-labelledby="sync-heading">
-          <Container>
-            <div className="setup-two-column">
-              <div className="setup-section-heading">
-                <SetupEyebrow anchor="sync">
-                  Repo sync
-                </SetupEyebrow>
-                <h2 id="sync-heading">Handover files keep parallel work aligned.</h2>
-              </div>
-
-              <div className="setup-sync-list">
-                {repoSyncNotes.map((note) => (
-                  <p key={note}>
-                    <GitBranch aria-hidden="true" size={17} />
-                    <span>{richText(note)}</span>
+            <SetupReveal className="setup-ladder-reveal">
+              <ol className="setup-ladder" aria-label={orchestration.aria}>
+              {orchestration.steps.map((step, index) => (
+                <li
+                  key={step.tool}
+                  style={cssVars({ "--level": index + 1 })}
+                  data-level={index + 1}
+                >
+                  <div className="setup-ladder-track" aria-hidden="true">
+                    <span className="setup-ladder-bar">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <h3>
+                    <span className="sr-only">
+                      {orchestration.levelLabel} {index + 1}:{" "}
+                    </span>
+                    <span translate="no">{step.tool}</span>
+                  </h3>
+                  <p>{richText(step.text)}</p>
+                  <p className="setup-ladder-when">
+                    <strong>{orchestration.whenLabel}</strong> {step.when}
                   </p>
+                </li>
+              ))}
+              </ol>
+            </SetupReveal>
+          </Container>
+        </section>
+
+        <section
+          className="setup-section setup-stage"
+          id="handover"
+          aria-labelledby="handover-heading"
+        >
+          <Container>
+            <SetupHeading
+              anchor="handover"
+              eyebrow={handover.eyebrow}
+              id="handover-heading"
+              title={handover.title}
+              intro={handover.intro}
+            />
+
+            <SetupReveal className="setup-handover-grid">
+              <article className="setup-sheet" aria-label={handover.file.name}>
+                <p className="setup-sheet-name" translate="no" style={cssVars({ "--seq": 0 })}>
+                  {handover.file.name}
+                </p>
+                {handover.file.sections.map((section, index) => (
+                  <div
+                    key={section.heading}
+                    className="setup-sheet-block"
+                    style={cssVars({ "--seq": 1 + index })}
+                  >
+                    <h3>{section.heading}</h3>
+                    <ul className={section.checklist ? "is-checklist" : undefined}>
+                      {section.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
+              </article>
+
+              <div className="setup-rules">
+                <div className="setup-rules-group" data-kind="dont">
+                  <h3 style={cssVars({ "--seq": dontStart })}>{handover.rules.dontTitle}</h3>
+                  <ul>
+                    {handover.rules.dont.map((rule, index) => (
+                      <li key={rule} style={cssVars({ "--seq": dontStart + 1 + index })}>
+                        <X aria-hidden="true" size={16} />
+                        <span>{richText(rule)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="setup-rules-group" data-kind="do">
+                  <h3 style={cssVars({ "--seq": doStart })}>{handover.rules.doTitle}</h3>
+                  <ul>
+                    {handover.rules.do.map((rule, index) => (
+                      <li key={rule} style={cssVars({ "--seq": doStart + 1 + index })}>
+                        <Check aria-hidden="true" size={16} />
+                        <span>{richText(rule)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
+            </SetupReveal>
           </Container>
         </section>
 
-        <section className="setup-section setup-section-muted" aria-labelledby="automation-heading">
+        <section
+          className="setup-section setup-section-muted setup-stage"
+          id="automation"
+          aria-labelledby="automation-heading"
+        >
           <Container>
-            <div className="setup-two-column">
-              <div className="setup-section-heading">
-                <SetupEyebrow anchor="automation">
-                  Automation
-                </SetupEyebrow>
-                <h2 id="automation-heading">CI/CD and personal agents handle the background checks.</h2>
-                <p>
-                  {richText(
-                    "**GitHub Actions agents** tell me whether deployment is in process, failed, merged, or completed. For personal automation, I use a self-hosted **Hermas agent** for starting the day, checking emails, reviewing meetings, and handling small personal tasks.",
-                  )}
-                </p>
+            <SetupHeading
+              anchor="automation"
+              eyebrow={automation.eyebrow}
+              id="automation-heading"
+              title={automation.title}
+              intro={automation.intro}
+            />
+
+            <SetupReveal className="setup-automation-grid">
+              <div className="setup-panel">
+                <h3 translate="no">{automation.ci.title}</h3>
+                <ol className="setup-feed" aria-label={automation.ci.aria}>
+                  {automation.ci.events.map((event, index) => {
+                    const Icon = ciIcons[event.state];
+
+                    return (
+                      <li
+                        key={event.state}
+                        data-state={event.state}
+                        style={cssVars({ "--i": index })}
+                      >
+                        <span className="setup-feed-icon">
+                          <Icon aria-hidden="true" size={18} />
+                        </span>
+                        <div>
+                          <strong>{event.label}</strong>
+                          <p>{event.text}</p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
               </div>
 
-              <div className="setup-automation-panel">
-                <Workflow aria-hidden="true" size={24} />
-                <strong>Plan - build - verify - review - ship</strong>
-                <p>
-                  The setup keeps fast feedback around the work while preserving
-                  manual review at the points that matter.
-                </p>
+              <div className="setup-panel">
+                <h3>
+                  <span translate="no">{automation.personal.title}</span>
+                  <span className="setup-chip">{automation.personal.tag}</span>
+                </h3>
+                <ul className="setup-routine" aria-label={automation.personal.aria}>
+                  {automation.personal.tasks.map((task, index) => {
+                    const Icon = routineIcons[index] ?? ListTodo;
+
+                    return (
+                      <li key={task} style={cssVars({ "--i": index })}>
+                        <Icon aria-hidden="true" size={18} />
+                        <span>{task}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-            </div>
+            </SetupReveal>
           </Container>
         </section>
 
-        <section className="setup-section setup-desk-section" aria-labelledby="desk-heading">
+        <section
+          className="setup-section setup-desk-section"
+          id="desk"
+          aria-labelledby="desk-heading"
+        >
           <Container>
-            <div className="setup-section-heading">
-              <SetupEyebrow anchor="desk">
-                Working setup
-              </SetupEyebrow>
-              <h2 id="desk-heading">The hardware stays simple and reliable.</h2>
-            </div>
+            <SetupHeading anchor="desk" eyebrow={desk.eyebrow} id="desk-heading" title={desk.title} />
 
             <div className="setup-desk-grid">
-              {deskSetup.map((item) => {
-                const Icon = item.icon;
+              {desk.items.map((item, index) => {
+                const Icon = deskIcons[index] ?? Laptop;
 
                 return (
                   <article key={item.title}>
@@ -506,16 +523,9 @@ export function SetupPage({ locale }: { locale: Locale }) {
         <section className="setup-closing" aria-labelledby="setup-closing-heading">
           <Container>
             <blockquote className="setup-closing-quote">
-              {/* <Quote aria-hidden="true" size={28} /> */}
-              <h2 id="setup-closing-heading">
-                The setup keeps changing, but the direction is consistent.
-              </h2>
+              <h2 id="setup-closing-heading">{closing.title}</h2>
             </blockquote>
-            <p>
-              Faster feedback, better thinking, fewer repetitive steps, and more
-              time spent on the parts of software that need taste, judgment, and
-              care.
-            </p>
+            <p>{closing.text}</p>
           </Container>
         </section>
       </main>

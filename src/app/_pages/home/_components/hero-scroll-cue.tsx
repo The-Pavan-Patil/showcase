@@ -2,11 +2,36 @@
 
 import { motion, type MotionValue } from "motion/react";
 import Image from "next/image";
-import { useEffect, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
+
+import { getSectionStart } from "@/lib/section-jump";
 
 export type HeroScrollCueLogo = { src: string; name: string };
 
 const CYCLE_MS = 2200;
+
+/**
+ * Scrolls down to Selected Work without following the `#work` link. A plain
+ * fragment link adds a history entry the Next.js router ignores, so Back
+ * from a case study opened afterwards would change the URL but leave the
+ * case study on screen.
+ */
+function scrollToWork(event: ReactMouseEvent<HTMLAnchorElement>) {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    return;
+  }
+  const work = document.getElementById("work");
+  if (!work) return;
+
+  event.preventDefault();
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: getSectionStart(work), behavior: reducedMotion ? "instant" : "smooth" });
+}
 
 /** Bottom-centre cue: one experience logo at a time, a hairline, then the label. */
 export function HeroScrollCue({
@@ -17,8 +42,8 @@ export function HeroScrollCue({
 }: {
   logos: HeroScrollCueLogo[];
   label: string;
-  /** 1 → 0 as the hero scrolls away. Applied per child via --cue-fade, since
-      opacity on the link itself would isolate the logos' blend mode. */
+  /** 1 → 0 as the hero scrolls away. Applied per child via --cue-fade, so the
+      hairline's fill and the accent dot keep their own opacity. */
   fade?: MotionValue<number>;
   /** 0 → 1: how far the hairline has drawn down. */
   draw?: MotionValue<number>;
@@ -58,6 +83,7 @@ export function HeroScrollCue({
     <motion.a
       className="hero-scroll-cue"
       href="#work"
+      onClick={scrollToWork}
       style={fade ? ({ "--cue-fade": fade } as unknown as CSSProperties) : undefined}
     >
       <span className="hero-scroll-cue-logos" aria-hidden="true">
@@ -73,7 +99,7 @@ export function HeroScrollCue({
                   : "idle"
             }
           >
-            <Image src={logo.src} alt="" fill sizes="28px" />
+            <Image src={logo.src} alt="" fill sizes="56px" loading="eager" />
           </span>
         ))}
       </span>

@@ -17,7 +17,6 @@ type ProjectTranslation = Pick<
 > & {
   media?: {
     alt: string;
-    caption?: string;
   };
 };
 
@@ -76,7 +75,6 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
     ],
     media: {
       alt: "オフライン同期と共同作業の構成につながるNudgeのモバイルタスク画面",
-      caption: "オフライン優先のタスクUI、同期フロー、共同作業モデル",
     },
     visualLabel:
       "役割に応じたジェスチャー、オフラインキュー、Supabase同期を示すNudgeのタスク画面",
@@ -188,7 +186,6 @@ export const deProjectTranslations: Record<string, ProjectTranslation> = {
     ],
     media: {
       alt: "Ein mobiles Nudge-Aufgabendeck verbunden mit Offline-Sync und Kollaborationsarchitektur",
-      caption: "Offline-first Aufgaben-UI, Sync-Fluss und Kollaborationsmodell",
     },
     visualLabel:
       "Nudge-Aufgabendeck mit rollenbewussten Gesten, Offline-Warteschlange und Supabase-Synchronisierung",

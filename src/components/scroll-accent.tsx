@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
+import { isScrollSettling, SECTION_JUMP_END, SECTION_JUMP_START } from "@/lib/section-jump";
 import { clamp } from "@/lib/utils";
 
 /**
@@ -281,10 +282,14 @@ function experienceNodeStops(section: HTMLElement): ScrollAccentStop[] {
     .filter((node) => node.dataset.scrollAccentOffset !== undefined)
     .map((node) => {
       const nodeFocus = Number.parseFloat(node.dataset.scrollAccentFocus ?? "");
+      // The node holds still on screen from `rest` to the end of the pin.
+      // Called before then, the dot rides it up with the moving timeline.
+      const rest = Number.parseFloat(node.dataset.scrollAccentRest ?? "");
+      const from = Number.isFinite(rest) ? Math.min(trackTop + rest, range.to) : range.from;
       return {
         ...stopFrom(node, trackTop + Number(node.dataset.scrollAccentOffset)),
-        y: range.from + (Number.isFinite(nodeFocus) ? nodeFocus : focusY),
-        stick: range,
+        y: from + (Number.isFinite(nodeFocus) ? nodeFocus : focusY),
+        stick: { from, to: range.to },
       };
     })
     .sort((first, second) => first.activateAt - second.activateAt);
@@ -302,9 +307,9 @@ function heroStartStop() {
 
 /**
  * Home: from the scroll cue to Selected Work, Experience and its timeline,
- * the AI workflow, hidden through About, then the quick message.
+ * the AI workflow, hidden through About, then the quick message and Contact.
  */
-function buildHomeStops(): ScrollAccentStop[] | null {
+function buildHomeStops(floatLine: number): ScrollAccentStop[] | null {
   const anchor = (id: string) =>
     document.querySelector<HTMLElement>(`[data-scroll-accent-anchor="${id}"]`);
   const hero = heroStartStop();
@@ -312,6 +317,7 @@ function buildHomeStops(): ScrollAccentStop[] | null {
   const experience = anchor("experience");
   const workflow = anchor("workflow");
   const message = anchor("message");
+  const contact = anchor("contact");
   const experienceSection = document.querySelector<HTMLElement>("[data-scroll-accent-experience]");
   const about = document.getElementById("about");
   const main = document.getElementById("main-content");
@@ -337,12 +343,27 @@ function buildHomeStops(): ScrollAccentStop[] | null {
     );
   }
   stops.push(...experienceNodeStops(experienceSection));
-  stops.push(stopFrom(workflow, sectionEntry(workflow)));
+  // The workflow eyebrow rides its stage while the cards are dealt.
+  stops.push(
+    stickyStopFrom(
+      workflow,
+      workflow.closest(".workflow-scene-track")?.querySelector<HTMLElement>(".workflow-scene-stage") ??
+        null,
+      sectionEntry(workflow),
+    ),
+  );
   if (about) stops.push(hiddenStop("about-hidden", sectionEntry(about)));
   stops.push(
     stickyStopFrom(message, message.closest<HTMLElement>(".quick-message-band"), sectionEntry(message)),
   );
-  stops.push(hiddenStop("end-hidden", mainEndEntry(main)));
+  if (contact) {
+    // The last eyebrow: the dot stays on it to the end of the page, and
+    // fades only if the eyebrow scrolls up under the header.
+    const contactStop = stopFrom(contact, sectionEntry(contact));
+    stops.push(contactStop, hiddenStop("end-hidden", contactStop.y - floatLine));
+  } else {
+    stops.push(hiddenStop("end-hidden", mainEndEntry(main)));
+  }
   return ordered(stops);
 }
 
@@ -404,6 +425,11 @@ export function ScrollAccent() {
     let arrivedAt: number | null = null;
     /** Whether reaching the current stop changes what is on screen. */
     let visibleHop = false;
+    /**
+     * Set by a header jump: the next frame puts the dot straight on the
+     * stop the page landed on, without touring the stops in between.
+     */
+    let snapNext = false;
 
     root.classList.add("scroll-accent-mounted");
 
@@ -446,12 +472,14 @@ export function ScrollAccent() {
       if (!stops.length) return;
 
       const scrollY = window.scrollY;
+      const snap = snapNext;
+      snapNext = false;
       const reached = resolveScrollAccentStop(stops, scrollY);
       const visiting = current ? stopIndexOf(current) : reached;
       if (Math.hypot(spring.x, spring.y) < ARRIVE_DISTANCE) arrivedAt ??= now;
       const arrived =
         arrivedAt !== null && (!visibleHop || now - arrivedAt >= TOUR_DWELL_MS);
-      const index = reducedMotion
+      const index = reducedMotion || snap
         ? reached
         : nextVisitIndex(stops, visiting, reached, arrived, (stop) => {
             const y = stopViewportPoint(stop, scrollY).y;
@@ -481,7 +509,7 @@ export function ScrollAccent() {
           Math.hypot(offset.x, offset.y) >= ARRIVE_DISTANCE ||
           current?.phase !== stop.phase ||
           current?.size !== stop.size;
-        if (reducedMotion || !lastDrawn || (fromHidden && !stop.hidden)) {
+        if (snap || reducedMotion || !lastDrawn || (fromHidden && !stop.hidden)) {
           // Snap, or reappear on the target after being hidden.
           spring = REST;
         } else if (stop.hidden) {
@@ -494,6 +522,9 @@ export function ScrollAccent() {
         current = stop;
         arrivedAt = null;
       }
+
+      // A jump also ends a flight already heading for this stop.
+      if (snap) spring = REST;
 
       const dt = lastTime ? Math.min((now - lastTime) / 1000, 1 / 30) : 1 / 60;
       lastTime = now;
@@ -534,7 +565,7 @@ export function ScrollAccent() {
         },
       );
       const previous = current;
-      stops = buildHomeStops() ?? buildGenericStops() ?? [];
+      stops = buildHomeStops(floatLine) ?? buildGenericStops() ?? [];
       // Re-measured stops are new objects; keep the current one if it still
       // exists so a resize is not mistaken for a new flight. If it is gone
       // (its project list was closed), the old object stays and the dot
@@ -548,6 +579,28 @@ export function ScrollAccent() {
       schedule();
     }
 
+    // While a jump or a restored position settles, the scenes may still be
+    // measuring themselves (the Experience nodes publish their stops only
+    // once laid out), so the dot hides, then reappears on the stop the page
+    // settled on.
+    let settleTimer = 0;
+    function handleSectionJump() {
+      snapNext = true;
+      dot!.dataset.settling = "";
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(handleSectionJumpEnd, 2000);
+      schedule();
+    }
+
+    function handleSectionJumpEnd() {
+      window.clearTimeout(settleTimer);
+      if (dot!.dataset.settling === undefined) return;
+      measure();
+      snapNext = true;
+      delete dot!.dataset.settling;
+      schedule();
+    }
+
     const resizeObserver = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
     if (main) resizeObserver?.observe(main);
     const details = Array.from(
@@ -556,6 +609,10 @@ export function ScrollAccent() {
     details.forEach((element) => element.addEventListener("toggle", measure));
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", measure);
+    window.addEventListener(SECTION_JUMP_START, handleSectionJump);
+    window.addEventListener(SECTION_JUMP_END, handleSectionJumpEnd);
+    // Mounted while a restored position settles (the homepage on Back).
+    if (isScrollSettling()) handleSectionJump();
     motionQuery.addEventListener("change", handleMotionPreference);
     void document.fonts?.ready.then(measure);
     measure();
@@ -565,6 +622,9 @@ export function ScrollAccent() {
       root.classList.remove("scroll-accent-mounted");
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", measure);
+      window.removeEventListener(SECTION_JUMP_START, handleSectionJump);
+      window.removeEventListener(SECTION_JUMP_END, handleSectionJumpEnd);
+      window.clearTimeout(settleTimer);
       motionQuery.removeEventListener("change", handleMotionPreference);
       details.forEach((element) => element.removeEventListener("toggle", measure));
       resizeObserver?.disconnect();

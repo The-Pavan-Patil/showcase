@@ -50,6 +50,18 @@ const RISE_SPAN = 0.25;
 const HOLD_VIEWPORTS = 0.45;
 const HOLD_MIN_PX = 240;
 const FIRST_NODE_AT = 0;
+/** Floor for the first call, so landing on the track's top is not a scroll. */
+const FIRST_NODE_MIN_PX = 4;
+/*
+ * When the client-project line above a company ends, the dot leaves it for
+ * that company's suitcase straight away and rides the icon up to the focus
+ * line, instead of waiting at the end of the line for the icon to arrive.
+ *
+ * COMPANY_CALL_SHIFT_PX  scroll (px) after the line's end at which the dot
+ *                        leaves for the suitcase. 0 = as the line ends;
+ *                        negative = a little before; positive = after.
+ */
+const COMPANY_CALL_SHIFT_PX = 0;
 
 type TimelineNode = {
   anchor: string;
@@ -57,6 +69,10 @@ type TimelineNode = {
   y: number;
   /** Timeline travel (after the hold) at which the node reaches the focus line. */
   offset: number;
+  /** Timeline travel at which the accent dot is sent to the node. */
+  call: number;
+  /** Timeline travel at which the node stops moving on screen. */
+  rest: number;
   /** Where the node is then, from the top of the pinned stage. */
   focusY: number;
 };
@@ -145,12 +161,35 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
     // the same pace to the nodes that never reached the line.
     const firstCentre = centres[0];
     const travel = Math.max(0, Math.round(list.offsetHeight - windowHeight));
+    const offsets = centres.map((centre) => Math.round(centre - firstCentre));
     const nodes = nodeElements.map((node, index) => {
-      const offset = Math.round(centres[index] - firstCentre);
+      const offset = offsets[index];
+      // A company after one with client projects is called as that
+      // company's project line ends, not when it reaches the focus line.
+      const previousRail = node
+        .closest(".experience-item")
+        ?.previousElementSibling?.querySelector<HTMLElement>(
+          ".client-projects[open] .client-project-list",
+        );
+      let call = offset;
+      if (
+        node.dataset.scrollAccentPhase === "experience-major" &&
+        previousRail &&
+        previousRail.getClientRects().length > 0
+      ) {
+        const railEnd = offsetWithin(previousRail, list) + previousRail.offsetHeight;
+        call = clamp(
+          Math.round(railEnd - firstCentre + COMPANY_CALL_SHIFT_PX),
+          (offsets[index - 1] ?? 0) + 1,
+          offset,
+        );
+      }
       return {
         anchor: node.dataset.scrollAccentAnchor ?? "",
         y: centres[index],
         offset,
+        call,
+        rest: Math.min(offset, travel),
         focusY: Math.round(windowTop + centres[index] - Math.min(offset, travel)),
       };
     });
@@ -293,16 +332,27 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
   const placed = new Map(liveLayout?.nodes.map((node) => [node.anchor, node]));
   // Live nodes publish when (scroll into the track) and where the accent dot
   // reaches them. The first is called during the hold; the rest as they
-  // reach the focus line once the timeline moves.
+  // reach the focus line once the timeline moves. The first call waits for
+  // at least FIRST_NODE_MIN_PX of scroll, so a header jump that opens the
+  // section at the track's top leaves the dot on the eyebrow until the
+  // visitor scrolls.
   const accentOffset = (anchor: string) => {
     const node = placed.get(anchor);
     if (!node || !liveLayout) return undefined;
     return node.offset === 0
-      ? Math.round(liveLayout.hold * FIRST_NODE_AT)
-      : liveLayout.hold + node.offset;
+      ? Math.max(FIRST_NODE_MIN_PX, Math.round(liveLayout.hold * FIRST_NODE_AT))
+      : liveLayout.hold + node.call;
+  };
+  // Scroll into the track from which the node holds still on screen. Before
+  // that, a dot sent to it rides it up with the timeline.
+  const accentRest = (anchor: string) => {
+    const node = placed.get(anchor);
+    if (!node || !liveLayout) return undefined;
+    return node.offset === 0 ? 0 : liveLayout.hold + node.rest;
   };
   const accentProps = (anchor: string) => ({
     "data-scroll-accent-offset": accentOffset(anchor),
+    "data-scroll-accent-rest": accentRest(anchor),
     "data-scroll-accent-focus": placed.get(anchor)?.focusY,
   });
 
@@ -317,6 +367,7 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
       <div
         className="experience-track"
         ref={trackRef}
+        data-section-start={isLive ? "" : undefined}
         data-scroll-accent-track={liveLayout ? "" : undefined}
         data-scroll-accent-focus={liveLayout?.focusY}
         data-scroll-accent-end={liveLayout?.range}

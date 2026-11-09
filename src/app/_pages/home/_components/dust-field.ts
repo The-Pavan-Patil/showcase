@@ -148,15 +148,36 @@ const DUST_FRAGMENT = /* glsl */ `
 
 /** The card's scrim, kept in step with `.dust-card-shade` in globals.css. */
 const SHADE_STOPS: Array<[number, string]> = [
-  [0, "rgb(0 0 0 / 34%)"],
-  [0.32, "rgb(0 0 0 / 0%)"],
-  [0.7, "rgb(0 0 0 / 0%)"],
-  [1, "rgb(0 0 0 / 30%)"],
+  [0, "rgb(0 0 0 / 12%)"],
+  [0.3, "rgb(0 0 0 / 0%)"],
+  [0.72, "rgb(0 0 0 / 0%)"],
+  [1, "rgb(0 0 0 / 10%)"],
 ];
+
+/** Kept in step with `.dust-card-media`'s box-shadow in globals.css. */
+const FRAME_SHADOW = { color: "rgb(0 0 0 / 16%)", blur: 18, offsetY: 6 };
+const FRAME_HAIRLINE = "rgb(255 255 255 / 8%)";
+
+/** The matte grain tiled over `.dust-card`; drawn once it has loaded. */
+const GRAIN_SRC = "/images/textures/card-grain.png";
+const GRAIN_SIZE = 128;
+let grainImage: HTMLImageElement | undefined;
+function getGrain() {
+  if (!grainImage && typeof Image !== "undefined") {
+    grainImage = new Image();
+    grainImage.src = GRAIN_SRC;
+  }
+  return grainImage?.complete && grainImage.naturalWidth > 0
+    ? grainImage
+    : undefined;
+}
+getGrain();
 
 /**
  * The card's background, kept in step with `.dust-card` in globals.css: a
- * glow ellipse top-right and a shadow ellipse bottom-left over the base.
+ * glow ellipse top-right and a shadow ellipse bottom-left over the base,
+ * each mixed back towards the base by its --card-matte-* strength, then the
+ * grain. Drawing a tone at that alpha over the base equals CSS color-mix.
  */
 function drawCardBackground(
   context: CanvasRenderingContext2D,
@@ -168,8 +189,14 @@ function drawCardBackground(
   context.fillStyle = color("--card-base");
   context.fillRect(0, 0, width, height);
 
+  const strength = (name: string) => {
+    const value = Number.parseFloat(color(name));
+    return Number.isFinite(value) ? value / 100 : 1;
+  };
+
   const ellipse = (
     hex: string,
+    alpha: number,
     cx: number,
     cy: number,
     rx: number,
@@ -177,6 +204,7 @@ function drawCardBackground(
     reach: number,
   ) => {
     context.save();
+    context.globalAlpha = alpha;
     context.translate(cx * width, cy * height);
     context.scale(rx * width, ry * height);
     const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
@@ -187,8 +215,21 @@ function drawCardBackground(
     context.fillRect(-cx / rx - 1, -cy / ry - 1, 1 / rx + 2, 1 / ry + 2);
     context.restore();
   };
-  ellipse(color("--card-glow"), 0.85, 0.1, 0.9, 0.6, 0.62);
-  ellipse(color("--card-deep"), 0.1, 0.95, 1.1, 0.7, 0.7);
+  ellipse(color("--card-glow"), strength("--card-matte-glow"), 0.85, 0.1, 0.9, 0.6, 0.62);
+  ellipse(color("--card-deep"), strength("--card-matte-deep"), 0.1, 0.95, 1.1, 0.7, 0.7);
+
+  const grain = getGrain();
+  const pattern = grain && context.createPattern(grain, "repeat");
+  if (pattern) {
+    pattern.setTransform(
+      new DOMMatrix().scale(
+        GRAIN_SIZE / grain.naturalWidth,
+        GRAIN_SIZE / grain.naturalHeight,
+      ),
+    );
+    context.fillStyle = pattern;
+    context.fillRect(0, 0, width, height);
+  }
 }
 
 function parsePercent(value: string | undefined, fallback: number) {
@@ -324,9 +365,9 @@ function rasterizeCard(card: HTMLElement, ratio: number) {
       Number.parseFloat(getComputedStyle(frame).borderTopLeftRadius) || 0;
 
     context.save();
-    context.shadowColor = "rgb(0 0 0 / 32%)";
-    context.shadowBlur = 40;
-    context.shadowOffsetY = 18;
+    context.shadowColor = FRAME_SHADOW.color;
+    context.shadowBlur = FRAME_SHADOW.blur;
+    context.shadowOffsetY = FRAME_SHADOW.offsetY;
     context.beginPath();
     context.roundRect(left, top, frameWidth, frameHeight, frameRadius);
     context.fillStyle = "#000";
@@ -348,7 +389,7 @@ function rasterizeCard(card: HTMLElement, ratio: number) {
       frameHeight - 1,
       frameRadius,
     );
-    context.strokeStyle = "rgb(255 255 255 / 14%)";
+    context.strokeStyle = FRAME_HAIRLINE;
     context.lineWidth = 1;
     context.stroke();
   }

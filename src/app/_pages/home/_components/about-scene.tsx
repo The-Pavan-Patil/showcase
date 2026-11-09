@@ -10,9 +10,10 @@ import {
   useSpring,
   useTransform,
 } from "motion/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { Container } from "@/components/container";
+import { onSectionJumpEnd } from "@/lib/section-jump";
 import { useMediaQuery, useScrollSceneLive } from "@/lib/use-scroll-scene";
 
 import { AboutBeyond, type AboutBeyondNote } from "./about-beyond";
@@ -78,6 +79,11 @@ export function AboutScene({
     damping: 32,
     mass: 0.2,
   });
+  // A header jump opens the scene at its start rather than playing back to it.
+  useEffect(
+    () => onSectionJumpEnd(() => progress.jump(scrollYProgress.get())),
+    [progress, scrollYProgress],
+  );
 
   // ABOUT leaves to the left and ME to the right, uncovering the card.
   const leftX = useTransform(progress, [at(0.06), at(0.46)], ["0vw", "-78vw"]);
@@ -167,7 +173,11 @@ export function AboutScene({
         />
       </Container>
 
-      <div className="about-scene-track" ref={trackRef}>
+      <div
+        className="about-scene-track"
+        data-section-start={isLive ? "" : undefined}
+        ref={trackRef}
+      >
         <div className="about-scene-stage">
           <h2 className="about-scene-title" id="about-heading">
             <motion.span

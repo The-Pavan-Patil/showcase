@@ -37,11 +37,13 @@ export const mainichiKoto = {
   ],
   media: {
     src: "/images/projects/mainichi-koto-kanji.png",
+    width: 2872,
+    height: 1678,
     focus: "50% 55%",
     alt: "Mainichi koto kanji study screen showing a Word Kanji flashcard for 着く with an I remember review action",
-    caption: "Mainichi koto Word Kanji review surface",
   },
-  cardPalette: { base: "#4f6b45", glow: "#9cbf7a", deep: "#1f2d1c" },
+  liveUrl: "https://vocab-xi-one.vercel.app",
+  cardPalette: { base: "#284530", glow: "#3d5744", deep: "#142a1a" },
   visual: "learning",
   visualLabel:
     "Mainichi koto learning system showing vocabulary cards, contextual kanji recall, spaced review, and a durable review queue",

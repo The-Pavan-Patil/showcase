@@ -58,9 +58,14 @@ export type UiCopy = {
       eyebrow: string;
       title: string;
       titleMuted: string;
-      description: string;
-      descriptionEmphasis: string;
       cta: string;
+      /** Accessible name of the home section's list of steps. */
+      stepsAria: string;
+      /** The home section's step cards. Wrap tool names in **double asterisks**. */
+      steps: Array<{
+        title: string;
+        text: string;
+      }>;
       pipelineAria: string;
       testFailed: string;
       testPassed: string;
@@ -182,6 +187,8 @@ export type UiCopy = {
   work: {
     selectedWork: string;
     technologiesAria: string;
+    liveSite: string;
+    liveSiteAria: string;
     factsAria: string;
     articleAria: string;
     role: string;
@@ -273,7 +280,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      scrollDown: "Scroll down",
+      scrollDown: "Scroll down for proof.",
       workEyebrow: "Selected work",
       workTitle: "Built for real constraints.",
       workMuted: "Designed to hold up.",
@@ -289,10 +296,26 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         eyebrow: "AI workflow",
         title: "See how I use AI to speed up",
         titleMuted: "development.",
-        description: "Separate agents plan, build, test, and try to break every change.",
-        descriptionEmphasis:
-          "An orchestration loop keeps them in step through git and CI.",
         cta: "View my full setup",
+        stepsAria: "The four steps of my AI workflow",
+        steps: [
+          {
+            title: "Brainstorm the system",
+            text: "I start with **Claude Opus** for planning and architecture. The first pass is a brainstorming session around the problem, constraints, architecture options, goals, acceptance criteria, and test cases.",
+          },
+          {
+            title: "Shape the Master PRD",
+            text: "I use **Spec Kit** and **Beads** on top of the brainstorming work to turn the idea into a Master PRD. That document becomes the source of truth for what we are building, why it matters, and how it will be accepted.",
+          },
+          {
+            title: "Break work into tasks",
+            text: "For large projects and small features, I use **Beads** to split the work into clear tasks. It keeps features from turning into one vague brief and makes progress easier to review.",
+          },
+          {
+            title: "Run agents by role",
+            text: "Once the plan is ready, I run **multiple agents** over the feature. Two agents usually implement, other agents check tests, linting, edge cases, and documentation.",
+          },
+        ],
         pipelineAria: "AI workflow from brainstorm to task planning with AO coordination, branching into three tasks. T3 fails its first test, returns through build and review, passes its second test, then all tasks merge through git and ship after GitHub Actions verification",
         testFailed: "Test failed",
         testPassed: "Test passed",
@@ -446,6 +469,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     work: {
       selectedWork: "Selected work",
       technologiesAria: "{title} technologies",
+      liveSite: "View live site",
+      liveSiteAria: "View the live {title} site (opens in a new tab)",
       factsAria: "{title} project facts",
       articleAria: "{title} case study article",
       role: "Role",
@@ -534,7 +559,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      scrollDown: "スクロール",
+      scrollDown: "スクロールして実績を見る",
       workEyebrow: "主な実績",
       workTitle: "現場の制約に向き合って作りました。",
       workMuted: "長く使えることを大切に。",
@@ -550,10 +575,26 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         eyebrow: "AIワークフロー",
         title: "AIで開発をどう",
         titleMuted: "速くしているか。",
-        description: "計画、実装、テスト、そして変更を壊そうとする役まで、それぞれ別のエージェントが担当します。",
-        descriptionEmphasis:
-          "GitとCIを中心にしたオーケストレーションループが、全体の足並みをそろえます。",
         cta: "セットアップ全体を見る",
+        stepsAria: "AIワークフローの4つのステップ",
+        steps: [
+          {
+            title: "システムをブレストする",
+            text: "計画とアーキテクチャには **Claude Opus** から始めます。最初は、課題、制約、アーキテクチャの選択肢、ゴール、受け入れ基準、テストケースを洗い出すブレストです。",
+          },
+          {
+            title: "Master PRDにまとめる",
+            text: "ブレストの内容をもとに、**Spec Kit** と **Beads** でアイデアをMaster PRDにまとめます。何を作るのか、なぜ重要なのか、どう受け入れるのかを決める唯一の基準になります。",
+          },
+          {
+            title: "作業をタスクに分ける",
+            text: "大きなプロジェクトでも小さな機能でも、**Beads** で作業を明確なタスクに分けます。機能があいまいな一つの依頼にならず、進捗もレビューしやすくなります。",
+          },
+          {
+            title: "役割ごとにエージェントを動かす",
+            text: "計画が固まったら、機能に **複数のエージェント** を走らせます。通常は2つのエージェントが実装し、ほかのエージェントがテスト、Lint、エッジケース、ドキュメントを確認します。",
+          },
+        ],
         pipelineAria: "ブレストからAOで調整したタスク計画へ進み、3つのタスクへ分岐するAIワークフロー。T3は最初のテストに失敗し、実装とレビューに戻り、2回目のテストに合格してから、すべてのタスクをGitでマージし、GitHub Actionsの検証後に公開します",
         testFailed: "テストに失敗",
         testPassed: "テストに合格",
@@ -707,6 +748,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     work: {
       selectedWork: "主な実績",
       technologiesAria: "{title} の技術",
+      liveSite: "公開サイトを見る",
+      liveSiteAria: "{title} の公開サイトを見る（新しいタブで開きます）",
       factsAria: "{title} のプロジェクト情報",
       articleAria: "{title} のケーススタディ記事",
       role: "役割",
@@ -794,7 +837,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
-      scrollDown: "Nach unten scrollen",
+      scrollDown: "Nach unten scrollen – hier sind die Belege.",
       workEyebrow: "Ausgewählte Arbeit",
       workTitle: "Gebaut für reale Anforderungen.",
       workMuted: "Entwickelt, um stabil zu bleiben.",
@@ -810,10 +853,26 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         eyebrow: "AI-Workflow",
         title: "So beschleunige ich die",
         titleMuted: "Entwicklung mit AI.",
-        description: "Eigene Agents planen, bauen, testen und versuchen, jede Änderung zu brechen.",
-        descriptionEmphasis:
-          "Eine Orchestrierungsschleife hält sie über Git und CI im Takt.",
         cta: "Mein vollständiges Setup ansehen",
+        stepsAria: "Die vier Schritte meines AI-Workflows",
+        steps: [
+          {
+            title: "Das System durchdenken",
+            text: "Für Planung und Architektur starte ich mit **Claude Opus**. Der erste Durchgang ist ein Brainstorming zu Problem, Rahmenbedingungen, Architekturoptionen, Zielen, Akzeptanzkriterien und Testfällen.",
+          },
+          {
+            title: "Das Master PRD formen",
+            text: "Auf Basis des Brainstormings mache ich mit **Spec Kit** und **Beads** aus der Idee ein Master PRD. Es wird zur einzigen Quelle dafür, was wir bauen, warum es zählt und wie es abgenommen wird.",
+          },
+          {
+            title: "Arbeit in Tasks aufteilen",
+            text: "Bei großen Projekten wie bei kleinen Features teile ich die Arbeit mit **Beads** in klare Tasks auf. So wird kein Feature zu einem vagen Briefing, und der Fortschritt lässt sich leichter prüfen.",
+          },
+          {
+            title: "Agents nach Rollen einsetzen",
+            text: "Steht der Plan, setze ich **mehrere Agents** auf das Feature an. Meist implementieren zwei, andere prüfen Tests, Linting, Edge Cases und Dokumentation.",
+          },
+        ],
         pipelineAria: "AI-Workflow vom Brainstorming zur Task-Planung mit AO-Koordination, der in drei Tasks verzweigt. T3 scheitert im ersten Test, kehrt zu Build und Review zurück, besteht den zweiten Test und wird dann über Git gemerged und nach GitHub-Actions-Verifikation ausgeliefert",
         testFailed: "Test fehlgeschlagen",
         testPassed: "Test bestanden",
@@ -967,6 +1026,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     work: {
       selectedWork: "Ausgewählte Arbeit",
       technologiesAria: "{title} Technologien",
+      liveSite: "Live-Website ansehen",
+      liveSiteAria: "Live-Website von {title} ansehen (öffnet in neuem Tab)",
       factsAria: "{title} Projektdaten",
       articleAria: "{title} Fallstudienartikel",
       role: "Rolle",

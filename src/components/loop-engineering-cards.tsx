@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { richText } from "@/lib/rich-text";
+
 type LoopEngineeringPoint = {
   label: string;
   title: string;
@@ -9,16 +11,6 @@ type LoopEngineeringPoint = {
 };
 
 type LoopStackLifecycle = "static" | "idle" | "stacking" | "collapsed";
-
-function richText(input: string) {
-  return input.split(/(\*\*[^*]+\*\*)/g).map((part, index) =>
-    part.startsWith("**") && part.endsWith("**") ? (
-      <strong key={index}>{part.slice(2, -2)}</strong>
-    ) : (
-      part
-    ),
-  );
-}
 
 export function LoopEngineeringCards({
   points,

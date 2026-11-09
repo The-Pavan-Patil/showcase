@@ -29,11 +29,12 @@ export const philipsGreenheart = {
   ],
   media: {
     src: "/images/case-studies/philips-greenheart.png",
+    width: 2892,
+    height: 1666,
     focus: "50% 50%",
     alt: "Philips Greenheart website hero with a calm portrait and heart health scan messaging",
-    caption: "Greenheart hero experience translated from Figma into production UI",
   },
-  cardPalette: { base: "#12304d", glow: "#2f9e78", deep: "#06111f" },
+  cardPalette: { base: "#283f57", glow: "#3d5268", deep: "#142537" },
   visual: "web",
   visualLabel: "Abstract browser composition representing a multilingual, monitored corporate website",
 } satisfies ProjectCaseStudy;

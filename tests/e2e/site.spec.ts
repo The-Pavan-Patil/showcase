@@ -256,17 +256,16 @@ test("setup workflow wires reveal as continuous strokes", async ({ page }, testI
 
   await page.evaluate((target) => window.scrollTo(0, target), halfwayThroughSplit);
   await expect(track).toHaveAttribute("data-workflow-lifecycle", "pinned");
-  await expect
-    .poll(() =>
-      page.locator(".ai-workflow-map").evaluate((element) =>
-        Number.parseFloat(
-          getComputedStyle(element).getPropertyValue(
-            "--workflow-split-progress",
-          ),
-        ),
+  const readSplitProgress = () =>
+    page.locator(".ai-workflow-map").evaluate((element) =>
+      Number.parseFloat(
+        getComputedStyle(element).getPropertyValue("--workflow-split-progress"),
       ),
-    )
-    .toBeCloseTo(0.5, 1);
+    );
+  await expect.poll(readSplitProgress).toBeCloseTo(0.5, 1);
+  // Scroll positions are whole pixels, so the progress lands within a few
+  // tenths of a percent of halfway; the wires must follow it exactly.
+  const splitProgress = await readSplitProgress();
 
   const wireStyles = await splitWires.evaluateAll((elements) =>
     elements.map((element) => {
@@ -282,7 +281,7 @@ test("setup workflow wires reveal as continuous strokes", async ({ page }, testI
 
   for (const style of wireStyles) {
     expect(style.dashArray).toBe("none");
-    expect(style.bottomInset).toBeCloseTo(50, 1);
+    expect(style.bottomInset).toBeCloseTo((1 - splitProgress) * 100, 1);
   }
 });
 
@@ -296,7 +295,7 @@ test("completed setup workflow removes its scroll runway without a reverse-scrol
 
   const track = page.locator(".ai-workflow-scroll-track");
   const diagram = page.locator(".ai-workflow-map");
-  const timeline = page.locator(".setup-timeline");
+  const nextSection = page.locator("#plan");
   await expect(track).toHaveClass(/is-workflow-scroll-ready/);
 
   const scrollTarget = await track.evaluate((element) => {
@@ -315,7 +314,7 @@ test("completed setup workflow removes its scroll runway without a reverse-scrol
 
   await page.evaluate((target) => window.scrollTo(0, target - 1), scrollTarget);
   await expect(track).toHaveAttribute("data-workflow-lifecycle", "pinned");
-  const timelineTopBeforeCompletion = await timeline.evaluate(
+  const nextSectionTopBeforeCompletion = await nextSection.evaluate(
     (element) => element.getBoundingClientRect().top,
   );
 
@@ -329,14 +328,14 @@ test("completed setup workflow removes its scroll runway without a reverse-scrol
     const diagramElement = document.querySelector<HTMLElement>(
       ".ai-workflow-map",
     );
-    const timelineElement = document.querySelector<HTMLElement>(
-      ".setup-timeline",
+    const nextSectionElement = document.querySelector<HTMLElement>(
+      "#plan",
     );
-    if (!trackElement || !diagramElement || !timelineElement) return null;
+    if (!trackElement || !diagramElement || !nextSectionElement) return null;
 
     const trackBounds = trackElement.getBoundingClientRect();
     const diagramBounds = diagramElement.getBoundingClientRect();
-    const timelineBounds = timelineElement.getBoundingClientRect();
+    const nextSectionBounds = nextSectionElement.getBoundingClientRect();
 
     return {
       trackHeight: trackBounds.height,
@@ -345,8 +344,8 @@ test("completed setup workflow removes its scroll runway without a reverse-scrol
           "--workflow-scaled-height",
         ),
       ),
-      timelineTop: timelineBounds.top,
-      diagramTimelineGap: timelineBounds.top - diagramBounds.bottom,
+      nextSectionTop: nextSectionBounds.top,
+      diagramNextSectionGap: nextSectionBounds.top - diagramBounds.bottom,
     };
   });
 
@@ -355,11 +354,11 @@ test("completed setup workflow removes its scroll runway without a reverse-scrol
     completedLayout!.scaledHeight,
     0,
   );
-  expect(completedLayout!.timelineTop).toBeCloseTo(
-    timelineTopBeforeCompletion - 2,
+  expect(completedLayout!.nextSectionTop).toBeCloseTo(
+    nextSectionTopBeforeCompletion - 2,
     0,
   );
-  expect(completedLayout!.diagramTimelineGap).toBeLessThan(100);
+  expect(completedLayout!.diagramNextSectionGap).toBeLessThan(160);
 
   await page.evaluate(() => window.scrollBy(0, -window.innerHeight * 0.75));
   await expect(track).toHaveAttribute("data-workflow-lifecycle", "collapsed");
@@ -602,203 +601,82 @@ test("the accent dot snaps between anchors with reduced motion", async ({ page }
   ).toBe(false);
 });
 
-test("loop engineering cards reveal once with responsive entrance directions", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "chromium");
+test("setup hero actions start on the hero copy edge", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.goto("/setup");
+  const actions = page.locator(".setup-hero-actions a");
+  await expect(actions).toHaveCount(2);
 
-  const grid = page.locator(".setup-orchestration-stack");
-  const cards = page.locator(".setup-orchestration-card");
-  await expect(grid).toHaveAttribute("data-loop-revealed", "false");
+  const ledeBox = await page.locator(".setup-lede").boundingBox();
+  const firstBox = await actions.first().boundingBox();
+  const lastBox = await actions.last().boundingBox();
+  expect(ledeBox && firstBox && lastBox).toBeTruthy();
+  expect(Math.abs(firstBox!.x - ledeBox!.x)).toBeLessThan(1);
 
-  const entranceStyles = await cards.evaluateAll((elements) =>
-    elements.map((element) => {
-      const styles = getComputedStyle(element);
-      const rawDelay = styles.getPropertyValue("--loop-reveal-delay").trim();
-      return {
-        x: styles.getPropertyValue("--loop-enter-x").trim(),
-        y: styles.getPropertyValue("--loop-enter-y").trim(),
-        delayMs: rawDelay.endsWith("ms")
-          ? Number.parseFloat(rawDelay)
-          : Number.parseFloat(rawDelay) * 1000,
-      };
-    }),
-  );
-
-  expect(entranceStyles).toEqual([
-    { x: "0px", y: "40px", delayMs: 0 },
-    { x: "-40px", y: "0px", delayMs: 160 },
-    { x: "40px", y: "0px", delayMs: 480 },
-    { x: "0px", y: "-40px", delayMs: 320 },
-  ]);
-
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    if ((await grid.getAttribute("data-loop-revealed")) === "true") break;
-
-    await grid.evaluate((element) => element.scrollIntoView({ block: "center" }));
-    await page.waitForTimeout(250);
+  // Small phones stack the buttons at the full width of the copy.
+  if (testInfo.project.name === "mobile-chromium") {
+    expect(Math.abs(firstBox!.width - ledeBox!.width)).toBeLessThan(1);
+    expect(Math.abs(lastBox!.width - ledeBox!.width)).toBeLessThan(1);
   }
-  await expect(grid).toHaveAttribute("data-loop-revealed", "true");
-  await expect(cards.last()).toHaveCSS("opacity", "1");
-
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await expect(grid).toHaveAttribute("data-loop-revealed", "true");
-  await expect
-    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
-    .toBe(true);
 });
 
-test("mobile loop engineering cards stack and release into the next section", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "mobile-chromium");
+test("setup index links each land on a section", async ({ page }) => {
+  await page.goto("/setup");
+
+  const hrefs = await page
+    .locator(".setup-index a")
+    .evaluateAll((links) => links.map((link) => link.getAttribute("href") ?? ""));
+  expect(hrefs.length).toBeGreaterThan(0);
+
+  for (const href of hrefs) {
+    expect(href).toMatch(/^#[a-z]+$/);
+    await expect(page.locator(`main > section${href}`)).toHaveCount(1);
+  }
+});
+
+test("setup index smooth-scrolls past the pinned workflow to its section", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.goto("/setup");
-  await page.evaluate(() => {
-    document.documentElement.style.scrollBehavior = "auto";
-  });
+  await expect(page.locator(".ai-workflow-scroll-track")).toHaveClass(/is-workflow-scroll-ready/);
 
-  const stack = page.locator(".setup-orchestration-stack");
-  const cards = page.locator(".setup-orchestration-card");
-  const chaosSection = page.locator(".setup-chaos-section");
-  await expect(stack).toHaveClass(/is-loop-stack-ready/);
-  await expect(stack).toHaveAttribute("data-loop-revealed", "true");
-  await expect(cards).toHaveCount(4);
-
-  await stack.evaluate((element) => element.scrollIntoView({ block: "start" }));
-  await page.waitForTimeout(300);
-
-  const stackTarget = await stack.evaluate((element) => {
-    const styles = getComputedStyle(element);
-    const stickyTop = Number.parseFloat(
-      styles.getPropertyValue("--loop-sticky-top"),
-    );
-    const scrollDistance = Number.parseFloat(
-      styles.getPropertyValue("--loop-scroll-distance"),
-    );
-    const entryScrollY =
-      element.getBoundingClientRect().top + window.scrollY - stickyTop;
-
-    return entryScrollY + scrollDistance * 0.92;
-  });
-
-  await page.evaluate((target) => window.scrollTo(0, target), stackTarget);
-  await expect(stack).toHaveAttribute("data-loop-stack-lifecycle", "stacking");
-  await expect
-    .poll(() =>
-      cards.last().evaluate((element) =>
-        Number.parseFloat(
-          getComputedStyle(element).getPropertyValue("--loop-card-translate"),
-        ),
-      ),
-    )
-    .toBeLessThan(-200);
-
-  const stackedLayout = await cards.evaluateAll((elements) =>
-    elements.map((element) => {
-      const bounds = element.getBoundingClientRect();
-      const heading = element.querySelector("h3")?.getBoundingClientRect();
-
-      return {
-        top: bounds.top,
-        height: bounds.height,
-        headingBottom: heading?.bottom ?? bounds.top,
-      };
-    }),
-  );
-
-  expect(stackedLayout).toHaveLength(4);
-  for (let index = 1; index < stackedLayout.length; index += 1) {
-    expect(stackedLayout[index].top).toBeGreaterThan(
-      stackedLayout[index - 1].top,
-    );
-    expect(stackedLayout[index].top).toBeGreaterThanOrEqual(
-      stackedLayout[index - 1].headingBottom - 1,
-    );
-    expect(stackedLayout[index].top - stackedLayout[index - 1].top).toBeLessThan(
-      stackedLayout[index - 1].height * 0.7,
-    );
-  }
-
-  const completionTarget = await stack.evaluate((element) => {
-    const styles = getComputedStyle(element);
-    const stickyTop = Number.parseFloat(
-      styles.getPropertyValue("--loop-sticky-top"),
-    );
-    const scrollDistance = Number.parseFloat(
-      styles.getPropertyValue("--loop-scroll-distance"),
-    );
-    const entryScrollY =
-      element.getBoundingClientRect().top + window.scrollY - stickyTop;
-
-    return entryScrollY + scrollDistance + 2;
-  });
-
-  const chaosTopBeforeCompletion = await chaosSection.evaluate(
-    (element) => element.getBoundingClientRect().top,
-  );
-  await page.evaluate((target) => window.scrollTo(0, target), completionTarget);
-  await expect(stack).toHaveAttribute("data-loop-stack-lifecycle", "collapsed");
-
-  const completedLayout = await page.evaluate(() => {
-    const stackElement = document.querySelector<HTMLElement>(
-      ".setup-orchestration-stack",
-    );
-    const lastCard = document.querySelector<HTMLElement>(
-      ".setup-orchestration-card:last-child",
-    );
-    const chaosElement = document.querySelector<HTMLElement>(
-      ".setup-chaos-section",
-    );
-    if (!stackElement || !lastCard || !chaosElement) return null;
-
-    const stackBounds = stackElement.getBoundingClientRect();
-    const lastCardBounds = lastCard.getBoundingClientRect();
-    const chaosBounds = chaosElement.getBoundingClientRect();
-
-    return {
-      stackHeight: stackBounds.height,
-      collapsedHeight: Number.parseFloat(
-        getComputedStyle(stackElement).getPropertyValue(
-          "--loop-collapsed-height",
-        ),
-      ),
-      chaosTop: chaosBounds.top,
-      lastCardBottom: lastCardBounds.bottom,
-    };
-  });
-
-  expect(completedLayout).not.toBeNull();
-  expect(completedLayout!.stackHeight).toBeCloseTo(
-    completedLayout!.collapsedHeight,
-    0,
-  );
-  expect(completedLayout!.chaosTop).toBeLessThanOrEqual(
-    chaosTopBeforeCompletion + 2,
-  );
-  expect(completedLayout!.chaosTop - completedLayout!.lastCardBottom).toBeLessThan(
-    180,
+  // A smooth scroll through the pinned runway used to stop on the diagram
+  // when its runway collapsed mid-scroll.
+  await page.locator('.setup-index a[href="#team"]').click();
+  await expect(page.locator(".ai-workflow-scroll-track")).toHaveAttribute(
+    "data-workflow-lifecycle",
+    "collapsed",
   );
   await expect
-    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
-    .toBe(true);
+    .poll(() => page.locator("#team").evaluate((element) => Math.abs(element.getBoundingClientRect().top)))
+    .toBeLessThan(1);
+  // Arriving plays the section's entrance.
+  await expect(page.locator(".setup-team")).toHaveAttribute("data-reveal", "play");
 });
 
-test("loop engineering cards remain visible with reduced motion", async ({ page }, testInfo) => {
+test("setup entrances leave every row visible with reduced motion", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/setup");
 
-  const cards = page.locator(".setup-orchestration-card");
-  const stack = page.locator(".setup-orchestration-stack");
-  await expect(cards.first()).toHaveCSS("opacity", "1");
-  await expect(stack).toHaveAttribute("data-loop-stack-lifecycle", "static");
-  await expect(stack).not.toHaveClass(/is-loop-stack-ready/);
-  const reducedTransform = await cards.first().evaluate((element) => {
-    const transform = getComputedStyle(element).transform;
-    const matrix = transform === "none" ? new DOMMatrix() : new DOMMatrix(transform);
-    return { x: matrix.m41, y: matrix.m42 };
-  });
-  expect(reducedTransform).toEqual({ x: 0, y: 0 });
+  await expect(page.locator("[data-reveal]")).toHaveCount(0);
+  await expect(page.locator(".setup-type-caret")).toHaveCount(0);
+  await expect(page.locator(".setup-type-rest")).toHaveCount(0);
+  for (const selector of [
+    ".setup-team-table tbody tr",
+    ".setup-log li",
+    ".setup-feed li",
+    ".setup-tasks li",
+    ".setup-rules-group li",
+  ]) {
+    const rows = page.locator(selector);
+    for (let index = 0; index < (await rows.count()); index += 1) {
+      await expect(rows.nth(index)).toHaveCSS("opacity", "1");
+    }
+  }
+  await expect(page.locator(".setup-log-summary")).toHaveCSS("opacity", "1");
 });
 
 async function scrollAboutSceneTo(page: import("@playwright/test").Page, progress: number) {
@@ -892,19 +770,165 @@ test("about scene shows the finished composition with reduced motion", async ({ 
   await expect(page.locator(".about-scene-beyond")).toBeHidden();
 });
 
-test("the hero and AI workflow sections each fill one screen", async ({ page }, testInfo) => {
+test("the hero and the pinned AI workflow stage each fill one screen", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
 
   await page.goto("/");
 
   const viewportHeight = await page.evaluate(() => window.innerHeight);
-  for (const selector of [".hero-section", ".ai-workflow-band"]) {
+  const selectors = [".hero-section"];
+  // Phones stack the workflow cards instead of pinning them on one screen.
+  if (testInfo.project.name === "chromium") {
+    await expect(page.locator(".workflow-scene")).toHaveAttribute("data-pinned", "");
+    selectors.push(".workflow-scene-stage");
+  }
+  for (const selector of selectors) {
     const box = await page.locator(selector).boundingBox();
     expect(Math.abs((box?.height ?? 0) - viewportHeight), selector).toBeLessThanOrEqual(1);
   }
 
   // Nothing below the hero shows on landing.
   await expect(page.locator("#work")).not.toBeInViewport();
+});
+
+/** Scrolls to `progress` through the workflow scene's pinned runway. */
+async function scrollWorkflowSceneTo(page: import("@playwright/test").Page, progress: number) {
+  await page.evaluate((target) => {
+    const track = document.querySelector<HTMLElement>(".workflow-scene-track");
+    if (!track) throw new Error("Workflow scene track is missing");
+    const bounds = track.getBoundingClientRect();
+    const top = bounds.top + window.scrollY + (bounds.height - window.innerHeight) * target;
+    window.scrollTo({ top, behavior: "instant" });
+  }, progress);
+}
+
+function opacityOf(element: Element) {
+  return Number(getComputedStyle(element).opacity);
+}
+
+test("AI workflow scene types the title, deals the cards, then connects them", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+
+  const scene = page.locator(".workflow-scene");
+  await expect(scene).toHaveAttribute("data-pinned", "");
+  await expect(
+    page.getByRole("heading", { level: 2, name: "See how I use AI to speed up development." }),
+  ).toBeAttached();
+
+  const chars = page.locator(".workflow-scene-title-char");
+  const cards = scene.getByRole("listitem");
+  const arrows = scene.locator(".workflow-scene-arrow");
+  const heads = scene.locator(".workflow-scene-arrow-head");
+  const cta = scene.getByRole("link", { name: /View my full setup/ });
+  const ctaRow = scene.locator(".workflow-scene-cta-row");
+  await expect(cards).toHaveCount(4);
+
+  // Rising into view, the title types in from its first character.
+  await page.evaluate(() => {
+    const track = document.querySelector<HTMLElement>(".workflow-scene-track")!;
+    const top = track.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top - window.innerHeight * 0.375, behavior: "instant" });
+  });
+  await expect.poll(() => chars.first().evaluate(opacityOf)).toBeGreaterThan(0.9);
+  await expect.poll(() => chars.last().evaluate(opacityOf)).toBeLessThan(0.1);
+
+  // Whole by the time the stage pins; no cards yet.
+  await scrollWorkflowSceneTo(page, 0);
+  await expect
+    .poll(() => chars.evaluateAll((elements) => Math.min(...elements.map((element) => Number(getComputedStyle(element).opacity)))))
+    .toBeGreaterThan(0.95);
+  await expect(page.locator(".workflow-scene-stage")).toHaveCSS("position", "sticky");
+  await expect.poll(() => cards.first().evaluate(opacityOf)).toBeLessThan(0.1);
+
+  // Dealt one at a time.
+  await scrollWorkflowSceneTo(page, 0.12);
+  await expect.poll(() => cards.first().evaluate(opacityOf)).toBeGreaterThan(0.5);
+  await expect.poll(() => cards.last().evaluate(opacityOf)).toBeLessThan(0.05);
+
+  // Once all four are down, arrows join them in order, then the CTA arrives.
+  await scrollWorkflowSceneTo(page, 0.59);
+  await expect.poll(() => cards.last().evaluate(opacityOf)).toBeGreaterThan(0.95);
+  await expect(arrows).toHaveCount(3);
+  await expect.poll(() => heads.first().evaluate(opacityOf)).toBeLessThan(0.05);
+  await expect.poll(() => ctaRow.evaluate(opacityOf)).toBeLessThan(0.05);
+
+  await scrollWorkflowSceneTo(page, 1);
+  for (const head of await heads.all()) {
+    await expect.poll(() => head.evaluate(opacityOf)).toBeGreaterThan(0.95);
+  }
+  for (const arrow of await arrows.all()) {
+    await expect(arrow).toHaveAttribute("d", /^M [\d.]+ [\d.]+ C /);
+  }
+  await expect(cta).toBeVisible();
+  await expect(cta).toHaveAttribute("href", "/setup");
+  await expect.poll(() => ctaRow.evaluate(opacityOf)).toBeGreaterThan(0.95);
+
+  // The eyebrow sits top left, the title centred, the CTA centred under the cards.
+  const viewport = page.viewportSize()!;
+  const eyebrow = (await scene.locator(".workflow-scene-eyebrow").boundingBox())!;
+  const title = (await page.locator(".workflow-scene-title").boundingBox())!;
+  const button = (await cta.boundingBox())!;
+  expect(eyebrow.x).toBeLessThan(viewport.width * 0.1);
+  expect(Math.abs(title.x + title.width / 2 - viewport.width / 2)).toBeLessThan(4);
+  expect(Math.abs(button.x + button.width / 2 - viewport.width / 2)).toBeLessThan(4);
+  expect(button.y).toBeGreaterThan(viewport.height * 0.8);
+});
+
+test("AI workflow scene reveals its CTA when it receives keyboard focus", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.locator(".workflow-scene")).toHaveAttribute("data-pinned", "");
+
+  const cta = page.locator(".workflow-scene").getByRole("link", { name: /View my full setup/ });
+  const ctaRow = page.locator(".workflow-scene-cta-row");
+  await scrollWorkflowSceneTo(page, 0.2);
+  await cta.focus();
+  await expect.poll(() => ctaRow.evaluate(opacityOf)).toBeGreaterThan(0.95);
+  await expect(page.locator(".workflow-scene-card").last()).toHaveCSS("opacity", "1");
+});
+
+test("AI workflow scene stacks the cards on phones and reveals each as it scrolls in", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+
+  await page.goto("/");
+
+  const scene = page.locator(".workflow-scene");
+  await expect(scene).toHaveAttribute("data-live", "");
+  await expect(scene).not.toHaveAttribute("data-pinned", "");
+  await expect(page.locator(".workflow-scene-stage")).toHaveCSS("position", "static");
+
+  const last = page.locator(".workflow-scene-card").last();
+  await expect.poll(() => last.evaluate(opacityOf)).toBeLessThan(0.05);
+  await last.evaluate((element) => {
+    const top = element.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top - window.innerHeight * 0.4, behavior: "instant" });
+  });
+  await expect.poll(() => last.evaluate(opacityOf)).toBeGreaterThan(0.95);
+  await expect(scene.locator(".workflow-scene-arrow")).toHaveCount(3);
+  await expect(scene.getByRole("link", { name: /View my full setup/ })).toBeVisible();
+});
+
+test("AI workflow scene shows the finished composition with reduced motion", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+
+  const scene = page.locator(".workflow-scene");
+  await expect(scene).not.toHaveAttribute("data-live", "");
+  await expect(page.locator(".workflow-scene-stage")).toHaveCSS("position", "static");
+  await expect(page.locator(".workflow-scene-title-char").first()).toHaveCSS("opacity", "1");
+  await expect(page.locator(".workflow-scene-title-char").last()).toHaveCSS("opacity", "1");
+  for (const card of await page.locator(".workflow-scene-card").all()) {
+    await expect(card).toHaveCSS("opacity", "1");
+  }
+  await expect(scene.locator(".workflow-scene-arrow")).toHaveCount(3);
+  await expect(scene.getByRole("link", { name: /View my full setup/ })).toBeVisible();
 });
 
 test("the hero is Montserrat copy with corner lines and a scroll cue", async ({ page }, testInfo) => {
@@ -935,8 +959,9 @@ test("the hero is Montserrat copy with corner lines and a scroll cue", async ({ 
 
 async function scrollExperienceToNode(page: import("@playwright/test").Page, anchor: string) {
   await page.locator(`[data-scroll-accent-anchor="${anchor}"]`).evaluate((element) => {
+    // A node may call the dot before it arrives; `rest` is where it settles.
     const track = element.closest<HTMLElement>("[data-scroll-accent-track]");
-    const offset = (element as HTMLElement).dataset.scrollAccentOffset;
+    const offset = (element as HTMLElement).dataset.scrollAccentRest;
     if (!track || offset === undefined) throw new Error("Experience node has no resting offset");
     const top = track.getBoundingClientRect().top + window.scrollY + Number(offset);
     window.scrollTo({ top, behavior: "instant" });

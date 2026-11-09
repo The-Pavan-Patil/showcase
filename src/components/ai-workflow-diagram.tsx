@@ -8,6 +8,14 @@ import type { UiCopy } from "@/lib/ui-copy";
 type WorkflowCopy = UiCopy["home"]["aiWorkflow"];
 type WorkflowLifecycle = "idle" | "pinned" | "collapsed";
 
+/**
+ * Dispatch on `window` to finish the diagram at once and drop its scroll
+ * runway. In-page links that jump past the diagram send it first: a smooth
+ * scroll through the pinned runway would otherwise be cut short when the
+ * diagram collapses and corrects the scroll position.
+ */
+export const AI_WORKFLOW_COMPLETE_EVENT = "ai-workflow:complete";
+
 function WorkflowWire({ direction }: { direction: "split" | "merge" }) {
   const paths = direction === "split"
     ? [
@@ -164,7 +172,12 @@ export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
 
     const collapseTrack = (compensateScroll: boolean) => {
       if (lifecycle === "collapsed") return;
-      const contentAnchor = track.parentElement?.nextElementSibling;
+      // Measure the content below the diagram, or the next section when the
+      // diagram ends its own, so the correction allows for the browser's
+      // scroll anchoring instead of doubling it.
+      const contentAnchor =
+        track.parentElement?.nextElementSibling ??
+        track.closest("section")?.nextElementSibling;
       const anchorTopBefore = contentAnchor?.getBoundingClientRect().top;
       setLifecycle("collapsed");
 
@@ -258,12 +271,24 @@ export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
       collapseTrack(false);
     };
 
+    const handleComplete = () => {
+      if (lifecycle === "collapsed") return;
+      if (animationFrame) window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+      progress = 1;
+      updateProgress(progress);
+      // Only correct the scroll when the runway reaches above the viewport;
+      // from the hero the whole track is below it and nothing visible moves.
+      collapseTrack(track.getBoundingClientRect().top < 0);
+    };
+
     setLifecycle("idle");
     updateProgress(0);
     configureScrollTrack();
     updateFromScroll();
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("resize", handleResize);
+    window.addEventListener(AI_WORKFLOW_COMPLETE_EVENT, handleComplete);
     reducedMotion.addEventListener("change", handleReducedMotionChange);
 
     return () => {
@@ -271,6 +296,7 @@ export function AiWorkflowDiagram({ workflow }: { workflow: WorkflowCopy }) {
       if (resizeFrame) window.cancelAnimationFrame(resizeFrame);
       window.removeEventListener("scroll", scheduleUpdate);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener(AI_WORKFLOW_COMPLETE_EVENT, handleComplete);
       reducedMotion.removeEventListener("change", handleReducedMotionChange);
     };
   }, []);

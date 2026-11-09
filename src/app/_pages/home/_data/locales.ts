@@ -148,9 +148,10 @@ export const portfolioContentByLocale: Record<Locale, PortfolioContent> = {
       role: "ソフトウェアエンジニア",
       heroTitle: "任せられる人、",
       heroAccent: "ここにいます。",
-      heroDescriptionLead: "Pavan Patilです。",
+      heroDescriptionLead:
+        "Pavan Patil、Web・モバイル・バックエンドのソフトウェアエンジニアです。",
       heroDescriptionTrail:
-        "Web・モバイル・バックエンドを横断し、設計から実装・リリースまで担うソフトウェアエンジニアです。",
+        "システム設計から実装・リリースまで、プロダクトを一貫して手がけます。",
       about:
         "子どものころ、父が家にコンピューターを持ってきてくれました。その時、画面の下で何が起きているのか知りたくなりました。小学6年生で初めてコードを書き、その好奇心は今も続いています。今は、計画を立て、設計し、ソフトウェアを書き、まだ形のないアイデアを人が使えるシステムにすることが好きです。何度も戻ってきたものが仕事になったことを、とても幸運に感じています。",
       education:
@@ -174,9 +175,9 @@ export const portfolioContentByLocale: Record<Locale, PortfolioContent> = {
       heroTitle: "Ich baue zuverlässige Software",
       heroAccent: "für komplexe reale Workflows.",
       heroDescriptionLead:
-        "Ich bin Pavan Patil, Softwareentwickler für Web, Mobile, Backend und datenintensive Systeme.",
+        "Ich bin Pavan Patil, Softwareentwickler für Web, Mobile, Backend und Datensysteme.",
       heroDescriptionTrail:
-        "Ich habe offline-first Kollaborationsprodukte, Enterprise-Dokumentationsflows, Workforce-Automatisierung und Echtzeit-LiDAR-Services gebaut.",
+        "Gebaut habe ich Offline-first-Apps, Enterprise-Workflows, Automatisierung und Echtzeit-LiDAR.",
       about:
         "Mein Interesse an Computern begann in der Kindheit, als mein Vater einen Computer nach Hause brachte und ich wissen wollte, was unter dem Bildschirm passiert. In der sechsten Klasse schrieb ich meinen ersten Code, und diese Neugier ist geblieben. Heute baue ich Produkte gerne Ende zu Ende: den Plan formen, die Architektur entwerfen, Software schreiben und grobe Ideen in Systeme verwandeln, die Menschen nutzen können. Ich bin dankbar, dass das, wozu ich immer zurückkam, mein Beruf wurde.",
       education:

@@ -18,6 +18,7 @@ import { getWorkPath, type Locale } from "@/lib/i18n";
 import type { ProjectCaseStudy } from "@/lib/portfolio";
 import { formatCopy, type UiCopy } from "@/lib/ui-copy";
 import { whenVisitorPauses } from "@/lib/page-settled";
+import { onSectionJumpEnd } from "@/lib/section-jump";
 import { useScrollSceneLive } from "@/lib/use-scroll-scene";
 
 import type { DustField, DustMotion } from "./dust-field";
@@ -190,6 +191,13 @@ export function ProjectDust({
         ease: [0.22, 1, 0.36, 1],
       });
     });
+    // A header jump lands on the scene as the scroll leaves it, without
+    // gliding the cards or gathering them on the way in.
+    const unsubscribeJump = onSectionJumpEnd(() => {
+      pinned = isDustStagePinned(scrollYProgress.get());
+      presence.jump(pinned ? 1 : 0);
+      position.jump(target.get());
+    });
 
     const resample = () => {
       if (!field) return;
@@ -276,6 +284,7 @@ export function ProjectDust({
       unsubscribe();
       unsubscribePresence();
       unsubscribeProgress();
+      unsubscribeJump();
       presence.stop();
       cancelAnimationFrame(frame);
       window.clearTimeout(resampleTimer);
@@ -292,7 +301,7 @@ export function ProjectDust({
         card.style.pointerEvents = "";
       }
     };
-  }, [isLive, position, presence, scrollYProgress]);
+  }, [isLive, position, presence, scrollYProgress, target]);
 
   // Tabbing to a card that is off to the side scrolls it to the centre.
   function centreCardForFocus(index: number) {
@@ -312,6 +321,7 @@ export function ProjectDust({
     <div
       className="dust-track"
       data-live={isLive ? "" : undefined}
+      data-section-start={isLive ? "" : undefined}
       ref={trackRef}
       style={{ "--dust-count": count } as CSSProperties}
     >

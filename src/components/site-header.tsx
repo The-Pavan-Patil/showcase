@@ -23,7 +23,6 @@ import {
 } from "react";
 
 import { LanguageToggle } from "@/components/language-toggle";
-import { getScrollAccentActivationY } from "@/components/scroll-accent";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   getHashHref,
@@ -32,6 +31,7 @@ import {
   isWorkPath,
   type Locale,
 } from "@/lib/i18n";
+import { isScrollSettling, jumpToSection } from "@/lib/section-jump";
 import { resumeUrl } from "@/lib/site";
 import type { UiCopy } from "@/lib/ui-copy";
 
@@ -289,24 +289,19 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
 
     if (!isHomePath(pathname, locale)) return;
 
-    const accentTarget = document.querySelector<HTMLElement>(
-      `[data-scroll-accent-anchor="${id}"]`,
-    );
+    const section = document.getElementById(id);
 
-    if (!accentTarget) return;
+    if (!section) return;
 
+    // Open the section where its scene starts instead of scrolling through
+    // every scene in between. The URL stays the page's own (a load always
+    // opens on the hero), and Back leaves the page rather than stepping
+    // through sections.
     event.preventDefault();
-    const bounds = accentTarget.getBoundingClientRect();
-    const targetY = bounds.top + window.scrollY + bounds.height / 2;
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    window.history.pushState(null, "", `#${id}`);
-    window.scrollTo({
-      top: Math.max(0, targetY - getScrollAccentActivationY(window.innerHeight)),
-      behavior: reducedMotion ? "auto" : "smooth",
-    });
+    if (window.location.hash) {
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+    void jumpToSection(section);
   };
 
   useEffect(
@@ -385,6 +380,16 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
       const scrollY = window.scrollY;
       const delta = scrollY - lastScrollY;
 
+      // A section jump or a restored position moves the page in one step;
+      // the header keeps its state until the visitor scrolls.
+      if (isScrollSettling()) {
+        downwardDistance = 0;
+        upwardDistance = 0;
+        lastScrollY = scrollY;
+        animationFrame = 0;
+        return;
+      }
+
       if (scrollY <= 64) {
         downwardDistance = 0;
         upwardDistance = 0;
@@ -454,7 +459,13 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
     <header
       className="site-header"
       data-density={isCompact ? "compact" : "expanded"}
-      onFocusCapture={() => setCompactPathname(null)}
+      onFocusCapture={(event) => {
+        // Keyboard focus opens a compact header so every control shows; a
+        // click on a link (which also focuses it) leaves the header as it is.
+        if (event.target instanceof Element && event.target.matches(":focus-visible")) {
+          setCompactPathname(null);
+        }
+      }}
     >
       <div className="site-header-shell">
         <Link
