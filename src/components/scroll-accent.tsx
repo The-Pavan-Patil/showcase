@@ -16,6 +16,12 @@ import { clamp } from "@/lib/utils";
  * Layout is read only when the page is measured (resize, fonts, toggled
  * details). Each frame does arithmetic on cached stops and writes one
  * transform; the loop stops while the dot is at rest.
+ *
+ * At rest on a target that moves with the page, the dot is docked: placed
+ * in document coordinates so the browser scrolls it with the eyebrow. A
+ * fixed dot placed from script trails a compositor scroll by a frame, which
+ * on phones made it shake against its eyebrow. In flight, floating under
+ * the header, or on a pinned target, it is fixed and placed per frame.
  */
 
 export type ScrollAccentStop = {
@@ -32,6 +38,12 @@ export type ScrollAccentStop = {
    * pinned for, during which the target keeps its place in the viewport.
    */
   stick?: { from: number; to: number };
+  /**
+   * Until this scroll position the target is moved by script (the
+   * Experience timeline travelling on its pinned stage) rather than by the
+   * page, so the dot must not dock to the page there.
+   */
+  scriptedUntil?: number;
   /** The dot fades out where it is (on the previous stop) instead of moving. */
   hidden?: boolean;
 };
@@ -94,6 +106,22 @@ export function stopViewportPoint(stop: ScrollAccentStop, scrollY: number) {
     ? clamp(scrollY - stop.stick.from, 0, stop.stick.to - stop.stick.from)
     : 0;
   return { x: stop.x, y: stop.y + pinned - scrollY };
+}
+
+/**
+ * Whether a target drawn at `viewportY` moves with the page at `scrollY`:
+ * below the float line's ease, not held by a pinned stage, and not moved by
+ * script. Only then can the resting dot dock to the document.
+ */
+export function ridesPage(
+  stop: ScrollAccentStop,
+  scrollY: number,
+  viewportY: number,
+  floatLine: number,
+) {
+  if (viewportY < floatLine + FLOAT_SOFTNESS) return false;
+  if (stop.stick && scrollY > stop.stick.from && scrollY < stop.stick.to) return false;
+  return stop.scriptedUntil === undefined || scrollY >= stop.scriptedUntil;
 }
 
 /**
@@ -290,6 +318,7 @@ function experienceNodeStops(section: HTMLElement): ScrollAccentStop[] {
         ...stopFrom(node, trackTop + Number(node.dataset.scrollAccentOffset)),
         y: from + (Number.isFinite(nodeFocus) ? nodeFocus : focusY),
         stick: { from, to: range.to },
+        scriptedUntil: from,
       };
     })
     .sort((first, second) => first.activateAt - second.activateAt);
@@ -418,7 +447,9 @@ export function ScrollAccent() {
     // The dot is drawn at target + offset; the spring takes the offset to 0.
     let spring = REST;
     let current: ScrollAccentStop | null = null;
-    let lastDrawn: { x: number; y: number } | null = null;
+    /** Where the dot was placed: document coordinates if docked, else viewport. */
+    let drawn: { x: number; y: number; docked: boolean } | null = null;
+    let drawnTransform = "";
     let frame = 0;
     let lastTime = 0;
     /** When the dot came within ARRIVE_DISTANCE of its current stop. */
@@ -448,6 +479,12 @@ export function ScrollAccent() {
     function targetPoint(stop: ScrollAccentStop, scrollY: number) {
       const point = stopViewportPoint(stop, scrollY);
       return { x: point.x - window.scrollX, y: floatBelow(point.y, floatLine) };
+    }
+
+    /** Where the dot is on screen now; a docked dot has scrolled with the page. */
+    function drawnOnScreen(scrollY: number) {
+      if (!drawn) return null;
+      return drawn.docked ? { x: drawn.x - window.scrollX, y: drawn.y - scrollY } : drawn;
     }
 
     function setData(key: string, value: string) {
@@ -502,14 +539,15 @@ export function ScrollAccent() {
         }
 
         // Where the dot is now, relative to its new target.
-        const offset = lastDrawn
-          ? { x: lastDrawn.x - target.x, y: lastDrawn.y - target.y }
+        const onScreen = drawnOnScreen(scrollY);
+        const offset = onScreen
+          ? { x: onScreen.x - target.x, y: onScreen.y - target.y }
           : { x: 0, y: 0 };
         visibleHop =
           Math.hypot(offset.x, offset.y) >= ARRIVE_DISTANCE ||
           current?.phase !== stop.phase ||
           current?.size !== stop.size;
-        if (snap || reducedMotion || !lastDrawn || (fromHidden && !stop.hidden)) {
+        if (snap || reducedMotion || !onScreen || (fromHidden && !stop.hidden)) {
           // Snap, or reappear on the target after being hidden.
           spring = REST;
         } else if (stop.hidden) {
@@ -534,12 +572,21 @@ export function ScrollAccent() {
 
       const x = target.x + spring.x;
       const y = target.y + spring.y;
+      const docked = atRest && ridesPage(anchor, scrollY, target.y, floatLine);
+      const place = docked ? { x: x + window.scrollX, y: y + scrollY } : { x, y };
       // The trailing translate centres the dot on the point at its live size.
-      dot!.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translate(-50%, -50%)`;
+      // Docked, the same transform holds while the page scrolls, so it is
+      // written only when it changes.
+      const transform = `translate3d(${place.x.toFixed(2)}px, ${place.y.toFixed(2)}px, 0) translate(-50%, -50%)`;
+      setData("docked", docked ? "true" : "false");
+      if (transform !== drawnTransform) {
+        dot!.style.transform = transform;
+        drawnTransform = transform;
+      }
       setData("ready", "true");
       setData("landed", atRest ? "true" : "false");
       setSurface(y + scrollY);
-      lastDrawn = { x, y };
+      drawn = { ...place, docked };
 
       if (!atRest) frame = window.requestAnimationFrame(render);
       else lastTime = 0;

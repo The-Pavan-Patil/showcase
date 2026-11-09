@@ -104,6 +104,11 @@ const ARROW_GAP = 10;
 const ARROW_HEAD = 6;
 /** How far an arrow drifts across the gap, so it reads as a flow, not a rule. */
 const ARROW_DRIFT = 18;
+/**
+ * The stacked gap is short and the arrow crosses it top to bottom, so it
+ * drifts less: a wider drift over ~45px drew a squiggle, not an arrow.
+ */
+const STACKED_ARROW_DRIFT = 8;
 
 /** Layout box relative to the diagram; ignores the cards' entry transforms. */
 function boxOf(element: HTMLElement): Box {
@@ -111,12 +116,18 @@ function boxOf(element: HTMLElement): Box {
 }
 
 /** Picks a point in the shared span of two ranges, nudged apart by the drift. */
-function sharedSpan(aStart: number, aEnd: number, bStart: number, bEnd: number) {
+function sharedSpan(
+  aStart: number,
+  aEnd: number,
+  bStart: number,
+  bEnd: number,
+  maxDrift = ARROW_DRIFT,
+) {
   const start = Math.max(aStart, bStart);
   const end = Math.min(aEnd, bEnd);
   if (end <= start) return { from: (aStart + aEnd) / 2, to: (bStart + bEnd) / 2 };
   const middle = (start + end) / 2;
-  const drift = Math.min(ARROW_DRIFT, (end - start) / 4) * Math.sign(bStart + bEnd - aStart - aEnd);
+  const drift = Math.min(maxDrift, (end - start) / 4) * Math.sign(bStart + bEnd - aStart - aEnd);
   return { from: middle - drift, to: middle + drift };
 }
 
@@ -126,10 +137,16 @@ function sharedSpan(aStart: number, aEnd: number, bStart: number, bEnd: number) 
  */
 function connect(a: Box, b: Box): Connector {
   if (b.y >= a.y + a.h) {
-    const { from: sx, to: ex } = sharedSpan(a.x, a.x + a.w, b.x, b.x + b.w);
+    const { from: sx, to: ex } = sharedSpan(
+      a.x,
+      a.x + a.w,
+      b.x,
+      b.x + b.w,
+      STACKED_ARROW_DRIFT,
+    );
     const sy = a.y + a.h + ARROW_GAP;
     const ey = b.y - ARROW_GAP;
-    const bend = (ey - sy) * 0.55;
+    const bend = (ey - sy) * 0.5;
     return {
       d: `M ${sx} ${sy} C ${sx} ${sy + bend}, ${ex} ${ey - bend}, ${ex} ${ey}`,
       head: `M ${ex - ARROW_HEAD} ${ey - ARROW_HEAD} L ${ex} ${ey} L ${ex + ARROW_HEAD} ${ey - ARROW_HEAD}`,

@@ -33,7 +33,9 @@ function useScrollRange(
  * The hero leaves in layers as the first screen scrolls away: the cue goes
  * first (its line drawing down on the way), the corner lines part outward,
  * the faded title line dissolves, and the title drifts slower than the page
- * while its stretched glyphs relax. Reduced motion gets the static hero.
+ * while its stretched glyphs relax. On phones the copy only fades: the page
+ * scrolls on the compositor there and a script-driven drift lands a frame
+ * behind it, so the title shook. Reduced motion gets the static hero.
  */
 export function HeroSection({
   title,
@@ -52,8 +54,8 @@ export function HeroSection({
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const isLive = useScrollSceneLive();
-  // On phones the corner lines stack under the title, so they ride along
-  // with it instead of parting sideways.
+  // On phones the corner lines stack under the title and, like it, stay put
+  // and fade (the stretch is held in CSS).
   const isStacked = useMediaQuery("(max-width: 760px)");
   const { scrollYProgress: progress } = useScroll({
     target: sectionRef,
@@ -76,7 +78,7 @@ export function HeroSection({
     !isLive
       ? undefined
       : isStacked
-        ? { y: titleY, opacity: cornerOpacity }
+        ? { opacity: cornerOpacity }
         : { x, opacity: cornerOpacity };
 
   return (
@@ -90,7 +92,7 @@ export function HeroSection({
           <motion.h1
             id="hero-title"
             style={
-              isLive
+              isLive && !isStacked
                 ? ({ y: titleY, "--hero-stretch": stretch } as unknown as CSSProperties)
                 : undefined
             }

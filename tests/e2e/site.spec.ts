@@ -684,6 +684,23 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
   await expect(traveler).toHaveAttribute("data-phase", "heading");
   await expect.poll(opacity).toBeGreaterThan(0.9);
 
+  // At rest on an eyebrow that scrolls with the page, the dot is docked to
+  // the document: it moves with the eyebrow in the same frame as a scroll,
+  // not a frame behind it (which shook on phones).
+  await expect(traveler).toHaveAttribute("data-docked", "true");
+  const sameFrameGap = await page
+    .locator('[data-scroll-accent-anchor="workflow"]')
+    .evaluate((slot) => {
+      const dot = document.querySelector(".scroll-accent-traveler")!;
+      const centreY = (element: Element) => {
+        const bounds = element.getBoundingClientRect();
+        return bounds.top + bounds.height / 2;
+      };
+      window.scrollBy(0, -40);
+      return Math.abs(centreY(dot) - centreY(slot));
+    });
+  expect(sameFrameGap).toBeLessThan(2);
+
   // Hidden through About.
   await page.locator("#about").evaluate((element) => {
     const bounds = element.getBoundingClientRect();
@@ -1065,6 +1082,18 @@ test("AI workflow scene stacks the cards on phones and reveals each as it scroll
   });
   await expect.poll(() => last.evaluate(opacityOf)).toBeGreaterThan(0.95);
   await expect(scene.locator(".workflow-scene-arrow")).toHaveCount(3);
+  // Each arrow runs down the gap between two cards, tall enough to read as
+  // an arrow and drifting only slightly toward the next card.
+  const arrows = await scene.locator(".workflow-scene-arrow").evaluateAll((paths) =>
+    paths.map((path) => {
+      const numbers = (path.getAttribute("d")?.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+      return { sx: numbers[0], sy: numbers[1], ex: numbers.at(-2) ?? 0, ey: numbers.at(-1) ?? 0 };
+    }),
+  );
+  for (const arrow of arrows) {
+    expect(arrow.ey - arrow.sy).toBeGreaterThan(36);
+    expect(Math.abs(arrow.ex - arrow.sx)).toBeLessThanOrEqual(16);
+  }
   await expect(scene.getByRole("link", { name: /View my full setup/ })).toBeVisible();
 });
 
@@ -1098,7 +1127,22 @@ test("the hero is Montserrat copy with corner lines and a scroll cue", async ({ 
   await expect(hero).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   for (const selector of ["#hero-title", ".hero-corner-start", ".hero-corner-end"]) {
     await expect(hero.locator(selector)).toHaveCSS("font-family", /Montserrat/);
-    await expect(hero.locator(selector)).toBeVisible();
+  }
+  await expect(hero.locator("#hero-title")).toBeVisible();
+  await expect(hero.locator(".hero-corner-start")).toBeVisible();
+  const isPhone = testInfo.project.name === "mobile-chromium";
+  // Phones keep the first corner line only, and set the title and that line
+  // in two lines each.
+  await expect(hero.locator(".hero-corner-end")).toBeVisible({ visible: !isPhone });
+  if (isPhone) {
+    await page.evaluate(() => document.fonts.ready);
+    const lineCount = (selector: string) =>
+      hero.locator(selector).evaluate((element: HTMLElement) =>
+        Math.round(element.offsetHeight / Number.parseFloat(getComputedStyle(element).lineHeight)),
+      );
+    expect(await lineCount(".hero-title-upper")).toBe(1);
+    expect(await lineCount(".hero-title-lower")).toBe(1);
+    expect(await lineCount(".hero-corner-start")).toBe(2);
   }
   // Line one is solid ink; line two fades out through a clipped gradient.
   const color = await hero.locator("#hero-title").evaluate((element) => getComputedStyle(element).color);

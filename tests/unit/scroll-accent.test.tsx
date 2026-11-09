@@ -7,6 +7,7 @@ import {
   launchSpring,
   nextVisitIndex,
   resolveScrollAccentStop,
+  ridesPage,
   ScrollAccent,
   stepSpring,
   stopViewportPoint,
@@ -82,6 +83,31 @@ describe("stopViewportPoint", () => {
     expect(stopViewportPoint(pinned, 1200).y).toBe(atPin);
     expect(stopViewportPoint(pinned, 1600).y).toBe(atPin);
     expect(stopViewportPoint(pinned, 1700).y).toBe(atPin - 100);
+  });
+});
+
+describe("ridesPage", () => {
+  it("docks a plain target that sits below the float line", () => {
+    expect(ridesPage(stops[1], 400, 700, 76)).toBe(true);
+  });
+
+  it("keeps the dot fixed while the target eases under the float line", () => {
+    expect(ridesPage(stops[1], 400, floatBelow(60, 76), 76)).toBe(false);
+  });
+
+  it("keeps the dot fixed while the target's stage is pinned, and docks it either side", () => {
+    const pinned: ScrollAccentStop = { ...stops[1], stick: { from: 800, to: 1600 } };
+
+    expect(ridesPage(pinned, 700, 400, 76)).toBe(true);
+    expect(ridesPage(pinned, 1200, 300, 76)).toBe(false);
+    expect(ridesPage(pinned, 1700, 200, 76)).toBe(true);
+  });
+
+  it("keeps the dot fixed while script moves the target", () => {
+    const node: ScrollAccentStop = { ...stops[2], scriptedUntil: 1800 };
+
+    expect(ridesPage(node, 1700, 400, 76)).toBe(false);
+    expect(ridesPage(node, 1800, 400, 76)).toBe(true);
   });
 });
 
