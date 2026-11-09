@@ -19,9 +19,10 @@ import { useMediaQuery, useScrollSceneLive } from "@/lib/use-scroll-scene";
 import { AboutBeyond, type AboutBeyondNote } from "./about-beyond";
 
 const PHONE_QUERY = "(max-width: 760px)";
-/** Phones and short screens show the paragraph after the card, so they skip
- * the Beyond-code beat and show it as a strip instead. */
-const COMPACT_QUERY = "(max-width: 760px), (max-height: 660px)";
+/** Short desktop screens show the paragraph after the card, so they skip the
+ * Beyond-code beat and show it as a strip instead. Phones keep both in the
+ * card, as wide screens do. */
+const COMPACT_QUERY = "(min-width: 761px) and (max-height: 660px)";
 
 /**
  * With the Beyond-code beat, the About timeline runs in the first part of the
@@ -262,10 +263,9 @@ export function AboutScene({
         </div>
       </div>
 
-      {/* Phones and short screens cannot fit the paragraph inside the pinned
-          portrait card, so while the scene is live it follows the scene
-          instead. CSS displays exactly one of the two bodies; the other is
-          display: none. */}
+      {/* Short desktop screens cannot fit the paragraph inside the pinned
+          card, so while the scene is live it follows the scene instead. CSS
+          displays exactly one of the two bodies; the other is display: none. */}
       <Container className="about-scene-after">{renderBody()}</Container>
 
       <AboutBeyond

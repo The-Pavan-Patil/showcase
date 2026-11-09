@@ -258,7 +258,11 @@ export function WorkflowScene({
               steps={copy.steps}
             />
 
+            {/* Remounted when the pin turns off (a resize to phone width):
+                motion leaves the pinned opacity and pointer-events inline
+                on the old row, which would hide the CTA. */}
             <motion.div
+              key={isPinned ? "pinned" : "unpinned"}
               className="workflow-scene-cta-row"
               style={
                 isPinned

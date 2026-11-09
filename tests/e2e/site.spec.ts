@@ -719,8 +719,12 @@ test("about scene parts the title and reveals the profile copy on scroll", async
   const resume = page.getByRole("link", { name: /Open résumé/ });
   await expect(resume).toBeVisible();
   await expect(resume).toHaveAttribute("target", "_blank");
+  // Phones and wide screens alike keep the copy in the card.
+  await expect(page.locator(".about-scene-card .about-scene-resume")).toBeVisible();
+  await expect(page.locator(".about-scene-after")).toBeHidden();
 
-  // Wide screens end on Beyond code inside the card; phones show it after.
+  // The scene ends on Beyond code inside the card; short desktop screens
+  // show it after.
   if ((await scene.getAttribute("data-beat")) !== null) {
     await scrollAboutSceneTo(page, 1);
     await expect.poll(() => page.locator(".about-scene-beyond").evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.95);
@@ -890,6 +894,25 @@ test("AI workflow scene reveals its CTA when it receives keyboard focus", async 
   await cta.focus();
   await expect.poll(() => ctaRow.evaluate(opacityOf)).toBeGreaterThan(0.95);
   await expect(page.locator(".workflow-scene-card").last()).toHaveCSS("opacity", "1");
+});
+
+test("AI workflow CTA stays visible after narrowing from the pinned layout to a phone", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium");
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const scene = page.locator(".workflow-scene");
+  const ctaRow = page.locator(".workflow-scene-cta-row");
+  await expect(scene).toHaveAttribute("data-pinned", "");
+  // Before its beat the pinned CTA is transparent and ignores the pointer.
+  await expect.poll(() => ctaRow.evaluate(opacityOf)).toBeLessThan(0.05);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(scene).not.toHaveAttribute("data-pinned", "");
+  const cta = scene.getByRole("link", { name: /View my full setup/ });
+  await cta.scrollIntoViewIfNeeded();
+  await expect.poll(() => ctaRow.evaluate(opacityOf)).toBeGreaterThan(0.95);
+  await expect(ctaRow).toHaveCSS("pointer-events", "auto");
 });
 
 test("AI workflow scene stacks the cards on phones and reveals each as it scrolls in", async ({ page }, testInfo) => {
