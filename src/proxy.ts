@@ -11,8 +11,12 @@ const localeByCountry: Partial<Record<string, Exclude<Locale, "en">>> = {
 
 // Crawlers must always see the URL they asked for. Googlebot mostly crawls
 // from the US, but redirecting it from anywhere would hide the English pages.
+// The terms after "headless" cover AI assistants that fetch a page while
+// answering someone (ChatGPT-User, Claude-User, Perplexity-User and the like).
+// Their names don't say "bot", and a redirect would hand them a translation
+// of the page they were asked to read.
 const botPattern =
-  /bot|crawl|spider|slurp|bingpreview|facebookexternalhit|embedly|quora link preview|whatsapp|telegram|discord|preview|lighthouse|pagespeed|headless/i;
+  /bot|crawl|spider|slurp|bingpreview|facebookexternalhit|embedly|quora link preview|whatsapp|telegram|discord|preview|lighthouse|pagespeed|headless|-user\b|chatgpt|claude|anthropic|openai|perplexity|mistral|cohere|duckassist|google-extended/i;
 
 function getPreferredLocale(request: NextRequest): Locale | null {
   const chosen = request.cookies.get(localeCookieName)?.value;
@@ -38,7 +42,10 @@ function isTopLevelPageVisit(request: NextRequest) {
     return false;
   }
 
-  if (!request.headers.get("accept")?.includes("text/html")) {
+  // Agents asking for Markdown get the English page's Markdown copy at the
+  // URL they asked for (see next.config.ts), never a redirect.
+  const accept = request.headers.get("accept") ?? "";
+  if (!accept.includes("text/html") || accept.includes("text/markdown")) {
     return false;
   }
 

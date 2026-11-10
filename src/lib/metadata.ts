@@ -62,8 +62,20 @@ export function getRootMetadata(locale: Locale): Metadata {
   };
 }
 
+/**
+ * Points agents at the Markdown copy of an English page (src/lib/agent-markdown.ts).
+ * The Japanese and German pages have none, so they get nothing.
+ */
+export function getMarkdownAlternate(locale: Locale, markdownPath: string) {
+  return locale === "en" ? { types: { "text/markdown": markdownPath } } : {};
+}
+
 export function getHomeMetadata(locale: Locale): Metadata {
-  return getRootMetadata(locale);
+  const metadata = getRootMetadata(locale);
+  return {
+    ...metadata,
+    alternates: { ...metadata.alternates, ...getMarkdownAlternate(locale, "/index.md") },
+  };
 }
 
 export function getSetupMetadata(locale: Locale): Metadata {
@@ -78,6 +90,7 @@ export function getSetupMetadata(locale: Locale): Metadata {
     alternates: {
       canonical,
       languages: getAlternateLanguages("/setup"),
+      ...getMarkdownAlternate(locale, "/setup.md"),
     },
     openGraph: {
       type: "website",

@@ -11,6 +11,7 @@
     "build": "next build",
     "start": "next start",
     "verify:discord": "node scripts/verify-discord-webhook.mjs",
+    "indexnow": "node scripts/indexnow.mjs",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",

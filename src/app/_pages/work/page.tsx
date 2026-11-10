@@ -27,7 +27,7 @@ import {
   type CaseStudyTextBlock,
   type ProjectCaseStudy,
 } from "@/lib/portfolio";
-import { getOgImage } from "@/lib/metadata";
+import { getMarkdownAlternate, getOgImage } from "@/lib/metadata";
 import { getSiteUrl } from "@/lib/site";
 import { formatCopy, uiCopyByLocale } from "@/lib/ui-copy";
 
@@ -70,6 +70,7 @@ export async function generateWorkMetadata({
     alternates: {
       canonical,
       languages: getAlternateLanguages(pathname),
+      ...getMarkdownAlternate(locale, `${pathname}.md`),
     },
     openGraph: {
       type: "article",
