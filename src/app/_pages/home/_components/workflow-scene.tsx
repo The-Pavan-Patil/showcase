@@ -277,9 +277,10 @@ export function WorkflowScene({
 
             {/* Remounted when the pin turns off (a resize to phone width):
                 motion leaves the pinned opacity and pointer-events inline
-                on the old row, which would hide the CTA. */}
+                on the old row, which would hide the CTA. Prefixed, as the
+                diagram beside it is keyed by its mode ("pinned" too). */}
             <motion.div
-              key={isPinned ? "pinned" : "unpinned"}
+              key={isPinned ? "cta-pinned" : "cta-unpinned"}
               className="workflow-scene-cta-row"
               style={
                 isPinned

@@ -3631,6 +3631,7 @@ html[lang="ja"] .hero-copy h1 {
   overflow: clip;
 }
 .footer-top { display: flex; align-items: center; justify-content: space-between; gap: 2rem; }
+.site-footer nav { display: flex; align-items: center; gap: 1.65rem; }
 .site-footer nav a { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--muted); font-size: 0.875rem; font-weight: 400; text-transform: uppercase; }
 .site-footer nav a:hover { color: var(--foreground); }
 .footer-bottom { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; padding-top: 1.2rem; }
@@ -5562,6 +5563,7 @@ html[lang="ja"] .setup-hero-copy h1 {
   /* The bottom padding clears the floating navigation bar. */
   .hero-section { padding: clamp(3rem, 9svh, 4.5rem) 0 calc(var(--hero-foot) + 7.5rem + env(safe-area-inset-bottom, 0px)); }
   .hero-scroll-cue { bottom: calc(var(--hero-foot) + env(safe-area-inset-bottom, 0px)); }
+  .hero-scroll-cue-logos { width: 2.925rem; height: 2.925rem; }
   /* 2rem plus the 0.5rem the accent dot's old start point took up. */
   .hero-copy { padding: 2.5rem 0 0; }
   .hero-copy h1,
@@ -5733,9 +5735,13 @@ html[lang="ja"] .setup-hero-copy h1 {
   .contact-section { padding-bottom: clamp(3rem, 8svh, 4rem); scroll-margin-top: 2rem; }
   .contact-card { grid-template-columns: 1fr; gap: 2rem; border-radius: var(--radius-feature); }
   .contact-email, .schedule-call-link { font-size: 0.8125rem; }
-  .footer-top { align-items: start; }
+  /* The brand, then the page links, then the contact links on a line of
+     their own. */
+  .footer-top { flex-direction: column; align-items: start; gap: 1.6rem; }
   .footer-top .brand-link { flex: none; white-space: nowrap; }
-  .site-footer ul { flex-wrap: wrap; justify-content: flex-end; gap: 0.8rem 1rem; }
+  .site-footer nav { display: grid; justify-items: start; gap: 0.9rem; }
+  .site-footer ul { flex-wrap: wrap; gap: 0.8rem 1.25rem; }
+  .site-footer .footer-contact-links { flex-wrap: nowrap; white-space: nowrap; }
   .footer-bottom { display: grid; }
   /* The watermark ends above the navigation bar's clearance rather than at
      the screen edge, so a fine rule marks where its letters are cut. */

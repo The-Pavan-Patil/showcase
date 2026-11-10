@@ -40,7 +40,6 @@ export type UiCopy = {
   footer: {
     navigationAria: string;
     email: string;
-    builtWithCare: string;
     stack: string;
   };
   home: {
@@ -276,7 +275,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     footer: {
       navigationAria: "Footer navigation",
       email: "Email",
-      builtWithCare: "Designed and built with care.",
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
@@ -555,7 +553,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     footer: {
       navigationAria: "フッターナビゲーション",
       email: "メール",
-      builtWithCare: "細部まで大切に設計し、実装しました。",
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {
@@ -833,7 +830,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     footer: {
       navigationAria: "Footer-Navigation",
       email: "E-Mail",
-      builtWithCare: "Mit Sorgfalt entworfen und gebaut.",
       stack: "Next.js · HeroUI · TypeScript",
     },
     home: {

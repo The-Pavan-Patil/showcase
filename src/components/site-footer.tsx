@@ -22,11 +22,14 @@ export function SiteFooter({ copy, locale, profile, socialLinks }: SiteFooterPro
             <span className="brand-mark" aria-hidden="true">P</span>
             <span>Pavan Patil</span>
           </Link>
+          {/* Two lists, so a phone can give the contact links a line of their own. */}
           <nav aria-label={copy.navigationAria}>
             <ul>
               <li><Link href={getHashHref(locale, "#work")}>{copy.navigation.work}</Link></li>
               <li><Link href={getHashHref(locale, "#experience")}>{copy.navigation.experience}</Link></li>
               <li><Link href={getHashHref(locale, "#about")}>{copy.navigation.about}</Link></li>
+            </ul>
+            <ul className="footer-contact-links">
               <li>
                 <a href={`mailto:${profile.email}`}>
                   {copy.email}<ArrowUpRight aria-hidden="true" size={13} />
@@ -43,7 +46,7 @@ export function SiteFooter({ copy, locale, profile, socialLinks }: SiteFooterPro
           </nav>
         </div>
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} {profile.name}. {copy.builtWithCare}</p>
+          <p>© {new Date().getFullYear()} {profile.name}</p>
           <p>{copy.stack}</p>
         </div>
         <div className="footer-watermark" aria-hidden="true">
