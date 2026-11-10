@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/container";
 import { JsonLd } from "@/components/json-ld";
 import { SiteFooter } from "@/components/site-footer";
+import { getOgImage } from "@/lib/metadata";
 import { getPortfolioContent } from "@/lib/portfolio";
 import { getSiteUrl } from "@/lib/site";
 import { getPersonReference } from "@/lib/structured-data";
@@ -92,6 +93,7 @@ export function getWritingPostMetadata(slug: string): Metadata {
   if (!post) return { title: "Post not found", robots: { index: false, follow: false } };
 
   const url = `/writing/${post.slug}`;
+  const image = getOgImage(locale, post.title);
 
   return {
     title: post.title,
@@ -107,9 +109,14 @@ export function getWritingPostMetadata(slug: string): Metadata {
       modifiedTime: post.updatedAt ?? post.publishedAt,
       authors: ["Pavan Patil"],
       tags: post.tags,
-      images: [{ url: "/og.png", width: 1200, height: 630, alt: post.title }],
+      images: [image],
     },
-    twitter: { card: "summary_large_image", title: post.title, description: post.description, images: ["/og.png"] },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [image.url],
+    },
   };
 }
 
@@ -128,7 +135,7 @@ function getPostSchema(post: WritingPost) {
     dateModified: post.updatedAt ?? post.publishedAt,
     inLanguage: locale,
     keywords: post.tags.join(", "),
-    image: `${siteUrl}/og.png`,
+    image: `${siteUrl}${getOgImage(locale, post.title).url}`,
     author: getPersonReference(siteUrl),
     publisher: getPersonReference(siteUrl),
   };

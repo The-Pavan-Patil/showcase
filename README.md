@@ -83,7 +83,7 @@ The target is Vercel. Before production deployment:
 1. Set `NEXT_PUBLIC_SITE_URL` to the canonical domain.
 2. Run every quality command above against the production build.
 3. Complete the manual accessibility checklist in the design-system documentation.
-4. Review the generated Open Graph card at `public/og.png`.
+4. Review the Open Graph cards in `public/og/` (regenerate with `node scripts/render-og-images.mjs` after changing the hero copy).
 
 No CMS, database, authentication, or unlicensed HeroUI Pro assets are used. The only backend contact path is an anonymous, message-only Discord webhook endpoint with no visitor registration, reply field, or stored message history.
 

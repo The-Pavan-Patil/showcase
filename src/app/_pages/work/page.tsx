@@ -27,6 +27,7 @@ import {
   type CaseStudyTextBlock,
   type ProjectCaseStudy,
 } from "@/lib/portfolio";
+import { getOgImage } from "@/lib/metadata";
 import { getSiteUrl } from "@/lib/site";
 import { formatCopy, uiCopyByLocale } from "@/lib/ui-copy";
 
@@ -61,12 +62,7 @@ export async function generateWorkMetadata({
         height: project.media.height,
         alt: project.media.alt,
       }
-    : {
-        url: "/og.png",
-        width: 1200,
-        height: 630,
-        alt: formatCopy(ui.work.caseStudyAlt, { title: project.title }),
-      };
+    : getOgImage(locale, formatCopy(ui.work.caseStudyAlt, { title: project.title }));
 
   return {
     title: project.title,
