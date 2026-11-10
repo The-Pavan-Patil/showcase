@@ -7,8 +7,8 @@ export type AboutBeyondNote = {
 };
 
 /**
- * Supporting context for the About section. In the live scene it is the
- * card's final beat ("card"); otherwise it is a compact strip under the card.
+ * Supporting context for the About section. In the live scene it appears in
+ * the card before the logo story; otherwise it follows the card as a strip.
  */
 export function AboutBeyond({
   ariaLabel,

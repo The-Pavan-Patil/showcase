@@ -439,6 +439,7 @@ a {
   place-items: center;
   width: 1.875rem;
   height: 1.875rem;
+  overflow: hidden;
   border-radius: 0.58rem;
   background: var(--foreground);
   color: var(--background);
@@ -451,8 +452,26 @@ a {
     border-radius var(--header-morph);
 }
 
-.brand-link.is-back .brand-mark {
+.site-header .brand-mark {
   border-radius: 50%;
+}
+
+.brand-link:not(.is-back) .brand-mark {
+  background: #111111;
+}
+
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.dark .brand-link:not(.is-back) .brand-mark {
+  background: var(--foreground);
+}
+
+.dark .brand-mark img {
+  filter: invert(1);
 }
 
 .brand-link.is-back .brand-mark svg {
@@ -473,7 +492,6 @@ a {
 .site-header[data-density="compact"] .brand-mark {
   width: 1.75rem;
   height: 1.75rem;
-  border-radius: 50%;
 }
 
 .desktop-nav ul,
@@ -3100,9 +3118,9 @@ html[lang="ja"] .hero-copy h1 {
 .about-scene[data-live] .about-scene-track {
   height: 420svh;
 }
-/* The Beyond-code beat adds a hold at the end without changing the pace. */
+/* Beyond code and the logo story each hold the same card for one more scroll. */
 .about-scene[data-beat] .about-scene-track {
-  height: 520svh;
+  height: 620svh;
 }
 /* The stage paints the page background so the title's difference blend has a
    backdrop, and sits above the scroll-accent traveler (40) but under the
@@ -3159,8 +3177,8 @@ html[lang="ja"] .hero-copy h1 {
   color: var(--background);
 }
 
-/* Beyond code: the About card's final beat in the live scene, otherwise a
-   compact strip under the card. Kept quieter than the work sections. */
+/* Beyond code lives in the card when the scene is pinned, and follows it as a
+   strip when the viewport is too short or motion is reduced. */
 .about-beyond-strip {
   padding-block: clamp(3.5rem, 6vw, 5rem);
 }
@@ -3187,6 +3205,88 @@ html[lang="ja"] .hero-copy h1 {
 .about-beyond-in-card .about-beyond-text {
   color: rgb(255 255 255 / 88%);
   font-size: clamp(0.98rem, 1.15vw, 1.1rem);
+}
+
+/* The favicon's story shares the photo card with About and Beyond code. The
+   same composition follows the strip in the static and short-screen layouts. */
+.about-scene-logo-beat {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+.about-logo-story-after {
+  padding-bottom: clamp(3.5rem, 6vw, 5rem);
+}
+.about-logo-story {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 3rem);
+  width: 100%;
+  height: 100%;
+  padding: clamp(1.5rem, 4vw, 3.25rem);
+  color: var(--brand-white);
+}
+.about-logo-story-after .about-logo-story {
+  position: relative;
+  min-height: clamp(28rem, 58svh, 40rem);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: #0b0d10;
+  isolation: isolate;
+}
+.about-logo-story-after .about-logo-story::before {
+  position: absolute;
+  z-index: -2;
+  inset: -2rem;
+  background: url("/pavan-profile-wide.jpg") center / cover;
+  filter: blur(28px);
+  content: "";
+}
+.about-logo-story-after .about-logo-story::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: rgb(6 8 10 / 54%);
+  content: "";
+}
+.about-logo-story-art {
+  display: grid;
+  min-width: 0;
+  place-items: center;
+}
+.about-logo-story-art img {
+  display: block;
+  width: min(100%, 23rem);
+  height: auto;
+  aspect-ratio: 1;
+}
+.about-logo-story-copy {
+  display: grid;
+  align-content: center;
+  gap: clamp(0.75rem, 1.5svh, 1.125rem);
+  max-width: 34rem;
+}
+.about-logo-story-copy h3 {
+  max-width: 16ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 2.8vw, 2.75rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.about-logo-story-copy p {
+  margin: 0;
+  font-size: clamp(0.9375rem, 1.2vw, 1.125rem);
+  line-height: 1.55;
+}
+.about-logo-story-copy .about-logo-story-reading {
+  color: var(--brand-gray);
+  font-size: 0.875rem;
+  font-weight: 700;
 }
 .about-beyond-list {
   display: grid;
@@ -5680,9 +5780,8 @@ html[lang="ja"] .setup-hero-copy h1 {
   .about-scene-title { font-size: clamp(3.5rem, 24vw, 8rem); }
   /* Phones have no top header but a bottom navigation bar. */
   .about-scene[data-live] .about-scene-track { height: 300svh; }
-  /* The Beyond-code hold, at the same pace: the About timeline keeps 76% of
-     the scroll (ABOUT_SHARE_WITH_BEAT). */
-  .about-scene[data-beat] .about-scene-track { height: 364svh; }
+  /* The two extra card beats preserve the original About scroll pace. */
+  .about-scene[data-beat] .about-scene-track { height: 428svh; }
   .about-scene[data-live] .about-scene-stage {
     padding: 1rem 1rem calc(6rem + env(safe-area-inset-bottom, 0px));
   }
@@ -5699,8 +5798,8 @@ html[lang="ja"] .setup-hero-copy h1 {
     min-height: calc(100svh - 7rem - env(safe-area-inset-bottom, 0px));
     aspect-ratio: auto;
   }
-  /* The copy and then Beyond code sit in the card, as on desktop. Their type
-     follows the screen height so short phones fit the whole paragraph. */
+  /* The copy, Beyond code, and logo story share the card. Their type follows
+     the screen height so short phones fit the whole paragraph. */
   .about-scene-content { gap: clamp(0.625rem, 1.8svh, 1rem); padding: 1.25rem; }
   .about-scene-heading h3 { font-size: clamp(1.35rem, 4.2svh, 2.1rem); }
   .about-scene-body p { font-size: clamp(0.75rem, 2.2svh, 1rem); line-height: 1.5; }
@@ -5722,6 +5821,20 @@ html[lang="ja"] .setup-hero-copy h1 {
   .about-beyond-keyword { font-size: 1.45rem; }
   .about-beyond-label { margin: 0; justify-self: end; }
   .about-beyond-text { grid-column: 1 / -1; margin-top: 0.5rem; font-size: 0.92rem; }
+  .about-logo-story {
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: clamp(0.75rem, 2svh, 1.25rem);
+    padding: 1.25rem;
+  }
+  .about-logo-story-art img { width: clamp(7rem, 25svh, 14rem); }
+  .about-logo-story-copy { gap: clamp(0.5rem, 1.1svh, 0.875rem); }
+  .about-logo-story-copy h3 { font-size: clamp(1.5rem, 5.4vw, 2.1rem); }
+  .about-logo-story-copy p { font-size: clamp(0.8125rem, 1.9svh, 1rem); line-height: 1.45; }
+  .about-logo-story-copy .about-logo-story-reading { font-size: 0.8125rem; }
+  .about-logo-story-after .about-logo-story {
+    min-height: calc(100svh - 7rem - env(safe-area-inset-bottom, 0px));
+  }
   .quick-message-section { padding-bottom: 5rem; scroll-margin-top: 2rem; }
   .quick-message-band { grid-template-columns: 1fr; gap: 1.45rem; }
   .quick-message-composer { margin-top: 0; }
@@ -5986,6 +6099,10 @@ html[lang="ja"] .setup-hero-copy h1 {
 
 /* Short phones: tighten the homepage sections that otherwise outgrow one
    screen. */
+@media (max-width: 360px) and (max-height: 600px) {
+  .about-logo-story-art img { width: min(21svh, 7.5rem); }
+}
+
 @media (max-width: 760px) and (max-height: 700px) {
   .contact-card { gap: 1rem; padding: 1.25rem; }
   .contact-actions { gap: 0.5rem; }
@@ -5993,6 +6110,14 @@ html[lang="ja"] .setup-hero-copy h1 {
   .quick-message-textarea { height: 5.25rem; }
   /* As wide as the column, unless that would run under the navigation bar. */
   .quick-message-keyboard > div { zoom: clamp(0.6, (100svh - 28.5rem) / 10.5rem, 90vw / 400px) !important; }
+}
+
+@media (max-width: 760px) and (max-height: 520px) {
+  .about-logo-story { gap: 0.5rem; padding: 1rem; }
+  .about-logo-story-art img { width: 5.5rem; }
+  .about-logo-story-copy { gap: 0.4rem; }
+  .about-logo-story-copy h3 { font-size: 1.375rem; }
+  .about-logo-story-after { padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -11,6 +11,7 @@ import {
   Route,
   UserRound,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -474,7 +475,11 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
           aria-label={isCaseStudy ? copy.backToSelectedWork : copy.brandAria}
         >
           <span className="brand-mark" aria-hidden="true">
-            {isCaseStudy ? <ArrowLeft size={16} strokeWidth={2.2} /> : "P"}
+            {isCaseStudy ? (
+              <ArrowLeft size={16} strokeWidth={2.2} />
+            ) : (
+              <Image src="/icon.svg" alt="" width={30} height={30} unoptimized />
+            )}
           </span>
           <span className="brand-name">Pavan Patil</span>
         </Link>

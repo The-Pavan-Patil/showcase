@@ -913,7 +913,7 @@ test("about scene parts the title and reveals the profile copy on scroll", async
   await expect.poll(() => left.evaluate(translateX)).toBeLessThan(-50);
   await expect.poll(() => right.evaluate(translateX)).toBeGreaterThan(50);
 
-  await scrollAboutSceneTo(page, 0.75);
+  await scrollAboutSceneTo(page, 0.57);
   await expect(page.locator(".about-scene-heading")).toHaveCSS("opacity", "1");
 
   const resume = page.getByRole("link", { name: /Open résumé/ });
@@ -923,15 +923,23 @@ test("about scene parts the title and reveals the profile copy on scroll", async
   await expect(page.locator(".about-scene-card .about-scene-resume")).toBeVisible();
   await expect(page.locator(".about-scene-after")).toBeHidden();
 
-  // The scene ends on Beyond code inside the card; short desktop screens
-  // show it after.
+  // Beyond code gets its own hold, then the favicon story takes over the card.
+  // Short viewports show both stories in normal page flow.
   if ((await scene.getAttribute("data-beat")) !== null) {
-    await scrollAboutSceneTo(page, 1);
+    await scrollAboutSceneTo(page, 0.79);
     await expect.poll(() => page.locator(".about-scene-beyond").evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.95);
     await expect(page.locator(".about-scene-beyond .about-beyond-keyword").first()).toBeVisible();
     await expect(page.locator(".about-beyond-strip")).toBeHidden();
+
+    await scrollAboutSceneTo(page, 1);
+    await expect.poll(() => page.locator(".about-scene-logo-beat").evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.95);
+    await expect.poll(() => page.locator(".about-scene-beyond").evaluate((element) => Number(getComputedStyle(element).opacity))).toBeLessThan(0.05);
+    await expect(page.locator(".about-scene-logo-beat .about-logo-story")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(page.locator(".about-scene-logo-beat")).toContainText("favicon");
+    await expect(page.locator(".about-scene-logo-beat img")).toHaveAttribute("src", "/images/brand/shi-glyph.svg");
   } else {
     await expect(page.locator(".about-beyond-strip .about-beyond-keyword").first()).toBeVisible();
+    await expect(page.locator(".about-logo-story-after")).toContainText("favicon");
   }
 });
 
@@ -951,7 +959,7 @@ test("about scene scrolls forward when the résumé link receives keyboard focus
   await resume.focus();
   await expect.poll(() => page.locator(".about-scene-body").first().evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.95);
 
-  // Once the copy has handed over to Beyond code, focus scrolls back to it.
+  // Once the copy has handed over to the later beats, focus scrolls back to it.
   await resume.blur();
   await scrollAboutSceneTo(page, 1);
   await expect.poll(() => opacityOf(content)).toBeLessThan(0.05);
@@ -972,6 +980,26 @@ test("about scene shows the finished composition with reduced motion", async ({ 
   await expect(page.locator(".about-scene-card .about-scene-resume")).toBeVisible();
   await expect(page.locator(".about-beyond-strip .about-beyond-keyword").first()).toBeVisible();
   await expect(page.locator(".about-scene-beyond")).toBeHidden();
+  await expect(page.locator(".about-logo-story-after")).toContainText("favicon");
+});
+
+test("the logo story grows with its copy on a short phone", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-chromium");
+
+  await page.setViewportSize({ width: 320, height: 480 });
+  await page.goto("/");
+
+  await expect(page.locator("#about")).not.toHaveAttribute("data-beat", "");
+  const card = page.locator(".about-logo-story-after .about-logo-story");
+  const copy = card.locator(".about-logo-story-copy");
+  await expect(copy).toContainText("favicon");
+  const cardBounds = await card.boundingBox();
+  const copyBounds = await copy.boundingBox();
+  expect(cardBounds).not.toBeNull();
+  expect(copyBounds).not.toBeNull();
+  expect(copyBounds!.y + copyBounds!.height).toBeLessThanOrEqual(
+    cardBounds!.y + cardBounds!.height - 16,
+  );
 });
 
 test("the hero and the pinned AI workflow stage each fill one screen", async ({ page }, testInfo) => {

@@ -151,6 +151,7 @@ export function HomePage({ locale }: { locale: Locale }) {
           beyondHeading={ui.home.beyondHeading}
           beyondAria={ui.home.personalInterestsAria}
           notes={ui.home.personalNotes}
+          logoStory={ui.home.logoStory}
         />
 
         <QuickMessageSection copy={ui.home.quickMessage} />

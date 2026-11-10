@@ -17,23 +17,26 @@ import { onSectionJumpEnd } from "@/lib/section-jump";
 import { useMediaQuery, useScrollSceneLive } from "@/lib/use-scroll-scene";
 
 import { AboutBeyond, type AboutBeyondNote } from "./about-beyond";
+import { AboutLogoStory, type AboutLogoStoryCopy } from "./about-logo-story";
 
 const PHONE_QUERY = "(max-width: 760px)";
-/** Short desktop screens show the paragraph after the card, so they skip the
- * Beyond-code beat and show it as a strip instead. Phones keep both in the
- * card, as wide screens do. */
-const COMPACT_QUERY = "(min-width: 761px) and (max-height: 660px)";
+/** Short viewports use a static Beyond-code strip and a naturally sized logo
+ * card, so neither story is clipped inside the pinned card. */
+const COMPACT_QUERY =
+  "(min-width: 761px) and (max-height: 660px), (max-width: 760px) and (max-height: 520px)";
 
 /**
- * With the Beyond-code beat, the About timeline runs in the first part of the
- * track (the track grows to match, so its pace is unchanged).
+ * The About timeline keeps its original scroll distance while Beyond code and
+ * the logo story each get a hold on the same card.
  */
-const ABOUT_SHARE_WITH_BEAT = 0.76;
+const ABOUT_SHARE_WITH_BEAT = 0.615;
 /** About-timeline progress at which the card copy is fully readable. */
 const CONTENT_READY_PROGRESS = 0.8;
 /** Track progress where the About copy hands over to Beyond code. */
-const BEAT_HANDOFF = [0.82, 0.87] as const;
-const BEAT_IN = [0.87, 0.95] as const;
+const BEAT_HANDOFF = [0.66, 0.71] as const;
+const BEAT_IN = [0.7, 0.77] as const;
+const LOGO_HANDOFF = [0.81, 0.87] as const;
+const LOGO_IN = [0.86, 0.94] as const;
 
 type AboutSceneProps = {
   displayWords: readonly [string, string];
@@ -47,6 +50,7 @@ type AboutSceneProps = {
   beyondHeading: string;
   beyondAria: string;
   notes: readonly AboutBeyondNote[];
+  logoStory: AboutLogoStoryCopy;
 };
 
 export function AboutScene({
@@ -61,6 +65,7 @@ export function AboutScene({
   beyondHeading,
   beyondAria,
   notes,
+  logoStory,
 }: AboutSceneProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const isLive = useScrollSceneLive();
@@ -117,11 +122,21 @@ export function AboutScene({
     value > at(0.72) && (!hasBeat || value < BEAT_HANDOFF[0]) ? "auto" : "none",
   );
 
-  // Final beat: the About copy steps aside for Beyond code on the same card.
+  // Each chapter rises into the same photo card as the previous one fades.
   const contentOpacity = useTransform(progress, [...BEAT_HANDOFF], [1, hasBeat ? 0 : 1]);
   const contentY = useTransform(progress, [...BEAT_HANDOFF], [0, hasBeat ? -24 : 0]);
-  const beyondOpacity = useTransform(progress, [...BEAT_IN], [0, 1]);
-  const beyondY = useTransform(progress, [...BEAT_IN], [28, 0]);
+  const beyondOpacity = useTransform(
+    progress,
+    [BEAT_IN[0], BEAT_IN[1], LOGO_HANDOFF[0], LOGO_HANDOFF[1]],
+    [0, 1, 1, 0],
+  );
+  const beyondY = useTransform(
+    progress,
+    [BEAT_IN[0], BEAT_IN[1], LOGO_HANDOFF[0], LOGO_HANDOFF[1]],
+    [28, 0, 0, -24],
+  );
+  const logoOpacity = useTransform(progress, [...LOGO_IN], [0, 1]);
+  const logoY = useTransform(progress, [...LOGO_IN], [28, 0]);
 
   function renderBody(style?: MotionStyle) {
     return (
@@ -259,6 +274,11 @@ export function AboutScene({
                 variant="card"
               />
             </motion.div>
+            {hasBeat ? (
+              <motion.div className="about-scene-logo-beat" style={{ opacity: logoOpacity, y: logoY }}>
+                <AboutLogoStory copy={logoStory} />
+              </motion.div>
+            ) : null}
           </motion.div>
         </div>
       </div>
@@ -274,6 +294,11 @@ export function AboutScene({
         heading={beyondHeading}
         notes={notes}
       />
+      {!hasBeat ? (
+        <Container className="about-logo-story-after">
+          <AboutLogoStory copy={logoStory} />
+        </Container>
+      ) : null}
     </section>
   );
 }

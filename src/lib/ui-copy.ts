@@ -98,6 +98,12 @@ export type UiCopy = {
       label: string;
       text: string;
     }>;
+    logoStory: {
+      heading: string;
+      reading: string;
+      meaning: string;
+      reason: string;
+    };
     downloadResume: string;
     portraitAlt: string;
     quickMessage: {
@@ -376,6 +382,14 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
           text: "When I need quiet, I get on the bike. It clears my head and helps me return with more patience.",
         },
       ],
+      logoStory: {
+        heading: "A promise I keep close.",
+        reading: "志 · kokorozashi",
+        meaning:
+          "志 is a purpose held in the heart. To me, it begins with the curiosity I felt as a child, wanting to know what was happening beneath a computer screen.",
+        reason:
+          "I chose it as this site's favicon because it feels like a quiet promise to myself: keep learning, build with care, and finish the difficult work. I want that intention beside my name wherever this portfolio appears.",
+      },
       downloadResume: "Open résumé",
       portraitAlt: "Pavan Patil smiling outdoors at night",
       quickMessage: {
@@ -654,6 +668,14 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
           text: "静かに考えたい時はバイクに乗ります。頭が整理され、より落ち着いて戻れます。",
         },
       ],
+      logoStory: {
+        heading: "この印に込めた思い。",
+        reading: "志 · こころざし",
+        meaning:
+          "志は、心に抱く目標や思いを表す漢字です。私にとっては、子どもの頃、コンピューターの画面の向こうで何が起きているのか知りたかった好奇心から始まります。",
+        reason:
+          "この文字をファビコンに選んだのは、自分への静かな約束のように感じるからです。学び続け、丁寧に作り、難しい仕事も最後までやり遂げる。その思いを、このポートフォリオとともに持ち歩きたいのです。",
+      },
       downloadResume: "履歴書を開く",
       portraitAlt: "夜の屋外で笑っているPavan Patil",
       quickMessage: {
@@ -931,6 +953,14 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
           text: "Wenn ich Ruhe brauche, fahre ich los. Das klärt den Kopf und bringt mich geduldiger zurück.",
         },
       ],
+      logoStory: {
+        heading: "Ein Zeichen für meinen Antrieb.",
+        reading: "志 · kokorozashi",
+        meaning:
+          "志 steht für ein Ziel, das man im Herzen trägt. Für mich beginnt es mit der Neugier meiner Kindheit: Ich wollte verstehen, was hinter einem Computerbildschirm passiert.",
+        reason:
+          "Ich habe es als Favicon gewählt, weil es sich wie ein stilles Versprechen an mich selbst anfühlt: weiterlernen, sorgfältig bauen und schwierige Arbeit zu Ende bringen. Diese Haltung soll meinen Namen auf jeder Seite begleiten.",
+      },
       downloadResume: "Lebenslauf öffnen",
       portraitAlt: "Pavan Patil lächelt nachts im Freien",
       quickMessage: {
