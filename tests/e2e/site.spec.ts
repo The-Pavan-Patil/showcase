@@ -1335,7 +1335,9 @@ test("selected work carries portrait cards through the dust lane on scroll", asy
 
   // Earlier cards have moved off to the left, the way they left.
   expect(await offCentre(0)).toBeLessThan(0);
-  await expect(cards.nth(2).getByRole("link", { name: /Read the Philips Greenheart case study/ })).toBeVisible();
+  await expect(cards.nth(0).locator('a[href="/work/nudge"]')).toHaveCount(1);
+  await expect(cards.nth(1).locator('a[href="/work/philips-greenheart"]')).toHaveCount(1);
+  await expect(cards.nth(2).getByRole("link", { name: /Read the Mainichi koto/ })).toBeVisible();
 });
 
 test("selected work shows a plain row of portrait cards with reduced motion", async ({ page }, testInfo) => {

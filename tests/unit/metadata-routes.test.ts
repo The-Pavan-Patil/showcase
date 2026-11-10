@@ -18,15 +18,15 @@ describe("metadata routes", () => {
       "https://portfolio.example/setup",
       "https://portfolio.example/ja/setup",
       "https://portfolio.example/de/setup",
-      "https://portfolio.example/work/mainichi-koto",
-      "https://portfolio.example/ja/work/mainichi-koto",
-      "https://portfolio.example/de/work/mainichi-koto",
       "https://portfolio.example/work/nudge",
       "https://portfolio.example/ja/work/nudge",
       "https://portfolio.example/de/work/nudge",
       "https://portfolio.example/work/philips-greenheart",
       "https://portfolio.example/ja/work/philips-greenheart",
       "https://portfolio.example/de/work/philips-greenheart",
+      "https://portfolio.example/work/mainichi-koto",
+      "https://portfolio.example/ja/work/mainichi-koto",
+      "https://portfolio.example/de/work/mainichi-koto",
       "https://portfolio.example/work/workforce-management-system",
       "https://portfolio.example/ja/work/workforce-management-system",
       "https://portfolio.example/de/work/workforce-management-system",
@@ -37,13 +37,13 @@ describe("metadata routes", () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://portfolio.example/");
 
     expect(sitemap()[6]).toMatchObject({
-      url: "https://portfolio.example/work/mainichi-koto",
+      url: "https://portfolio.example/work/nudge",
       alternates: {
         languages: {
-          en: "https://portfolio.example/work/mainichi-koto",
-          ja: "https://portfolio.example/ja/work/mainichi-koto",
-          de: "https://portfolio.example/de/work/mainichi-koto",
-          "x-default": "https://portfolio.example/work/mainichi-koto",
+          en: "https://portfolio.example/work/nudge",
+          ja: "https://portfolio.example/ja/work/nudge",
+          de: "https://portfolio.example/de/work/nudge",
+          "x-default": "https://portfolio.example/work/nudge",
         },
       },
     });

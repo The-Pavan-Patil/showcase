@@ -16,9 +16,9 @@ describe("portfolio content", () => {
     expect(projects).toHaveLength(4);
     expect(new Set(projects.map((project) => project.slug)).size).toBe(4);
     expect(projects.map((project) => project.slug)).toEqual([
-      "mainichi-koto",
       "nudge",
       "philips-greenheart",
+      "mainichi-koto",
       "workforce-management-system",
     ]);
   });
@@ -41,9 +41,9 @@ describe("portfolio content", () => {
   });
 
   it("cycles through next projects", () => {
-    expect(getNextProject("mainichi-koto").slug).toBe("nudge");
     expect(getNextProject("nudge").slug).toBe("philips-greenheart");
-    expect(getNextProject("workforce-management-system").slug).toBe("mainichi-koto");
+    expect(getNextProject("philips-greenheart").slug).toBe("mainichi-koto");
+    expect(getNextProject("workforce-management-system").slug).toBe("nudge");
   });
 
   it("publishes a public Mainichi koto product case study", () => {

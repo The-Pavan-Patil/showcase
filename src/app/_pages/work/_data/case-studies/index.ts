@@ -5,8 +5,8 @@ import { workforceManagementSystem } from "./workforce-management-system";
 import type { ProjectCaseStudy } from "@/lib/portfolio-types";
 
 export const caseStudies: ProjectCaseStudy[] = [
-  mainichiKoto,
   nudge,
   philipsGreenheart,
+  mainichiKoto,
   workforceManagementSystem,
 ];
