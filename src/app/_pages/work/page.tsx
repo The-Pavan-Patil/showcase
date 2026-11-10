@@ -265,9 +265,12 @@ export function WorkPage({
               </div>
               <div className="next-project-media">
                 {nextProject.media ? (
+                  // Hidden from screen readers so the link is named by its
+                  // title alone; the alt text is for search engines.
                   <Image
                     src={nextProject.media.src}
-                    alt=""
+                    alt={nextProject.media.alt}
+                    aria-hidden="true"
                     fill
                     sizes="(max-width: 900px) 100vw, 40vw"
                   />

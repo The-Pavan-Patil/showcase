@@ -206,7 +206,7 @@ export function AboutScene({
               style={isLive ? { scale: photoScale } : undefined}
               aria-hidden="true"
             >
-              <Image src="/pavan-profile-wide.jpg" alt="" fill sizes="(max-width: 760px) 100vw, 75vw" />
+              <Image src="/pavan-profile-wide.jpg" alt={portraitAlt} fill sizes="(max-width: 760px) 100vw, 75vw" />
             </motion.div>
             <motion.div
               className="about-scene-photo about-scene-photo-sharp"

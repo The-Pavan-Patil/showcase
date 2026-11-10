@@ -99,7 +99,7 @@ export function HeroScrollCue({
                   : "idle"
             }
           >
-            <Image src={logo.src} alt="" fill sizes="56px" loading="eager" />
+            <Image src={logo.src} alt={logo.name} fill sizes="56px" loading="eager" />
           </span>
         ))}
       </span>

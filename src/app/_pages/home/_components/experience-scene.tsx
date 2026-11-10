@@ -462,7 +462,9 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
                       <div className="experience-company-row" data-experience-reveal>
                         <div className="experience-company-lockup">
                           <span className="experience-logo">
-                            <Image src={item.logoUrl} alt="" fill sizes="48px" />
+                            {/* Named for search engines; hidden from screen readers, which read
+                                the company name in the heading beside it. */}
+                            <Image src={item.logoUrl} alt={item.company} aria-hidden="true" fill sizes="48px" />
                           </span>
                           <div className="experience-role">
                             <h3>{item.company}</h3>
@@ -514,7 +516,7 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
                                   aria-hidden="true"
                                 />
                                 <span className="client-project-logo" data-experience-reveal>
-                                  <Image src={project.logoUrl} alt="" fill sizes="40px" />
+                                  <Image src={project.logoUrl} alt={project.client} aria-hidden="true" fill sizes="40px" />
                                 </span>
                                 <div className="client-project-body" data-experience-reveal>
                                   <h4>
