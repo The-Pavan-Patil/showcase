@@ -1,3 +1,4 @@
+import { getDisambiguation } from "@/lib/identity";
 import { getHomePath, type Locale } from "@/lib/i18n";
 import type { PortfolioContent } from "@/lib/portfolio-types";
 import { uiCopyByLocale } from "@/lib/ui-copy";
@@ -47,8 +48,13 @@ export function getPersonSchema({
     "@type": "Person",
     "@id": getPersonId(siteUrl),
     name: profile.name,
+    givenName: "Pavan",
+    familyName: "Patil",
     jobTitle: profile.role,
     description: uiCopyByLocale[locale].metadata.description,
+    // Many people share this name. One English sentence (role, employer,
+    // city, clients) on every language version keeps the entity distinct.
+    disambiguatingDescription: getDisambiguation(),
     url: `${siteUrl}${getHomePath(locale) === "/" ? "" : getHomePath(locale)}`,
     image: `${siteUrl}/pavan-profile.jpg`,
     email: `mailto:${profile.email}`,

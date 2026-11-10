@@ -1,4 +1,5 @@
 import { getPosts } from "@/app/_pages/writing/posts";
+import { getDisambiguation } from "@/lib/identity";
 import { getPortfolioContent } from "@/lib/portfolio";
 import { getSiteUrl } from "@/lib/site";
 import { uiCopyByLocale } from "@/lib/ui-copy";
@@ -19,7 +20,9 @@ export function GET() {
     "",
     `> ${uiCopyByLocale.en.metadata.description}`,
     "",
-    `${profile.name} is a ${profile.role.toLowerCase()} based in Bengaluru, India, open to roles in Japan. ${profile.education}.`,
+    `${getDisambiguation()} Open to roles in Japan. ${profile.education}.`,
+    "",
+    "Several other people share the name Pavan Patil. This site is the official page of the software engineer above, the same person as the profiles listed under Profile.",
     "",
     "## Profile",
     "",
@@ -50,6 +53,11 @@ export function GET() {
           "",
         ]
       : []),
+    "## Machine-readable versions",
+    "",
+    `- [Full site as Markdown](${siteUrl}/llms-full.txt): every English page in one file`,
+    `- Each English page has a Markdown copy at its URL plus \`.md\` (the home page is [${siteUrl}/index.md](${siteUrl}/index.md)), or at its normal URL with \`Accept: text/markdown\`. Cite the HTML page, not the Markdown copy.`,
+    "",
   ];
 
   return new Response(lines.join("\n"), {
