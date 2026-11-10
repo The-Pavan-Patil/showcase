@@ -221,10 +221,10 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       defaultTitle: "Pavan Patil — Software Engineer",
       titleTemplate: "%s — Pavan Patil",
       description:
-        "Pavan Patil is a Bengaluru-based software engineer building web, mobile, and backend products with TypeScript, React, Next.js, React Native, Node.js, and PostgreSQL.",
+        "Software engineer in Bengaluru building web, mobile and backend products from system design to production. Built for Hero Vida, Philips and DRDO.",
       openGraphDescription:
-        "Software engineer building across web, mobile, and backend—from system design to production.",
-      twitterDescription: "Web, mobile, and backend—from system design to production.",
+        "Web, mobile and backend products, from system design to production. Built for Hero Vida, Philips and DRDO.",
+      twitterDescription: "Web, mobile and backend, end to end. Built for Hero Vida, Philips and DRDO.",
       keywords: [
         "Pavan Patil",
         "Software Engineer",
@@ -502,10 +502,10 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       defaultTitle: "Pavan Patil — ソフトウェアエンジニア",
       titleTemplate: "%s — Pavan Patil",
       description:
-        "インド・ベンガルールを拠点に、TypeScript、React、Next.js、React Native、Node.js、PostgreSQLでWeb、モバイル、バックエンドのプロダクトを作るソフトウェアエンジニアです。日本でのお仕事も歓迎しています。",
+        "インド・ベンガルール拠点のソフトウェアエンジニアです。Hero Vida、Philips、DRDOの案件で、Web・モバイル・バックエンドを設計から本番リリースまで担当してきました。日本でのお仕事も歓迎しています。",
       openGraphDescription:
-        "Web・モバイル・バックエンドを横断し、設計から実装・リリースまで担うソフトウェアエンジニアです。",
-      twitterDescription: "Web・モバイル・バックエンド。設計からリリースまで。",
+        "Hero Vida、Philips、DRDOの案件で、Web・モバイル・バックエンドを設計から本番リリースまで担当。",
+      twitterDescription: "Web・モバイル・バックエンドを一貫して。Hero Vida、Philips、DRDOの案件を担当。",
       keywords: [
         "Pavan Patil",
         "ソフトウェアエンジニア",
@@ -781,10 +781,10 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       defaultTitle: "Pavan Patil — Softwareentwickler",
       titleTemplate: "%s — Pavan Patil",
       description:
-        "Pavan Patil ist Softwareentwickler aus Bengaluru, Indien, und baut Web-, Mobile- und Backend-Produkte mit TypeScript, React, Next.js, React Native, Node.js und PostgreSQL.",
+        "Softwareentwickler aus Bengaluru, Indien. Web-, Mobile- und Backend-Produkte von Systemdesign bis Produktion, gebaut für Hero Vida, Philips und DRDO.",
       openGraphDescription:
-        "Zuverlässige Software für komplexe reale Abläufe in Web, Mobile, Backend und datenintensiven Systemen.",
-      twitterDescription: "Zuverlässige Software für komplexe reale Abläufe.",
+        "Web-, Mobile- und Backend-Produkte von Systemdesign bis Produktion. Gebaut für Hero Vida, Philips und DRDO.",
+      twitterDescription: "Web, Mobile und Backend aus einer Hand. Gebaut für Hero Vida, Philips und DRDO.",
       keywords: [
         "Pavan Patil",
         "Softwareentwickler",

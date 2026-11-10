@@ -9,10 +9,26 @@ import {
 import { getSiteUrl } from "@/lib/site";
 import { uiCopyByLocale } from "@/lib/ui-copy";
 
+/**
+ * Social-preview cards, one per language, rendered from the home hero by
+ * `scripts/render-og-images.mjs`. Link previews are cached by image URL, so a
+ * redesigned card needs a new file name, not new pixels under the old one.
+ */
+const ogImagePaths: Record<Locale, string> = {
+  en: "/og/en.png",
+  ja: "/og/ja.png",
+  de: "/og/de.png",
+};
+
+export function getOgImage(locale: Locale, alt: string) {
+  return { url: ogImagePaths[locale], width: 1200, height: 630, alt };
+}
+
 export function getRootMetadata(locale: Locale): Metadata {
   const siteUrl = getSiteUrl();
   const ui = uiCopyByLocale[locale];
   const canonical = getHomePath(locale);
+  const image = getOgImage(locale, ui.metadata.defaultTitle);
 
   return {
     metadataBase: new URL(siteUrl),
@@ -34,20 +50,13 @@ export function getRootMetadata(locale: Locale): Metadata {
       siteName: "Pavan Patil",
       title: ui.metadata.defaultTitle,
       description: ui.metadata.openGraphDescription,
-      images: [
-        {
-          url: "/og.png",
-          width: 1200,
-          height: 630,
-          alt: ui.metadata.defaultTitle,
-        },
-      ],
+      images: [image],
     },
     twitter: {
       card: "summary_large_image",
       title: ui.metadata.defaultTitle,
       description: ui.metadata.twitterDescription,
-      images: ["/og.png"],
+      images: [image.url],
     },
     robots: { index: true, follow: true },
   };
@@ -61,6 +70,7 @@ export function getSetupMetadata(locale: Locale): Metadata {
   const canonical = getSetupPath(locale);
   const description =
     "Pavan Patil's AI-assisted software workflow across planning, implementation, testing, review, automation, and hardware setup.";
+  const image = getOgImage(locale, "Setup and AI Workflow - Pavan Patil");
 
   return {
     title: "Setup and AI Workflow",
@@ -74,20 +84,13 @@ export function getSetupMetadata(locale: Locale): Metadata {
       url: canonical,
       title: "Setup and AI Workflow - Pavan Patil",
       description,
-      images: [
-        {
-          url: "/og.png",
-          width: 1200,
-          height: 630,
-          alt: "Setup and AI Workflow - Pavan Patil",
-        },
-      ],
+      images: [image],
     },
     twitter: {
       card: "summary_large_image",
       title: "Setup and AI Workflow",
       description,
-      images: ["/og.png"],
+      images: [image.url],
     },
   };
 }
