@@ -478,7 +478,8 @@ export function SiteHeader({ copy, locale, themeCopy }: SiteHeaderProps) {
             {isCaseStudy ? (
               <ArrowLeft size={16} strokeWidth={2.2} />
             ) : (
-              <Image src="/icon.svg" alt="" width={30} height={30} unoptimized />
+              // The link's label names it; the alt text is for search engines.
+              <Image src="/icon.svg" alt="志" width={30} height={30} unoptimized />
             )}
           </span>
           <span className="brand-name">Pavan Patil</span>

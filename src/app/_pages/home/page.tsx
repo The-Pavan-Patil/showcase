@@ -142,7 +142,6 @@ export function HomePage({ locale }: { locale: Locale }) {
         <AboutScene
           displayWords={ui.home.aboutDisplay}
           title={ui.home.aboutTitle}
-          muted={ui.home.aboutMuted}
           description={profile.about}
           resumeHref={resumeUrl}
           resumeLabel={ui.home.downloadResume}

@@ -89,7 +89,6 @@ export type UiCopy = {
     clientProjects: string;
     aboutDisplay: [string, string];
     aboutTitle: string;
-    aboutMuted: string;
     beyondCode: string;
     beyondHeading: string;
     personalInterestsAria: string;
@@ -100,7 +99,6 @@ export type UiCopy = {
     }>;
     logoStory: {
       heading: string;
-      reading: string;
       meaning: string;
       reason: string;
     };
@@ -360,8 +358,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologyStackAria: "{name} technology stack",
       clientProjects: "Client projects",
       aboutDisplay: ["About", "Me"],
-      aboutTitle: "Curiosity became craft,",
-      aboutMuted: "and craft became my work.",
+      aboutTitle: "My story",
       beyondCode: "Beyond code",
       beyondHeading: "Discipline, adrenaline, and stillness.",
       personalInterestsAria: "Personal interests",
@@ -383,10 +380,9 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         },
       ],
       logoStory: {
-        heading: "A promise I keep close.",
-        reading: "志 · kokorozashi",
+        heading: "What is this symbol?",
         meaning:
-          "志 is a purpose held in the heart. To me, it begins with the curiosity I felt as a child, wanting to know what was happening beneath a computer screen.",
+          "志 is a kanji, a Japanese character. It means a purpose held in the heart. To me, it begins with the curiosity I felt as a child, wanting to know what was happening beneath a computer screen.",
         reason:
           "I chose it as this site's favicon because it feels like a quiet promise to myself: keep learning, build with care, and finish the difficult work. I want that intention beside my name wherever this portfolio appears.",
       },
@@ -646,8 +642,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologyStackAria: "{name} の技術スタック",
       clientProjects: "クライアント案件",
       aboutDisplay: ["私に", "ついて"],
-      aboutTitle: "好奇心が技術になり、",
-      aboutMuted: "技術が仕事になりました。",
+      aboutTitle: "私のストーリー",
       beyondCode: "コード以外",
       beyondHeading: "規律、刺激、そして落ち着き。",
       personalInterestsAria: "個人的な関心",
@@ -669,8 +664,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         },
       ],
       logoStory: {
-        heading: "この印に込めた思い。",
-        reading: "志 · こころざし",
+        heading: "なぜこの漢字をロゴに？",
         meaning:
           "志は、心に抱く目標や思いを表す漢字です。私にとっては、子どもの頃、コンピューターの画面の向こうで何が起きているのか知りたかった好奇心から始まります。",
         reason:
@@ -931,8 +925,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologyStackAria: "{name} Technologie-Stack",
       clientProjects: "Kundenprojekte",
       aboutDisplay: ["Über", "mich"],
-      aboutTitle: "Neugier wurde Handwerk,",
-      aboutMuted: "und Handwerk wurde meine Arbeit.",
+      aboutTitle: "Meine Geschichte",
       beyondCode: "Neben Code",
       beyondHeading: "Disziplin, Adrenalin und Ruhe.",
       personalInterestsAria: "Persönliche Interessen",
@@ -954,10 +947,9 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         },
       ],
       logoStory: {
-        heading: "Ein Zeichen für meinen Antrieb.",
-        reading: "志 · kokorozashi",
+        heading: "Was bedeutet dieses Zeichen?",
         meaning:
-          "志 steht für ein Ziel, das man im Herzen trägt. Für mich beginnt es mit der Neugier meiner Kindheit: Ich wollte verstehen, was hinter einem Computerbildschirm passiert.",
+          "志 ist ein Kanji, ein japanisches Schriftzeichen. Es steht für ein Ziel, das man im Herzen trägt. Für mich beginnt es mit der Neugier meiner Kindheit: Ich wollte verstehen, was hinter einem Computerbildschirm passiert.",
         reason:
           "Ich habe es als Favicon gewählt, weil es sich wie ein stilles Versprechen an mich selbst anfühlt: weiterlernen, sorgfältig bauen und schwierige Arbeit zu Ende bringen. Diese Haltung soll meinen Namen auf jeder Seite begleiten.",
       },

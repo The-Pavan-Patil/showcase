@@ -7,8 +7,9 @@ export type AboutBeyondNote = {
 };
 
 /**
- * Supporting context for the About section. In the live scene it appears in
- * the card before the logo story; otherwise it follows the card as a strip.
+ * Supporting context for the About section. In the live scene it is the
+ * card's second slide, titled like the first; otherwise it follows the card
+ * as a strip under a small eyebrow.
  */
 export function AboutBeyond({
   ariaLabel,
@@ -23,10 +24,17 @@ export function AboutBeyond({
   notes: readonly AboutBeyondNote[];
   variant?: "card" | "strip";
 }) {
+  const isCard = variant === "card";
   const content = (
     <>
-      <p className="eyebrow">{eyebrow}</p>
-      <h3 className="sr-only">{heading}</h3>
+      {isCard ? (
+        <h3 className="about-card-title">{eyebrow}</h3>
+      ) : (
+        <>
+          <p className="eyebrow">{eyebrow}</p>
+          <h3 className="sr-only">{heading}</h3>
+        </>
+      )}
       <ul className="about-beyond-list" aria-label={ariaLabel}>
         {notes.map((note) => (
           <li className="about-beyond-row" key={note.label}>
@@ -41,7 +49,7 @@ export function AboutBeyond({
     </>
   );
 
-  return variant === "card" ? (
+  return isCard ? (
     <div className="about-beyond about-beyond-in-card">{content}</div>
   ) : (
     <Container className="about-beyond about-beyond-strip">{content}</Container>

@@ -41,7 +41,6 @@ const LOGO_IN = [0.86, 0.94] as const;
 type AboutSceneProps = {
   displayWords: readonly [string, string];
   title: string;
-  muted: string;
   description: string;
   resumeHref: string;
   resumeLabel: string;
@@ -56,7 +55,6 @@ type AboutSceneProps = {
 export function AboutScene({
   displayWords,
   title,
-  muted,
   description,
   resumeHref,
   resumeLabel,
@@ -253,10 +251,7 @@ export function AboutScene({
                 className="about-scene-heading"
                 style={isLive ? { opacity: headingOpacity, y: headingY } : undefined}
               >
-                <h3>
-                  {title}
-                  <span className="about-scene-heading-muted"> {muted}</span>
-                </h3>
+                <h3 className="about-card-title">{title}</h3>
               </motion.div>
               {renderBody(isLive ? { opacity: bodyOpacity, y: bodyY } : undefined)}
             </motion.div>
