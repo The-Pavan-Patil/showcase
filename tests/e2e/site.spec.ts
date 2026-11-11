@@ -723,10 +723,26 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
     })
     .toBeLessThan(2);
 
+  // Contact is the last eyebrow: at the end of the page the dot stays on it
+  // while it is still in view below the header (desktop), and fades once it
+  // has scrolled away (phones, where the footer is taller than the screen).
   await page.evaluate(() => {
     window.scrollTo(0, document.documentElement.scrollHeight);
   });
-  await expect.poll(opacity).toBeLessThan(0.1);
+  const contactSlot = page.locator('[data-scroll-accent-anchor="contact"]');
+  if ((await contactSlot.boundingBox())!.y > 100) {
+    await expect(traveler).toHaveAttribute("data-phase", "heading");
+    await expect.poll(opacity).toBeGreaterThan(0.9);
+    await expect
+      .poll(async () => {
+        const slot = (await contactSlot.boundingBox())!;
+        const dot = await center();
+        return Math.hypot(dot.x - (slot.x + slot.width / 2), dot.y - (slot.y + slot.height / 2));
+      })
+      .toBeLessThan(2);
+  } else {
+    await expect.poll(opacity).toBeLessThan(0.1);
+  }
 });
 
 test("the accent dot rides the page and the pinned Work stage without script frames", async ({ page }, testInfo) => {
@@ -1047,7 +1063,7 @@ test("AI workflow scene types the title, deals the cards, then connects them", a
   const scene = page.locator(".workflow-scene");
   await expect(scene).toHaveAttribute("data-pinned", "");
   await expect(
-    page.getByRole("heading", { level: 2, name: "See how I use AI to speed up development." }),
+    page.getByRole("heading", { level: 2, name: "How I build with AI." }),
   ).toBeAttached();
 
   const chars = page.locator(".workflow-scene-title-char");

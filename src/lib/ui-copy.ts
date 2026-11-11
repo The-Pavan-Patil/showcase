@@ -46,17 +46,14 @@ export type UiCopy = {
     scrollDown: string;
     workEyebrow: string;
     workTitle: string;
-    workMuted: string;
     workDescription: string;
     workCount: string;
     experienceEyebrow: string;
     experienceTitle: string;
-    experienceMuted: string;
     experienceDescription: string;
     aiWorkflow: {
       eyebrow: string;
       title: string;
-      titleMuted: string;
       cta: string;
       /** Accessible name of the home section's list of steps. */
       stepsAria: string;
@@ -285,21 +282,18 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     },
     home: {
       scrollDown: "Scroll down for proof.",
-      workEyebrow: "Selected work",
-      workTitle: "Built for real constraints.",
-      workMuted: "Designed to hold up.",
+      workEyebrow: "Case studies",
+      workTitle: "Proof of work.",
       workDescription:
         "Three products that show how I approach learning systems, synchronization, multilingual experiences, and reliable delivery.",
       workCount: "03 case studies",
       experienceEyebrow: "Experience",
-      experienceTitle: "Product delivery,",
-      experienceMuted: "from interface to infrastructure.",
+      experienceTitle: "Track record.",
       experienceDescription:
         "Experience across client products, internal platforms, cloud operations, and real-time research systems.",
       aiWorkflow: {
         eyebrow: "AI workflow",
-        title: "See how I use AI to speed up",
-        titleMuted: "development.",
+        title: "How I build with AI.",
         cta: "View my full setup",
         stepsAria: "The four steps of my AI workflow",
         steps: [
@@ -414,7 +408,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         characterCount: "{count}/500",
       },
       contactEyebrow: "Contact",
-      contactTitle: "Looking for an engineer who can own the details?",
+      contactTitle: "What needs handling?",
       contactDescription:
         "I’m open to software engineering roles across product, platform, web, and mobile teams.",
       contactScheduleLabel: "Book a 30-minute chat",
@@ -571,21 +565,18 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     },
     home: {
       scrollDown: "スクロールして実績を見る",
-      workEyebrow: "主な実績",
-      workTitle: "現場の制約に向き合って作りました。",
-      workMuted: "長く使えることを大切に。",
+      workEyebrow: "ケーススタディ",
+      workTitle: "仕事で証明。",
       workDescription:
         "学習システム、同期、多言語体験、安定したリリースにどう取り組んだかを示す3つのプロダクトです。",
       workCount: "03 ケーススタディ",
       experienceEyebrow: "経験",
-      experienceTitle: "プロダクト開発を、",
-      experienceMuted: "画面から基盤まで。",
+      experienceTitle: "積み重ねてきた実績。",
       experienceDescription:
         "クライアント向けプロダクト、社内基盤、クラウド運用、リアルタイム研究システムでの経験があります。",
       aiWorkflow: {
         eyebrow: "AIワークフロー",
-        title: "AIで開発をどう",
-        titleMuted: "速くしているか。",
+        title: "AIと進める開発。",
         cta: "セットアップ全体を見る",
         stepsAria: "AIワークフローの4つのステップ",
         steps: [
@@ -700,7 +691,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         characterCount: "{count}/500",
       },
       contactEyebrow: "連絡",
-      contactTitle: "細部まで責任を持てるエンジニアをお探しですか？",
+      contactTitle: "何をお任せいただけますか？",
       contactDescription:
         "プロダクト、プラットフォーム、Web、モバイルのチームで、ソフトウェアエンジニアの仕事を探しています。",
       contactScheduleLabel: "30分のチャットを予約",
@@ -856,21 +847,18 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
     },
     home: {
       scrollDown: "Nach unten scrollen – hier sind die Belege.",
-      workEyebrow: "Ausgewählte Arbeit",
-      workTitle: "Gebaut für reale Anforderungen.",
-      workMuted: "Entwickelt, um stabil zu bleiben.",
+      workEyebrow: "Fallstudien",
+      workTitle: "Belege meiner Arbeit.",
       workDescription:
         "Drei Produkte, die zeigen, wie ich Lernsysteme, Synchronisierung, mehrsprachige Erlebnisse und zuverlässige Lieferung angehe.",
       workCount: "03 Fallstudien",
       experienceEyebrow: "Erfahrung",
-      experienceTitle: "Produktlieferung,",
-      experienceMuted: "von der Oberfläche bis zur Infrastruktur.",
+      experienceTitle: "Mein Werdegang.",
       experienceDescription:
         "Erfahrung mit Kundenprodukten, internen Plattformen, Cloud-Betrieb und Echtzeit-Forschungssystemen.",
       aiWorkflow: {
         eyebrow: "AI-Workflow",
-        title: "So beschleunige ich die",
-        titleMuted: "Entwicklung mit AI.",
+        title: "So entwickle ich mit AI.",
         cta: "Mein vollständiges Setup ansehen",
         stepsAria: "Die vier Schritte meines AI-Workflows",
         steps: [
@@ -985,7 +973,7 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         characterCount: "{count}/500",
       },
       contactEyebrow: "Kontakt",
-      contactTitle: "Suchen Sie einen Entwickler, der Details wirklich übernimmt?",
+      contactTitle: "Was soll ich übernehmen?",
       contactDescription:
         "Ich bin offen für Softwareentwickler-Rollen in Produkt-, Plattform-, Web- und Mobile-Teams.",
       contactScheduleLabel: "30-minütiges Gespräch buchen",

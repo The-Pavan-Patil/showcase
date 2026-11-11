@@ -64,13 +64,6 @@ const CJK = "\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}ー";
 /** A CJK character, a run of anything else that is not a space, or a space. */
 const TITLE_SEGMENT = new RegExp(`[${CJK}]|[^\\s${CJK}]+|\\s+`, "gu");
 const PUNCTUATION = /^\p{P}+$/u;
-const CJK_EDGE = new RegExp(`[${CJK}]`, "u");
-
-/** Joins the title's two halves; CJK runs straight on, without a space. */
-function joinTitle(first: string, second: string) {
-  const isCjkSeam = CJK_EDGE.test(first.at(-1) ?? "") && CJK_EDGE.test(second.at(0) ?? "");
-  return isCjkSeam ? `${first}${second}` : `${first} ${second}`;
-}
 
 /**
  * Words wrap as units (CJK breaks between characters, as it would anyway);
@@ -200,7 +193,7 @@ export function WorkflowScene({
   const entry = useSpring(entryProgress, SPRING);
   const pin = useSpring(pinProgress, SPRING);
 
-  const fullTitle = joinTitle(copy.title, copy.titleMuted);
+  const fullTitle = copy.title;
   const title = useMemo(() => splitTitle(fullTitle), [fullTitle]);
 
   const ctaOpacity = useTransform(pin, [...CTA_BEAT], [0, 1]);

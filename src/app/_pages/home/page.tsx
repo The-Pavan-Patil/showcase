@@ -115,7 +115,6 @@ export function HomePage({ locale }: { locale: Locale }) {
                   eyebrow={ui.home.workEyebrow}
                   accentSpacer
                   title={ui.home.workTitle}
-                  muted={ui.home.workMuted}
                   description={ui.home.workDescription}
                 />
                 <span className="section-count">{ui.home.workCount}</span>
@@ -130,7 +129,6 @@ export function HomePage({ locale }: { locale: Locale }) {
           copy={{
             experienceEyebrow: ui.home.experienceEyebrow,
             experienceTitle: ui.home.experienceTitle,
-            experienceMuted: ui.home.experienceMuted,
             technologyStackAria: ui.home.technologyStackAria,
             clientProjects: ui.home.clientProjects,
           }}
