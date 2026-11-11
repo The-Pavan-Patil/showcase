@@ -3085,7 +3085,9 @@ html[lang="ja"] .hero-copy h1 {
   padding: clamp(1.5rem, 3vw, 2.5rem);
   color: #f5f5f4;
 }
-.about-scene-heading h3 {
+/* Every slide in the About card titles itself the same way, the first
+   slide's style. */
+.about-card-title {
   max-width: 24ch;
   margin: 0;
   color: #fff;
@@ -3096,8 +3098,10 @@ html[lang="ja"] .hero-copy h1 {
   line-height: 1;
   text-transform: uppercase;
 }
-.about-scene-heading-muted {
-  color: inherit;
+/* Japanese titles break between phrases, so a short tail like に？ never
+   sits alone on the second line. */
+html[lang="ja"] .about-card-title {
+  word-break: auto-phrase;
 }
 .about-scene-body p {
   max-width: 46rem;
@@ -3195,8 +3199,7 @@ html[lang="ja"] .hero-copy h1 {
 }
 .about-scene[data-beat] .about-scene-beyond { display: block; }
 .about-scene[data-beat] .about-beyond-strip { display: none; }
-.about-beyond-in-card .eyebrow { color: rgb(255 255 255 / 82%); }
-.about-beyond-in-card .about-beyond-list { margin-top: 1.25rem; }
+.about-beyond-in-card .about-beyond-list { margin-top: 1.4rem; }
 .about-beyond-in-card .about-beyond-keyword {
   color: #fff;
   font-size: clamp(1.75rem, 2.8vw, 2.6rem);
@@ -3207,8 +3210,10 @@ html[lang="ja"] .hero-copy h1 {
   font-size: clamp(0.98rem, 1.15vw, 1.1rem);
 }
 
-/* The favicon's story shares the photo card with About and Beyond code. The
-   same composition follows the strip in the static and short-screen layouts. */
+/* The favicon's story shares the photo card with About and Beyond code, laid
+   out like the first slide: mark, title and copy stacked at the bottom left.
+   The same composition follows the strip in the static and short-screen
+   layouts. */
 .about-scene-logo-beat {
   position: absolute;
   z-index: 3;
@@ -3220,13 +3225,13 @@ html[lang="ja"] .hero-copy h1 {
 }
 .about-logo-story {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  align-items: center;
-  gap: clamp(1.5rem, 3vw, 3rem);
+  align-content: end;
+  justify-items: start;
+  gap: 1.4rem;
   width: 100%;
   height: 100%;
-  padding: clamp(1.5rem, 4vw, 3.25rem);
-  color: var(--brand-white);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  color: #f5f5f4;
 }
 .about-logo-story-after .about-logo-story {
   position: relative;
@@ -3251,42 +3256,27 @@ html[lang="ja"] .hero-copy h1 {
   background: rgb(6 8 10 / 54%);
   content: "";
 }
-.about-logo-story-art {
-  display: grid;
-  min-width: 0;
-  place-items: center;
-}
+/* The glyph sits 14-15% inside its square, so the negative margins line its
+   ink up with the title's left edge and keep the usual gap below it. */
 .about-logo-story-art img {
+  --mark-size: clamp(4.5rem, 7vw, 6.5rem);
   display: block;
-  width: min(100%, 23rem);
+  width: var(--mark-size);
   height: auto;
   aspect-ratio: 1;
+  margin: 0 0 calc(var(--mark-size) * -0.15) calc(var(--mark-size) * -0.14);
 }
+/* The story's paragraphs read like the first slide's. */
 .about-logo-story-copy {
   display: grid;
-  align-content: center;
-  gap: clamp(0.75rem, 1.5svh, 1.125rem);
-  max-width: 34rem;
-}
-.about-logo-story-copy h3 {
-  max-width: 16ch;
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(2rem, 2.8vw, 2.75rem);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  text-transform: uppercase;
+  gap: 1rem;
+  max-width: 46rem;
 }
 .about-logo-story-copy p {
   margin: 0;
-  font-size: clamp(0.9375rem, 1.2vw, 1.125rem);
-  line-height: 1.55;
-}
-.about-logo-story-copy .about-logo-story-reading {
-  color: var(--brand-gray);
-  font-size: 0.875rem;
-  font-weight: 700;
+  color: rgb(255 255 255 / 92%);
+  font-size: clamp(1.05rem, 1.3vw, 1.25rem);
+  line-height: 1.6;
 }
 .about-beyond-list {
   display: grid;
@@ -5801,10 +5791,10 @@ html[lang="ja"] .setup-hero-copy h1 {
   /* The copy, Beyond code, and logo story share the card. Their type follows
      the screen height so short phones fit the whole paragraph. */
   .about-scene-content { gap: clamp(0.625rem, 1.8svh, 1rem); padding: 1.25rem; }
-  .about-scene-heading h3 { font-size: clamp(1.35rem, 4.2svh, 2.1rem); }
+  .about-card-title { font-size: clamp(1.35rem, 4.2svh, 2.1rem); }
   .about-scene-body p { font-size: clamp(0.75rem, 2.2svh, 1rem); line-height: 1.5; }
   .about-scene-beyond { padding: 1.25rem; }
-  .about-beyond-in-card .about-beyond-list { gap: clamp(0.5rem, 1.6svh, 1rem); margin-top: 0.5rem; }
+  .about-beyond-in-card .about-beyond-list { gap: clamp(0.5rem, 1.6svh, 1rem); margin-top: clamp(0.625rem, 1.8svh, 1rem); }
   .about-beyond-in-card .about-beyond-row { padding-top: clamp(0.5rem, 1.4svh, 0.85rem); }
   .about-beyond-in-card .about-beyond-keyword { font-size: clamp(1.25rem, 3.4svh, 1.6rem); }
   .about-beyond-in-card .about-beyond-text { font-size: clamp(0.8125rem, 2.2svh, 0.95rem); line-height: 1.5; }
@@ -5821,17 +5811,11 @@ html[lang="ja"] .setup-hero-copy h1 {
   .about-beyond-keyword { font-size: 1.45rem; }
   .about-beyond-label { margin: 0; justify-self: end; }
   .about-beyond-text { grid-column: 1 / -1; margin-top: 0.5rem; font-size: 0.92rem; }
-  .about-logo-story {
-    grid-template-columns: 1fr;
-    align-content: center;
-    gap: clamp(0.75rem, 2svh, 1.25rem);
-    padding: 1.25rem;
-  }
-  .about-logo-story-art img { width: clamp(7rem, 25svh, 14rem); }
-  .about-logo-story-copy { gap: clamp(0.5rem, 1.1svh, 0.875rem); }
-  .about-logo-story-copy h3 { font-size: clamp(1.5rem, 5.4vw, 2.1rem); }
-  .about-logo-story-copy p { font-size: clamp(0.8125rem, 1.9svh, 1rem); line-height: 1.45; }
-  .about-logo-story-copy .about-logo-story-reading { font-size: 0.8125rem; }
+  /* Spacing and type follow the first slide's phone layout. */
+  .about-logo-story { gap: clamp(0.625rem, 1.8svh, 1rem); padding: 1.25rem; }
+  .about-logo-story-art img { --mark-size: clamp(3.5rem, 8svh, 4.5rem); }
+  .about-logo-story-copy { gap: clamp(0.5rem, 1.4svh, 0.875rem); }
+  .about-logo-story-copy p { font-size: clamp(0.75rem, 2.2svh, 1rem); line-height: 1.5; }
   .about-logo-story-after .about-logo-story {
     min-height: calc(100svh - 7rem - env(safe-area-inset-bottom, 0px));
   }
@@ -6099,9 +6083,6 @@ html[lang="ja"] .setup-hero-copy h1 {
 
 /* Short phones: tighten the homepage sections that otherwise outgrow one
    screen. */
-@media (max-width: 360px) and (max-height: 600px) {
-  .about-logo-story-art img { width: min(21svh, 7.5rem); }
-}
 
 @media (max-width: 760px) and (max-height: 700px) {
   .contact-card { gap: 1rem; padding: 1.25rem; }
@@ -6114,9 +6095,8 @@ html[lang="ja"] .setup-hero-copy h1 {
 
 @media (max-width: 760px) and (max-height: 520px) {
   .about-logo-story { gap: 0.5rem; padding: 1rem; }
-  .about-logo-story-art img { width: 5.5rem; }
+  .about-logo-story-art img { --mark-size: 3rem; }
   .about-logo-story-copy { gap: 0.4rem; }
-  .about-logo-story-copy h3 { font-size: 1.375rem; }
   .about-logo-story-after { padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
 }
 

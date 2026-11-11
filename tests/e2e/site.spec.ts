@@ -937,6 +937,16 @@ test("about scene parts the title and reveals the profile copy on scroll", async
     await expect(page.locator(".about-scene-logo-beat .about-logo-story")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
     await expect(page.locator(".about-scene-logo-beat")).toContainText("favicon");
     await expect(page.locator(".about-scene-logo-beat img")).toHaveAttribute("src", "/images/brand/shi-glyph.svg");
+
+    // All three slides title themselves like the first: same type, same left edge.
+    const titleOf = (selector: string) =>
+      page.locator(selector).evaluate((element) => {
+        const style = getComputedStyle(element);
+        return [style.fontFamily, style.fontSize, style.textTransform, Math.round(element.getBoundingClientRect().left)];
+      });
+    const firstTitle = await titleOf(".about-scene-content .about-card-title");
+    expect(await titleOf(".about-scene-beyond .about-card-title")).toEqual(firstTitle);
+    expect(await titleOf(".about-scene-logo-beat .about-card-title")).toEqual(firstTitle);
   } else {
     await expect(page.locator(".about-beyond-strip .about-beyond-keyword").first()).toBeVisible();
     await expect(page.locator(".about-logo-story-after")).toContainText("favicon");
@@ -989,17 +999,17 @@ test("the logo story grows with its copy on a short phone", async ({ page }, tes
   await page.setViewportSize({ width: 320, height: 480 });
   await page.goto("/");
 
+  await expect(page.locator("#about")).toHaveAttribute("data-live", "");
   await expect(page.locator("#about")).not.toHaveAttribute("data-beat", "");
   const card = page.locator(".about-logo-story-after .about-logo-story");
-  const copy = card.locator(".about-logo-story-copy");
-  await expect(copy).toContainText("favicon");
-  const cardBounds = await card.boundingBox();
-  const copyBounds = await copy.boundingBox();
-  expect(cardBounds).not.toBeNull();
-  expect(copyBounds).not.toBeNull();
-  expect(copyBounds!.y + copyBounds!.height).toBeLessThanOrEqual(
-    cardBounds!.y + cardBounds!.height - 16,
-  );
+  await expect(card.locator(".about-logo-story-copy")).toContainText("favicon");
+  // Both edges in one pass: the sections above can still settle between two
+  // separate measurements.
+  const [cardBottom, copyBottom] = await card.evaluate((element) => [
+    element.getBoundingClientRect().bottom,
+    element.querySelector(".about-logo-story-copy")!.getBoundingClientRect().bottom,
+  ]);
+  expect(copyBottom).toBeLessThanOrEqual(cardBottom - 16);
 });
 
 test("the hero and the pinned AI workflow stage each fill one screen", async ({ page }, testInfo) => {
