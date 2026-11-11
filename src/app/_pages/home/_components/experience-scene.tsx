@@ -101,7 +101,6 @@ type ExperienceSceneProps = {
     UiCopy["home"],
     | "experienceEyebrow"
     | "experienceTitle"
-    | "experienceMuted"
     | "technologyStackAria"
     | "clientProjects"
   >;
@@ -402,7 +401,6 @@ export function ExperienceScene({ copy, experience }: ExperienceSceneProps) {
                   accentAnchor={isLive ? undefined : "experience"}
                   accentSpacer={isLive}
                   title={copy.experienceTitle}
-                  muted={copy.experienceMuted}
                 />
                 {isLive ? (
                   <p className="experience-counter" aria-hidden="true">
