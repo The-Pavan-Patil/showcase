@@ -640,13 +640,13 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
   await activate("work");
   await expect(traveler).toHaveAttribute("data-phase", "heading");
 
-  // While Selected Work is pinned, the dot stays on its eyebrow.
+  // As Selected Work pins, its heading slides up at the page's speed, and
+  // the dot rides the eyebrow up with it...
   await page.locator(".work-stack").evaluate((track) => {
-    const bounds = track.getBoundingClientRect();
-    window.scrollTo(0, bounds.top + window.scrollY + (bounds.height - window.innerHeight) / 2);
+    window.scrollTo(0, track.getBoundingClientRect().top + window.scrollY + 8);
   });
   await expect(traveler).toHaveAttribute("data-active-anchor", "work");
-  const eyebrowSlot = page.locator(".work-stack-stage .scroll-accent-heading-target");
+  const eyebrowSlot = page.locator(".work-stack-head .scroll-accent-heading-target");
   await expect
     .poll(async () => {
       const slot = (await eyebrowSlot.boundingBox())!;
@@ -654,6 +654,14 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
       return Math.hypot(dot.x - (slot.x + slot.width / 2), dot.y - (slot.y + slot.height / 2));
     })
     .toBeLessThan(2);
+
+  // ...then hides while the cards play.
+  await page.locator(".work-stack").evaluate((track) => {
+    const bounds = track.getBoundingClientRect();
+    window.scrollTo(0, bounds.top + window.scrollY + (bounds.height - window.innerHeight) / 2);
+  });
+  await expect(traveler).toHaveAttribute("data-phase", "hidden");
+  await expect.poll(opacity).toBeLessThan(0.1);
 
   await activate("experience");
   await expect(traveler).toHaveAttribute("data-phase", "heading");
@@ -782,17 +790,18 @@ test("the accent dot rides the page and the pinned Work stage without script fra
   );
   expect(moved).toBeCloseTo(-60, 0);
 
-  // Landed, it pins with the stage: no overshoot past the pinned eyebrow.
+  // Landed, it stays docked as the Work stage pins: its heading slides away
+  // at the page's speed, so the dot moves with the page, in the same frame.
   await expect(traveler).toHaveAttribute("data-landed", "true");
-  const gap = await page.locator(".work-stack-stage").evaluate((stage, source) => {
+  const pinnedMove = await page.locator(".work-stack").evaluate((track, source) => {
     const measure = new Function(`return (${source})`)() as (element: Element) => number;
-    const slot = stage.querySelector(".scroll-accent-heading-target")!;
     const dot = document.querySelector(".scroll-accent-traveler")!;
-    const from = stage.parentElement!.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo(0, from + 300);
-    return Math.abs(measure(dot) - measure(slot));
+    window.scrollTo(0, track.getBoundingClientRect().top + window.scrollY);
+    const before = measure(dot);
+    window.scrollBy(0, 12);
+    return measure(dot) - before;
   }, centreY.toString());
-  expect(gap).toBeLessThan(2);
+  expect(pinnedMove).toBeCloseTo(-12, 0);
 });
 
 test("the accent dot snaps between anchors with reduced motion", async ({ page }, testInfo) => {
@@ -1358,7 +1367,7 @@ async function scrollWorkStackTo(page: import("@playwright/test").Page, progress
 }
 
 // Mirrors resolveProgressForIndex in work-stack-timeline.ts for 3 cards.
-const stackFrontProgress = (index: number) => (index + 0.25) / (2 + 0.25 + 0.75);
+const stackFrontProgress = (index: number) => (index + 0.3) / (2 + 0.3 + 0.7);
 
 test("selected work lifts each case-study card off the stack on scroll", async ({ page }, testInfo) => {
   test.skip(!["chromium", "mobile-chromium", "mobile-webkit"].includes(testInfo.project.name));
@@ -1370,6 +1379,14 @@ test("selected work lifts each case-study card off the stack on scroll", async (
   await expect(track).toHaveAttribute("data-live", "");
   const cards = page.locator(".work-card");
   await expect(cards).toHaveCount(3);
+
+  // As the stage pins, the heading sits above the deck...
+  const headBottom = () =>
+    page.locator(".work-stack-head").evaluate((element) => element.getBoundingClientRect().bottom);
+  await scrollWorkStackTo(page, 0);
+  await expect
+    .poll(async () => (await cards.nth(0).boundingBox())!.y - (await headBottom()))
+    .toBeGreaterThan(0);
 
   // A card's box on screen, and its unscaled width.
   const box = (index: number) =>
@@ -1384,6 +1401,9 @@ test("selected work lifts each case-study card off the stack on scroll", async (
     await expect(page.locator(".work-stack-counter")).toContainText(`0${index + 1}`);
     // The stage stays pinned to the viewport while the cards move.
     expect(await page.locator(".work-stack-stage").evaluate((element) => element.getBoundingClientRect().top)).toBeCloseTo(0, 0);
+
+    // ...and has slid away before the first card leaves, so none crosses it.
+    await expect.poll(headBottom).toBeLessThanOrEqual(0);
 
     // In front, the card is flat and full size, on screen, and takes the pointer.
     await expect.poll(async () => {

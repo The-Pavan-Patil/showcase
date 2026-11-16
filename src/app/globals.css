@@ -1490,12 +1490,6 @@ html[lang="ja"] .hero-copy h1 {
 .work-stack-stage {
   padding: var(--work-stage-pad-top) 0 6rem;
 }
-.work-stack-head {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 2rem;
-}
 .work-stack-lane {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1580,6 +1574,7 @@ html[lang="ja"] .hero-copy h1 {
   font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1.1;
+  text-wrap: balance;
 }
 .work-card-kicker {
   margin: 0.45rem 0 0;
@@ -1636,13 +1631,24 @@ html[lang="ja"] .hero-copy h1 {
 
 /* Live: the stage pins for --stack-screens screens of scroll, the span of
    the --work-stack timeline (inset 0: the default inset is the page's
-   scroll-padding). */
+   scroll-padding). As it pins, the heading slides up and away at the
+   page's speed and the deck rises to the middle; then the cards leave. */
 .work-stack[data-live] {
   /* Scale each card loses per place back in the stack, and how far it shows
      below the card in front of it. */
   --stack-step: 0.09;
   --stack-peek: 0.9rem;
   --stack-room: calc(var(--stack-peek) * (var(--stack-count) - 1));
+  /* Room under the stack for the counter. */
+  --stack-counter-room: 2.25rem;
+  /* The front card's size (cq units resolve against the deck). Wider
+     screens: landscape, at most 60rem wide. */
+  --stack-card-w: min(
+    100cqw - 2 * var(--page-gutter),
+    60rem,
+    (100cqh - var(--stack-room) - var(--stack-counter-room)) * 2
+  );
+  --stack-card-h: calc(var(--stack-card-w) / 2);
   /* How far a leaving card tips back. */
   --stack-tilt: 42deg;
   --stack-perspective: 1100px;
@@ -1659,36 +1665,73 @@ html[lang="ja"] .hero-copy h1 {
   overflow: hidden;
   padding-bottom: 1.5rem;
 }
+/* The heading, as in the AI workflow scene: the eyebrow top left and the
+   title centred, a size smaller. It moves up exactly as far as the page
+   scrolls over the same stretch, so it reads as scrolling away while the
+   deck stays. */
 .work-stack[data-live] .work-stack-head {
   position: relative;
   z-index: 1;
+  animation: work-stack-head-slide linear both;
+  animation-timeline: --work-stack;
+  animation-range: contain 0px contain var(--stack-head-slide);
+}
+.work-stack[data-live] .section-header-row {
+  display: block;
+}
+.work-stack[data-live] .section-heading {
+  max-width: none;
 }
 .work-stack[data-live] .section-description,
 .work-stack[data-live] .section-count {
   display: none;
 }
 .work-stack[data-live] .section-heading h2 {
-  font-size: var(--title-stage);
+  margin-top: clamp(0.75rem, 2svh, 1.25rem);
+  font-size: clamp(1.75rem, min(3.2vw, 5.6svh), 2.75rem);
+  text-align: center;
+  text-wrap: balance;
 }
-/* Every card is centred in the lane, above the room the edges behind it
-   peek into. A leaving card passes over the heading on its way out. */
-.work-stack[data-live] .work-stack-lane {
+/* The deck: the cards, the edges of those behind peeking out, and the
+   counter. It rises by --stack-deck-rise (half the heading's height, set by
+   work-stack.tsx) while the heading leaves, so it ends mid-screen. */
+.work-stack[data-live] .work-stack-deck {
   position: relative;
   z-index: 2;
   flex: 1;
+  min-height: 0;
+  margin-top: clamp(1.25rem, 3svh, 2rem);
+  container-type: size;
+  animation: work-stack-deck-rise linear both;
+  animation-timeline: --work-stack;
+  animation-range: contain 0px contain var(--stack-head-slide);
+}
+.work-stack[data-live] .work-stack-lane {
+  position: absolute;
+  inset: 0;
   display: block;
   width: auto;
-  min-height: 0;
-  margin: 2rem 0 0;
-  container-type: size;
+  margin: 0;
 }
 .work-stack[data-live] .work-stack-slot {
   position: absolute;
-  inset: 0 0 var(--stack-room);
+  inset: 0 0 calc(var(--stack-room) + var(--stack-counter-room));
   z-index: calc(var(--stack-count) - var(--stack-index));
   display: grid;
   place-items: center;
   pointer-events: none;
+}
+/* Just under the edges peeking out below the front card. */
+.work-stack[data-live] .work-stack-counter {
+  position: absolute;
+  top: calc(
+    (100% - var(--stack-room) - var(--stack-counter-room) + var(--stack-card-h)) / 2 +
+      var(--stack-room) + 0.75rem
+  );
+  right: 0;
+  left: 0;
+  font-size: 0.875rem;
+  text-align: center;
 }
 .work-stack[data-live] .work-stack-lift,
 .work-stack[data-live] .work-card {
@@ -1698,9 +1741,9 @@ html[lang="ja"] .hero-copy h1 {
 .work-stack[data-live] .work-stack-slot[data-front] .work-card {
   pointer-events: auto;
 }
-/* Phones: the portrait card. */
 .work-stack[data-live] .work-card {
-  height: min(100cqh - var(--stack-room), 42rem, (100cqw - 3rem) * 1.25);
+  width: var(--stack-card-w);
+  height: var(--stack-card-h);
   box-shadow: 0 -1px 0 rgb(255 255 255 / 6%) inset;
   animation: work-stack-advance linear both;
   animation-timeline: --work-stack;
@@ -1718,9 +1761,7 @@ html[lang="ja"] .hero-copy h1 {
     --card-pad: clamp(1.75rem, 2.8vw, 2.75rem);
     grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
     grid-template-rows: minmax(0, 1fr) auto;
-    width: min(100cqw - 2 * var(--page-gutter), 70rem, (100cqh - var(--stack-room)) * 2);
-    height: auto;
-    aspect-ratio: 2 / 1;
+    aspect-ratio: auto;
   }
   .work-stack[data-live] .work-card-head {
     grid-row: 1;
@@ -1728,7 +1769,7 @@ html[lang="ja"] .hero-copy h1 {
     padding-right: 0;
   }
   .work-stack[data-live] .work-card-title {
-    font-size: clamp(1.75rem, 2.9vw, 2.85rem);
+    font-size: clamp(1.6rem, 2.5vw, 2.5rem);
   }
   .work-stack[data-live] .work-card-kicker {
     margin-top: 0.6rem;
@@ -1771,6 +1812,18 @@ html[lang="ja"] .hero-copy h1 {
   to {
     transform: translateY(calc(var(--stack-depth-to) * var(--stack-peek)))
       scale(calc(1 - var(--stack-depth-to) * var(--stack-step)));
+  }
+}
+/* The heading slides away by --stack-head-slide over a pinned stretch just
+   as long, so at the page's speed; the deck rises meanwhile. */
+@keyframes work-stack-head-slide {
+  to {
+    transform: translateY(calc(-1 * var(--stack-head-slide)));
+  }
+}
+@keyframes work-stack-deck-rise {
+  to {
+    transform: translateY(calc(-1 * var(--stack-deck-rise, 0px)));
   }
 }
 /* Leaving: one screen up, at about the speed of the page, tipping back. */
@@ -5844,6 +5897,13 @@ html[lang="ja"] .setup-hero-copy h1 {
   .work-stack[data-live] {
     --stack-step: 0.06;
     --stack-peek: 0.6rem;
+    /* The portrait card. */
+    --stack-card-h: min(
+      100cqh - var(--stack-room) - var(--stack-counter-room),
+      36rem,
+      (100cqw - 4rem) * 1.25
+    );
+    --stack-card-w: calc(var(--stack-card-h) * 0.8);
   }
   /* Phones have no top header but a bottom navigation bar. */
   .work-stack[data-live] .work-stack-stage {

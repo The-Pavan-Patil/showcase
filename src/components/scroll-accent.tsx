@@ -372,13 +372,11 @@ function buildHomeStops(floatLine: number): ScrollAccentStop[] | null {
   if (!hero || !work || !workflow || !message || !experienceSection || !main) return null;
 
   const stops: ScrollAccentStop[] = [hero];
-  stops.push(
-    stickyStopFrom(
-      work,
-      work.closest(".work-stack")?.querySelector<HTMLElement>(".work-stack-stage") ?? null,
-      sectionEntry(work),
-    ),
-  );
+  // As the work stage pins, its heading slides away at the page's speed, so
+  // the dot rides the eyebrow like any other, and hides once it has gone
+  // under the header while the cards play.
+  const workStop = stopFrom(work, sectionEntry(work));
+  stops.push(workStop, hiddenStop("work-hidden", workStop.y - floatLine));
   // The pinned scene has no eyebrow of its own on the timeline; the static
   // one does.
   if (experience) {

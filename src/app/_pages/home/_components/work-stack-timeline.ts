@@ -14,10 +14,11 @@
  * Screens of scroll, once pinned, before the first card starts to leave, and
  * that the last card rests in front before the stage unpins. Together they
  * make one screen, so the track stays a whole number of screens tall and
- * the sections after it start on the same pixel rows as before.
+ * the sections after it start on the same pixel rows as before. Over the
+ * first hold the heading slides up and away at the page's speed.
  */
-export const STACK_HOLD_START = 0.25;
-export const STACK_HOLD_END = 0.75;
+export const STACK_HOLD_START = 0.3;
+export const STACK_HOLD_END = 0.7;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -55,13 +56,16 @@ function percent(share: number) {
 }
 
 /**
- * Custom properties for the track: how long the stage pins, and the part of
- * it over which the cards move up through the stack.
+ * Custom properties for the track: how long the stage pins, how far the
+ * heading slides away as it pins (as far as the page scrolls meanwhile, so
+ * at its speed), and the part of the pin over which the cards move up
+ * through the stack.
  */
 export function resolveStackStyle(count: number) {
   return {
     "--stack-count": count,
     "--stack-screens": resolveStackScreens(count),
+    "--stack-head-slide": `${Number((STACK_HOLD_START * 100).toFixed(4))}svh`,
     "--stack-travel-start": percent(resolveProgressForPosition(0, count)),
     "--stack-travel-end": percent(
       resolveProgressForPosition(Math.max(count - 1, 0), count),

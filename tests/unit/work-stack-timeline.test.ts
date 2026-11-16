@@ -47,8 +47,9 @@ describe("work stack timeline", () => {
     expect(resolveStackStyle(3)).toEqual({
       "--stack-count": 3,
       "--stack-screens": 3,
-      "--stack-travel-start": "8.3333%",
-      "--stack-travel-end": "75%",
+      "--stack-head-slide": "30svh",
+      "--stack-travel-start": "10%",
+      "--stack-travel-end": "76.6667%",
     });
   });
 
@@ -56,13 +57,13 @@ describe("work stack timeline", () => {
     expect(resolveCardStyle(0, 3)).toEqual({
       "--stack-index": 0,
       "--stack-depth-to": -2,
-      "--stack-leave-start": "8.3333%",
-      "--stack-leave-end": "41.6667%",
+      "--stack-leave-start": "10%",
+      "--stack-leave-end": "43.3333%",
     });
     expect(resolveCardStyle(1, 3)).toMatchObject({
       "--stack-depth-to": -1,
-      "--stack-leave-start": "41.6667%",
-      "--stack-leave-end": "75%",
+      "--stack-leave-start": "43.3333%",
+      "--stack-leave-end": "76.6667%",
     });
     // The last card ends in front and never leaves.
     expect(resolveCardStyle(2, 3)).toMatchObject({ "--stack-depth-to": 0 });
