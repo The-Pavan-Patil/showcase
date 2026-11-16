@@ -22,43 +22,6 @@ export function whenVisitorEngages(): Promise<void> {
   });
 }
 
-/**
- * Resolves once the visitor has engaged and then paused: `quiet` ms with no
- * scrolling, or `maxWait` ms after engaging, whichever is first. For heavy
- * setup that would otherwise freeze the first scroll; `maxWait` keeps a
- * visitor who never stops scrolling from never getting it.
- */
-export function whenVisitorPauses({
-  quiet = 700,
-  maxWait = Infinity,
-}: { quiet?: number; maxWait?: number } = {}): Promise<void> {
-  return whenVisitorEngages().then(
-    () =>
-      new Promise((resolve) => {
-        let timer = 0;
-        const deadline = Number.isFinite(maxWait)
-          ? window.setTimeout(() => done(), maxWait)
-          : 0;
-        const wait = () => {
-          window.clearTimeout(timer);
-          timer = window.setTimeout(done, quiet);
-        };
-        const done = () => {
-          window.clearTimeout(timer);
-          window.clearTimeout(deadline);
-          ENGAGEMENT_EVENTS.forEach((type) =>
-            window.removeEventListener(type, wait, LISTENER_OPTIONS),
-          );
-          resolve();
-        };
-        ENGAGEMENT_EVENTS.forEach((type) =>
-          window.addEventListener(type, wait, LISTENER_OPTIONS),
-        );
-        wait();
-      }),
-  );
-}
-
 /** Resolves once the page has loaded and the main thread is idle. */
 export function whenPageIdle({ timeout = 3000 }: { timeout?: number } = {}): Promise<void> {
   return new Promise((resolve) => {

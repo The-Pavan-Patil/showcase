@@ -23,7 +23,7 @@ import { clamp } from "@/lib/utils";
  * target's stage, so the browser scrolls and pins the dot itself; script
  * only writes the flight's offset from the pin. A fixed dot placed from
  * script trails a compositor scroll, and freezes outright while the main
- * thread is busy (three.js building the dust cards on the first scroll
+ * thread is busy (as when heavy scene setup lands on the first scroll
  * down), which on phones made it shake and jump. Floating under the header,
  * or on a target that script moves, it is fixed and placed per frame.
  */
@@ -372,13 +372,11 @@ function buildHomeStops(floatLine: number): ScrollAccentStop[] | null {
   if (!hero || !work || !workflow || !message || !experienceSection || !main) return null;
 
   const stops: ScrollAccentStop[] = [hero];
-  stops.push(
-    stickyStopFrom(
-      work,
-      work.closest(".dust-track")?.querySelector<HTMLElement>(".dust-stage") ?? null,
-      sectionEntry(work),
-    ),
-  );
+  // As the work stage pins, its heading slides away at the page's speed, so
+  // the dot rides the eyebrow like any other, and hides once it has gone
+  // under the header while the cards play.
+  const workStop = stopFrom(work, sectionEntry(work));
+  stops.push(workStop, hiddenStop("work-hidden", workStop.y - floatLine));
   // The pinned scene has no eyebrow of its own on the timeline; the static
   // one does.
   if (experience) {

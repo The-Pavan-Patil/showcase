@@ -5,7 +5,7 @@ import { JsonLd } from "@/components/json-ld";
 import { AboutScene } from "./_components/about-scene";
 import { ExperienceScene } from "./_components/experience-scene";
 import { HeroSection } from "./_components/hero-section";
-import { ProjectDust } from "./_components/project-dust";
+import { WorkStack } from "./_components/work-stack";
 import { WorkflowScene } from "./_components/workflow-scene";
 import { QuickMessageSection } from "@/components/quick-message-section";
 import { ScrollAccent } from "@/components/scroll-accent";
@@ -106,7 +106,7 @@ export function HomePage({ locale }: { locale: Locale }) {
         />
 
         <section className="work-section" id="work" aria-labelledby="work-heading">
-          <ProjectDust
+          <WorkStack
             copy={ui.projectCard}
             heading={
               <div className="section-header-row">
