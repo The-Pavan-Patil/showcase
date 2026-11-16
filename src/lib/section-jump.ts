@@ -4,8 +4,8 @@ import { clamp } from "@/lib/utils";
 
 /**
  * Header jumps between homepage sections. Scrolling smoothly to a section
- * would play every scroll scene on the way (the dust gathers, the accent dot
- * tours the timeline), so instead the page dips out, moves in one step to
+ * would play every scroll scene on the way (the work cards fly off, the accent
+ * dot tours the timeline), so instead the page dips out, moves in one step to
  * where the section's scene starts, and fades back in. Scenes that smooth
  * the scroll with a spring snap it on landing, so nothing animates until the
  * visitor scrolls again.

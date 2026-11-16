@@ -641,12 +641,12 @@ test("the single accent dot follows headings and Experience timeline nodes", asy
   await expect(traveler).toHaveAttribute("data-phase", "heading");
 
   // While Selected Work is pinned, the dot stays on its eyebrow.
-  await page.locator(".dust-track").evaluate((track) => {
+  await page.locator(".work-stack").evaluate((track) => {
     const bounds = track.getBoundingClientRect();
     window.scrollTo(0, bounds.top + window.scrollY + (bounds.height - window.innerHeight) / 2);
   });
   await expect(traveler).toHaveAttribute("data-active-anchor", "work");
-  const eyebrowSlot = page.locator(".dust-stage .scroll-accent-heading-target");
+  const eyebrowSlot = page.locator(".work-stack-stage .scroll-accent-heading-target");
   await expect
     .poll(async () => {
       const slot = (await eyebrowSlot.boundingBox())!;
@@ -758,7 +758,7 @@ test("the accent dot rides the page and the pinned Work stage without script fra
 
   // Each check scrolls and reads positions in one task, so no animation
   // frame runs in between: what it sees is what the browser alone does,
-  // as when the main thread is busy (three.js building the dust cards).
+  // as when the main thread is busy.
   const centreY = (element: Element) => {
     const bounds = element.getBoundingClientRect();
     return bounds.top + bounds.height / 2;
@@ -784,7 +784,7 @@ test("the accent dot rides the page and the pinned Work stage without script fra
 
   // Landed, it pins with the stage: no overshoot past the pinned eyebrow.
   await expect(traveler).toHaveAttribute("data-landed", "true");
-  const gap = await page.locator(".dust-stage").evaluate((stage, source) => {
+  const gap = await page.locator(".work-stack-stage").evaluate((stage, source) => {
     const measure = new Function(`return (${source})`)() as (element: Element) => number;
     const slot = stage.querySelector(".scroll-accent-heading-target")!;
     const dot = document.querySelector(".scroll-accent-traveler")!;
@@ -1347,48 +1347,66 @@ test("experience shows the plain timeline with reduced motion", async ({ page },
   await expect(page.locator(".client-project-item").first()).toBeVisible();
 });
 
-async function scrollWorkDustTo(page: import("@playwright/test").Page, progress: number) {
+async function scrollWorkStackTo(page: import("@playwright/test").Page, progress: number) {
   await page.evaluate((target) => {
-    const track = document.querySelector<HTMLElement>(".dust-track");
-    if (!track) throw new Error("Work dust track is missing");
+    const track = document.querySelector<HTMLElement>(".work-stack");
+    if (!track) throw new Error("Work stack track is missing");
     const bounds = track.getBoundingClientRect();
     const top = bounds.top + window.scrollY + (bounds.height - window.innerHeight) * target;
     window.scrollTo({ top, behavior: "instant" });
   }, progress);
 }
 
-// Mirrors resolveProgressForIndex in project-dust-timeline.ts for 3 cards.
-const dustRestProgress = (index: number) => (index + 0.3) / (2 + 0.3 * 2);
+// Mirrors resolveProgressForIndex in work-stack-timeline.ts for 3 cards.
+const stackFrontProgress = (index: number) => (index + 0.25) / (2 + 0.25 + 0.75);
 
-test("selected work carries portrait cards through the dust lane on scroll", async ({ page }, testInfo) => {
-  test.skip(!["chromium", "mobile-chromium"].includes(testInfo.project.name));
+test("selected work lifts each case-study card off the stack on scroll", async ({ page }, testInfo) => {
+  test.skip(!["chromium", "mobile-chromium", "mobile-webkit"].includes(testInfo.project.name));
 
   await page.goto("/");
+  await expect(page.locator("#about")).toHaveAttribute("data-live", "");
 
-  const track = page.locator(".dust-track");
+  const track = page.locator(".work-stack");
   await expect(track).toHaveAttribute("data-live", "");
-  const cards = page.locator(".dust-card");
+  const cards = page.locator(".work-card");
   await expect(cards).toHaveCount(3);
-  await expect(page.locator(".dust-canvas")).toHaveCount(1);
 
-  // Distance of a card's centre from the lane's centre.
-  const offCentre = (index: number) =>
+  // A card's box on screen, and its unscaled width.
+  const box = (index: number) =>
     page.evaluate((cardIndex) => {
-      const lane = document.querySelector<HTMLElement>(".dust-lane")!.getBoundingClientRect();
-      const card = document.querySelectorAll<HTMLElement>(".dust-card")[cardIndex]!.getBoundingClientRect();
-      return card.left + card.width / 2 - (lane.left + lane.width / 2);
+      const card = document.querySelectorAll<HTMLElement>(".work-card")[cardIndex]!;
+      const { top, bottom, width } = card.getBoundingClientRect();
+      return { top, bottom, width, layoutWidth: card.offsetWidth };
     }, index);
 
   for (const index of [0, 1, 2]) {
-    await scrollWorkDustTo(page, dustRestProgress(index));
-    await expect.poll(() => offCentre(index)).toBeCloseTo(0, 0);
-    await expect(page.locator(".dust-counter")).toContainText(`0${index + 1}`);
-    // The stage stays pinned to the viewport while the cards travel.
-    expect(await page.locator(".dust-stage").evaluate((element) => element.getBoundingClientRect().top)).toBeCloseTo(0, 0);
+    await scrollWorkStackTo(page, stackFrontProgress(index));
+    await expect(page.locator(".work-stack-counter")).toContainText(`0${index + 1}`);
+    // The stage stays pinned to the viewport while the cards move.
+    expect(await page.locator(".work-stack-stage").evaluate((element) => element.getBoundingClientRect().top)).toBeCloseTo(0, 0);
+
+    // In front, the card is flat and full size, on screen, and takes the pointer.
+    await expect.poll(async () => {
+      const front = await box(index);
+      return Math.abs(front.width - front.layoutWidth);
+    }).toBeLessThan(1);
+    expect((await box(index)).top).toBeGreaterThan(0);
+    await expect(page.locator(".work-stack-slot").nth(index)).toHaveAttribute("data-front", "");
+
+    // The next card waits behind it: smaller, its edge showing below.
+    if (index < 2) {
+      const front = await box(index);
+      const behind = await box(index + 1);
+      expect(behind.width).toBeLessThan(front.width);
+      expect(behind.bottom).toBeGreaterThan(front.bottom);
+      await expect(page.locator(".work-stack-slot").nth(index + 1)).not.toHaveAttribute("data-front", "");
+    }
+    // The cards before it have risen off the top.
+    if (index > 0) {
+      await expect.poll(async () => (await box(index - 1)).bottom).toBeLessThan(0);
+    }
   }
 
-  // Earlier cards have moved off to the left, the way they left.
-  expect(await offCentre(0)).toBeLessThan(0);
   await expect(cards.nth(0).locator('a[href="/work/nudge"]')).toHaveCount(1);
   await expect(cards.nth(1).locator('a[href="/work/philips-greenheart"]')).toHaveCount(1);
   await expect(cards.nth(2).getByRole("link", { name: /Read the Mainichi koto/ })).toBeVisible();
@@ -1400,11 +1418,10 @@ test("selected work shows a plain row of portrait cards with reduced motion", as
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
 
-  await expect(page.locator(".dust-track")).not.toHaveAttribute("data-live", "");
-  await expect(page.locator(".dust-stage")).toHaveCSS("position", "static");
-  await expect(page.locator(".dust-canvas")).toHaveCount(0);
+  await expect(page.locator(".work-stack")).not.toHaveAttribute("data-live", "");
+  await expect(page.locator(".work-stack-stage")).toHaveCSS("position", "static");
   for (const index of [0, 1, 2]) {
-    const card = page.locator(".dust-card").nth(index);
+    const card = page.locator(".work-card").nth(index);
     await expect(card).toHaveCSS("transform", "none");
     await expect(card.getByRole("link")).toBeVisible();
   }

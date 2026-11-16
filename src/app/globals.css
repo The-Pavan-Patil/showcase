@@ -143,7 +143,7 @@ html[lang="ja"] body {
   font-family: var(--font-jp), var(--font-sans);
 }
 
-html[lang="ja"] :where(h1, h2, h3, h4, .brand-link, .section-heading, .dust-card-title, .case-section-body h2, .next-project-copy h2) {
+html[lang="ja"] :where(h1, h2, h3, h4, .brand-link, .section-heading, .work-card-title, .case-section-body h2, .next-project-copy h2) {
   font-family: var(--font-jp), var(--font-display);
 }
 
@@ -1464,36 +1464,39 @@ html[lang="ja"] .hero-copy h1 {
   white-space: nowrap;
 }
 
-/* Selected work: a pinned full-screen lane of portrait cards. Scrolling
-   moves them right to left; past the dust lines a card exists only as
-   particles (WebGL, see dust-field.ts) and the solid card is clipped there.
-   Without `data-live` (server render, no script, reduced motion) the same
-   cards sit in a plain row. */
+/* Selected work: a pinned stack of case-study cards. The front card rises
+   off the top, tipping back, while every card behind it moves up a place,
+   so the next one is flat and full size as the last one clears. The cards
+   move on scroll-driven CSS animations, so the browser places them with the
+   scroll and no script runs per frame; where each animation starts and ends
+   comes from work-stack-timeline.ts. Without `data-live` (server render, no
+   script, reduced motion, or no scroll timelines) the same cards sit in a
+   plain row. */
 .work-section {
   --work-stage-pad-top: 6.5rem;
   position: relative;
   scroll-margin-top: 0;
 }
-.dust-track {
+.work-stack {
   position: relative;
 }
-.dust-anchor-layer {
+.work-stack-anchor-layer {
   position: absolute;
   top: calc(var(--work-stage-pad-top) + 0.275rem);
   right: 0;
   left: 0;
   pointer-events: none;
 }
-.dust-stage {
+.work-stack-stage {
   padding: var(--work-stage-pad-top) 0 6rem;
 }
-.dust-head {
+.work-stack-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 2rem;
 }
-.dust-lane {
+.work-stack-lane {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
@@ -1503,20 +1506,19 @@ html[lang="ja"] .hero-copy h1 {
   list-style: none;
 }
 /* Each card wears its project's colours (--card-*, set from the project
-   data); the screenshot sits in a framed window in the middle. The same
-   layers are redrawn on the canvas in dust-field.ts, so keep them in step. */
+   data); the screenshot sits in a framed window on it. */
 /* Matte finish: deep ink palettes (see ProjectCardPalette) whose glow and
    deep tones sit close to the base and are mixed back towards it, so the
    card reads as flat pigment rather than a lit surface. A fine 1-device-px
    grain (256px tile at 128px, 3.5% alpha) sits over it, the top and bottom
-   scrims are light, and the screenshot frame casts a short, soft shadow.
-   dust-field.ts reads the same --card-matte-* values and mirrors the rest. */
-.dust-card {
+   scrims are light, and the screenshot frame casts a short, soft shadow. */
+.work-card {
   --card-base: #27272a;
   --card-glow: #52525b;
   --card-deep: #09090b;
   --card-matte-glow: 55%;
   --card-matte-deep: 50%;
+  --card-pad: clamp(1.25rem, 2.2vw, 1.85rem);
   position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -1539,7 +1541,7 @@ html[lang="ja"] .hero-copy h1 {
   color: #fff;
   isolation: isolate;
 }
-.dust-card-media {
+.work-card-media {
   position: relative;
   grid-row: 2;
   place-self: center;
@@ -1548,16 +1550,14 @@ html[lang="ja"] .hero-copy h1 {
   aspect-ratio: 16 / 11;
   overflow: hidden;
   border-radius: 0.85rem;
-  /* Kept in step with FRAME_SHADOW and FRAME_HAIRLINE in dust-field.ts. */
   box-shadow:
     0 6px 18px rgb(0 0 0 / 16%),
     0 0 0 1px rgb(255 255 255 / 8%);
 }
-.dust-card-media img {
+.work-card-media img {
   object-fit: cover;
 }
-/* Kept in step with SHADE_STOPS in dust-field.ts. */
-.dust-card-shade {
+.work-card-shade {
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -1569,11 +1569,11 @@ html[lang="ja"] .hero-copy h1 {
     rgb(0 0 0 / 10%) 100%
   );
 }
-.dust-card-head {
+.work-card-head {
   grid-row: 1;
-  padding: clamp(1.25rem, 2.2vw, 1.85rem) clamp(1.25rem, 2.2vw, 1.85rem) 0;
+  padding: var(--card-pad) var(--card-pad) 0;
 }
-.dust-card-title {
+.work-card-title {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(1.4rem, 2vw, 1.95rem);
@@ -1581,42 +1581,45 @@ html[lang="ja"] .hero-copy h1 {
   letter-spacing: -0.035em;
   line-height: 1.1;
 }
-.dust-card-kicker {
+.work-card-kicker {
   margin: 0.45rem 0 0;
   color: rgb(255 255 255 / 80%);
   font-size: clamp(0.92rem, 1.1vw, 1.05rem);
   line-height: 1.4;
 }
-.dust-card-foot {
+.work-card-headline {
+  display: none;
+}
+.work-card-foot {
   grid-row: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0 clamp(1.25rem, 2.2vw, 1.85rem) clamp(1.25rem, 2.2vw, 1.85rem);
+  padding: 0 var(--card-pad) var(--card-pad);
   font-size: clamp(0.9rem, 1vw, 1rem);
   font-weight: 600;
 }
-.dust-card-arrow {
+.work-card-arrow {
   flex: none;
   transition: transform 170ms ease;
 }
-.dust-card:hover .dust-card-arrow,
-.dust-card:focus-within .dust-card-arrow {
+.work-card:hover .work-card-arrow,
+.work-card:focus-within .work-card-arrow {
   transform: translate(2px, -2px);
 }
 /* The whole card is the link. */
-.dust-card-link {
+.work-card-link {
   position: absolute;
   inset: 0;
   z-index: 1;
   border-radius: inherit;
 }
-.dust-card-link:focus-visible {
+.work-card-link:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: -3px;
 }
-.dust-counter,
+.work-stack-counter,
 .experience-counter {
   flex: none;
   margin: 0;
@@ -1626,25 +1629,28 @@ html[lang="ja"] .hero-copy h1 {
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
-.dust-counter-total,
+.work-stack-counter-total,
 .experience-counter-total {
   color: var(--muted);
 }
-.dust-canvas {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  /* Dust fades out near the heading instead of ending on a hard line. */
-  mask-image: linear-gradient(180deg, transparent 0, #000 2.5rem);
-}
 
-.dust-track[data-live] {
-  height: calc((var(--dust-count) + 1) * 100svh);
+/* Live: the stage pins for --stack-screens screens of scroll, the span of
+   the --work-stack timeline (inset 0: the default inset is the page's
+   scroll-padding). */
+.work-stack[data-live] {
+  /* Scale each card loses per place back in the stack, and how far it shows
+     below the card in front of it. */
+  --stack-step: 0.09;
+  --stack-peek: 0.9rem;
+  --stack-room: calc(var(--stack-peek) * (var(--stack-count) - 1));
+  /* How far a leaving card tips back. */
+  --stack-tilt: 42deg;
+  --stack-perspective: 1100px;
+  height: calc((var(--stack-screens) + 1) * 100svh);
+  view-timeline: --work-stack block;
+  view-timeline-inset: 0px;
 }
-.dust-track[data-live] .dust-stage {
+.work-stack[data-live] .work-stack-stage {
   position: sticky;
   top: 0;
   display: flex;
@@ -1653,52 +1659,129 @@ html[lang="ja"] .hero-copy h1 {
   overflow: hidden;
   padding-bottom: 1.5rem;
 }
-.dust-track[data-live] .dust-head {
+.work-stack[data-live] .work-stack-head {
   position: relative;
-  z-index: 3;
+  z-index: 1;
 }
-.dust-track[data-live] .section-description,
-.dust-track[data-live] .section-count {
+.work-stack[data-live] .section-description,
+.work-stack[data-live] .section-count {
   display: none;
 }
-.dust-track[data-live] .section-heading h2 {
+.work-stack[data-live] .section-heading h2 {
   font-size: var(--title-stage);
 }
-.dust-track[data-live] .dust-field {
+/* Every card is centred in the lane, above the room the edges behind it
+   peek into. A leaving card passes over the heading on its way out. */
+.work-stack[data-live] .work-stack-lane {
   position: relative;
+  z-index: 2;
   flex: 1;
-  min-height: 0;
-  margin-top: 1rem;
-}
-/* Every card is centred in the lane; the scene offsets them sideways. The
-   lane is inset from the dust field's top so dust can fade in above it. */
-.dust-track[data-live] .dust-lane {
-  position: absolute;
-  inset: 2.5rem 0 0;
   display: block;
   width: auto;
-  margin: 0;
+  min-height: 0;
+  margin: 2rem 0 0;
   container-type: size;
 }
-.dust-track[data-live] .dust-slot {
+.work-stack[data-live] .work-stack-slot {
   position: absolute;
-  inset: 0;
+  inset: 0 0 var(--stack-room);
+  z-index: calc(var(--stack-count) - var(--stack-index));
   display: grid;
   place-items: center;
   pointer-events: none;
 }
-.dust-track[data-live] .dust-card {
-  height: min(94cqh, 42rem, (100cqw - 3rem) * 1.25);
-  pointer-events: auto;
+.work-stack[data-live] .work-stack-lift,
+.work-stack[data-live] .work-card {
+  transform-origin: 50% 100%;
   will-change: transform;
 }
-/* With WebGL the canvas draws the cards; the DOM cards stay in place,
-   invisible, for links, focus and screen readers (and show on focus). */
-.dust-track[data-dust="ready"] .dust-card {
-  opacity: 0;
+.work-stack[data-live] .work-stack-slot[data-front] .work-card {
+  pointer-events: auto;
 }
-.dust-track[data-dust="ready"] .dust-card:focus-within {
-  opacity: 1;
+/* Phones: the portrait card. */
+.work-stack[data-live] .work-card {
+  height: min(100cqh - var(--stack-room), 42rem, (100cqw - 3rem) * 1.25);
+  box-shadow: 0 -1px 0 rgb(255 255 255 / 6%) inset;
+  animation: work-stack-advance linear both;
+  animation-timeline: --work-stack;
+  animation-range: contain var(--stack-travel-start) contain var(--stack-travel-end);
+}
+.work-stack[data-live] .work-stack-slot:not(:last-child) .work-stack-lift {
+  animation: work-stack-leave linear both;
+  animation-timeline: --work-stack;
+  animation-range: contain var(--stack-leave-start) contain var(--stack-leave-end);
+}
+/* Wider screens: a landscape card, words on the left and the screenshot on
+   the right. */
+@media (min-width: 761px) {
+  .work-stack[data-live] .work-card {
+    --card-pad: clamp(1.75rem, 2.8vw, 2.75rem);
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    width: min(100cqw - 2 * var(--page-gutter), 70rem, (100cqh - var(--stack-room)) * 2);
+    height: auto;
+    aspect-ratio: 2 / 1;
+  }
+  .work-stack[data-live] .work-card-head {
+    grid-row: 1;
+    grid-column: 1;
+    padding-right: 0;
+  }
+  .work-stack[data-live] .work-card-title {
+    font-size: clamp(1.75rem, 2.9vw, 2.85rem);
+  }
+  .work-stack[data-live] .work-card-kicker {
+    margin-top: 0.6rem;
+    font-size: clamp(1rem, 1.2vw, 1.15rem);
+  }
+  .work-stack[data-live] .work-card-headline {
+    display: block;
+    max-width: 24ch;
+    margin: clamp(1.25rem, 2.6vh, 2rem) 0 0;
+    color: rgb(255 255 255 / 92%);
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.55vw, 1.5rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+  }
+  .work-stack[data-live] .work-card-media {
+    grid-row: 1 / -1;
+    grid-column: 2;
+    width: calc(100% - var(--card-pad));
+    margin-right: calc(var(--card-pad) / 2);
+  }
+  .work-stack[data-live] .work-card-foot {
+    grid-row: 2;
+    grid-column: 1;
+    justify-content: flex-start;
+    gap: 0.4rem;
+    padding-right: 0;
+  }
+}
+
+/* Moving up through the stack: from the card's place when the stage pins
+   to its place when the last card is in front (negative once it has left,
+   so the front card grows a little as it goes). */
+@keyframes work-stack-advance {
+  from {
+    transform: translateY(calc(var(--stack-index) * var(--stack-peek)))
+      scale(calc(1 - var(--stack-index) * var(--stack-step)));
+  }
+  to {
+    transform: translateY(calc(var(--stack-depth-to) * var(--stack-peek)))
+      scale(calc(1 - var(--stack-depth-to) * var(--stack-step)));
+  }
+}
+/* Leaving: one screen up, at about the speed of the page, tipping back. */
+@keyframes work-stack-leave {
+  from {
+    transform: perspective(var(--stack-perspective)) translateY(0) rotateX(0deg);
+  }
+  to {
+    transform: perspective(var(--stack-perspective)) translateY(-100svh)
+      rotateX(var(--stack-tilt));
+  }
 }
 
 .project-visual {
@@ -5757,9 +5840,13 @@ html[lang="ja"] .setup-hero-copy h1 {
   }
   .ai-workflow-ship-pill { width: 100%; }
   .work-section { --work-stage-pad-top: 2rem; }
-  .dust-lane { grid-template-columns: 1fr; }
+  .work-stack-lane { grid-template-columns: 1fr; }
+  .work-stack[data-live] {
+    --stack-step: 0.06;
+    --stack-peek: 0.6rem;
+  }
   /* Phones have no top header but a bottom navigation bar. */
-  .dust-track[data-live] .dust-stage {
+  .work-stack[data-live] .work-stack-stage {
     padding-bottom: calc(6.25rem + env(safe-area-inset-bottom, 0px));
   }
   .experience-section { --experience-stage-pad-top: 2rem; }
