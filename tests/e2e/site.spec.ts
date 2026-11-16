@@ -938,6 +938,14 @@ test("about scene parts the title and reveals the profile copy on scroll", async
   await expect.poll(() => left.evaluate(translateX)).toBeLessThan(-50);
   await expect.poll(() => right.evaluate(translateX)).toBeGreaterThan(50);
 
+  // Parted, both words have left the screen entirely: no edge of the wide
+  // "ABOUT" is left behind, only faded out.
+  await scrollAboutSceneTo(page, 0.5);
+  await expect.poll(() => left.evaluate((element) => element.getBoundingClientRect().right)).toBeLessThanOrEqual(0);
+  await expect
+    .poll(() => right.evaluate((element) => element.getBoundingClientRect().left - window.innerWidth))
+    .toBeGreaterThanOrEqual(0);
+
   await scrollAboutSceneTo(page, 0.57);
   await expect(page.locator(".about-scene-heading")).toHaveCSS("opacity", "1");
 

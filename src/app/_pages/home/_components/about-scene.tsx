@@ -89,9 +89,14 @@ export function AboutScene({
     [progress, scrollYProgress],
   );
 
-  // ABOUT leaves to the left and ME to the right, uncovering the card.
-  const leftX = useTransform(progress, [at(0.06), at(0.46)], ["0vw", "-78vw"]);
-  const rightX = useTransform(progress, [at(0.06), at(0.46)], ["0vw", "78vw"]);
+  // ABOUT leaves to the left and ME to the right, uncovering the card. Each
+  // word is centred, so it clears the screen once it has moved half the
+  // screen plus half its own width (a little more covers the letters'
+  // overhang), whatever its length, language or the screen's width. A fixed
+  // 78vw left the end of the wide "ABOUT" on screen, only faded out.
+  const wordsOut = useTransform(progress, [at(0.06), at(0.46)], [0, 1]);
+  const leftTransform = useMotionTemplate`translateX(calc(${wordsOut} * (-50vw - 50% - 2vw)))`;
+  const rightTransform = useMotionTemplate`translateX(calc(${wordsOut} * (50vw + 50% + 2vw)))`;
   const wordsOpacity = useTransform(progress, [at(0.36), at(0.46)], [1, 0]);
 
   // The card is laid out at its final size and opened with clip-path, so its
@@ -196,13 +201,13 @@ export function AboutScene({
           <h2 className="about-scene-title" id="about-heading">
             <motion.span
               className="about-scene-word about-scene-word-left"
-              style={isLive ? { x: leftX, opacity: wordsOpacity } : undefined}
+              style={isLive ? { transform: leftTransform, opacity: wordsOpacity } : undefined}
             >
               {displayWords[0]}
             </motion.span>{" "}
             <motion.span
               className="about-scene-word about-scene-word-right"
-              style={isLive ? { x: rightX, opacity: wordsOpacity } : undefined}
+              style={isLive ? { transform: rightTransform, opacity: wordsOpacity } : undefined}
             >
               {displayWords[1]}
             </motion.span>
