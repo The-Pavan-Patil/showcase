@@ -452,7 +452,8 @@ a {
     border-radius var(--header-morph);
 }
 
-.site-header .brand-mark {
+.site-header .brand-mark,
+.site-footer .brand-mark {
   border-radius: 50%;
 }
 

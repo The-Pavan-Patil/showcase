@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/container";
@@ -19,7 +20,9 @@ export function SiteFooter({ copy, locale, profile, socialLinks }: SiteFooterPro
       <Container>
         <div className="footer-top">
           <Link className="brand-link" href={getHomePath(locale)}>
-            <span className="brand-mark" aria-hidden="true">P</span>
+            <span className="brand-mark" aria-hidden="true">
+              <Image src="/icon.svg" alt="" width={30} height={30} unoptimized />
+            </span>
             <span>Pavan Patil</span>
           </Link>
           {/* Two lists, so a phone can give the contact links a line of their own. */}
