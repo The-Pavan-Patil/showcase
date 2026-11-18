@@ -12,14 +12,13 @@ import {
 import { supportedLocales } from "@/lib/i18n";
 
 describe("portfolio content", () => {
-  it("contains exactly four unique case studies", () => {
-    expect(projects).toHaveLength(4);
-    expect(new Set(projects.map((project) => project.slug)).size).toBe(4);
+  it("contains exactly three unique case studies", () => {
+    expect(projects).toHaveLength(3);
+    expect(new Set(projects.map((project) => project.slug)).size).toBe(3);
     expect(projects.map((project) => project.slug)).toEqual([
       "nudge",
       "philips-greenheart",
       "mainichi-koto",
-      "workforce-management-system",
     ]);
   });
 
@@ -43,7 +42,7 @@ describe("portfolio content", () => {
   it("cycles through next projects", () => {
     expect(getNextProject("nudge").slug).toBe("philips-greenheart");
     expect(getNextProject("philips-greenheart").slug).toBe("mainichi-koto");
-    expect(getNextProject("workforce-management-system").slug).toBe("nudge");
+    expect(getNextProject("mainichi-koto").slug).toBe("nudge");
   });
 
   it("publishes a public Mainichi koto product case study", () => {

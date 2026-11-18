@@ -1,4 +1,4 @@
-export type ProjectVisual = "sync" | "web" | "operations" | "learning";
+export type ProjectVisual = "sync" | "web" | "learning";
 
 export type ProjectMetric = {
   value: string;

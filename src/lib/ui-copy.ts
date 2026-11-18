@@ -152,24 +152,6 @@ export type UiCopy = {
       localeBadge: string;
       apmBadge: string;
     };
-    operations: {
-      overview: string;
-      live: string;
-      records: string;
-      multiSite: string;
-      attendance: string;
-      automated: string;
-      payroll: string;
-      overtime: string;
-      workflow: string;
-      capability: string;
-      status: string;
-      rules: string;
-      configured: string;
-      excel: string;
-      exportable: string;
-      tracked: string;
-    };
     learning: {
       deck: string;
       due: string;
@@ -436,24 +418,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         localeBadge: "EN · JP",
         apmBadge: "APM · healthy",
       },
-      operations: {
-        overview: "Workforce overview",
-        live: "Live",
-        records: "Records",
-        multiSite: "Multi-site",
-        attendance: "Attendance",
-        automated: "Automated",
-        payroll: "Payroll",
-        overtime: "Overtime",
-        workflow: "Workflow",
-        capability: "Capability",
-        status: "Status",
-        rules: "Rules",
-        configured: "Configured",
-        excel: "Excel",
-        exportable: "Exportable",
-        tracked: "Tracked",
-      },
       learning: {
         deck: "Study deck",
         due: "Due today",
@@ -717,24 +681,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         localeBadge: "EN · JP",
         apmBadge: "APM · 良好",
       },
-      operations: {
-        overview: "人員管理の概要",
-        live: "稼働中",
-        records: "記録",
-        multiSite: "複数拠点",
-        attendance: "勤怠",
-        automated: "自動化",
-        payroll: "給与",
-        overtime: "残業",
-        workflow: "フロー",
-        capability: "機能",
-        status: "状態",
-        rules: "ルール",
-        configured: "設定済み",
-        excel: "Excel",
-        exportable: "出力可",
-        tracked: "記録中",
-      },
       learning: {
         deck: "学習デッキ",
         due: "今日の復習",
@@ -996,24 +942,6 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         button: "Inhalte ansehen",
         localeBadge: "EN · JP",
         apmBadge: "APM · stabil",
-      },
-      operations: {
-        overview: "Workforce-Übersicht",
-        live: "Live",
-        records: "Datensätze",
-        multiSite: "Mehrere Standorte",
-        attendance: "Anwesenheit",
-        automated: "Automatisiert",
-        payroll: "Lohnlauf",
-        overtime: "Überstunden",
-        workflow: "Workflow",
-        capability: "Funktion",
-        status: "Status",
-        rules: "Regeln",
-        configured: "Konfiguriert",
-        excel: "Excel",
-        exportable: "Exportierbar",
-        tracked: "Erfasst",
       },
       learning: {
         deck: "Lerndeck",

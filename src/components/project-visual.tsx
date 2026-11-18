@@ -7,7 +7,6 @@ import {
   Check,
   Cloud,
   Database,
-  FileSpreadsheet,
   Globe2,
   Languages,
   Layers3,
@@ -39,7 +38,6 @@ export function ProjectVisual({
     >
       {type === "sync" ? <SyncVisual copy={copy.sync} /> : null}
       {type === "web" ? <WebVisual copy={copy.web} /> : null}
-      {type === "operations" ? <OperationsVisual copy={copy.operations} /> : null}
       {type === "learning" ? <LearningVisual copy={copy.learning} /> : null}
     </div>
   );
@@ -95,34 +93,6 @@ function WebVisual({ copy }: { copy: UiCopy["projectVisual"]["web"] }) {
           <div className="web-orbit-core"><Activity size={23} /></div>
           <span className="locale-badge"><Languages size={13} /> {copy.localeBadge}</span>
           <span className="apm-badge">{copy.apmBadge}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function OperationsVisual({ copy }: { copy: UiCopy["projectVisual"]["operations"] }) {
-  return (
-    <div className="ops-frame" aria-hidden="true">
-      <aside>
-        <div className="ops-logo">S</div>
-        <span className="active" /><span /><span /><span />
-      </aside>
-      <div className="ops-main">
-        <div className="visual-topline">
-          <span>{copy.overview}</span>
-          <span className="status-dot">{copy.live}</span>
-        </div>
-        <div className="ops-stats">
-          <div><Users size={15} /><strong>1,000+</strong><span>{copy.records}</span></div>
-          <div><Check size={15} /><strong>{copy.multiSite}</strong><span>{copy.attendance}</span></div>
-          <div><FileSpreadsheet size={15} /><strong>{copy.automated}</strong><span>{copy.payroll}</span></div>
-        </div>
-        <div className="ops-table">
-          <div><b>{copy.workflow}</b><b>{copy.capability}</b><b>{copy.status}</b></div>
-          <div><span>{copy.attendance}</span><span>{copy.multiSite}</span><em>{copy.tracked}</em></div>
-          <div><span>{copy.overtime}</span><span>{copy.rules}</span><em>{copy.configured}</em></div>
-          <div><span>{copy.payroll}</span><span>{copy.excel}</span><em>{copy.exportable}</em></div>
         </div>
       </div>
     </div>

@@ -1864,7 +1864,6 @@ html[lang="ja"] .hero-copy h1 {
 
 .sync-diagram,
 .browser-frame,
-.ops-frame,
 .learning-frame {
   position: relative;
   z-index: 1;
@@ -1944,22 +1943,6 @@ html[lang="ja"] .hero-copy h1 {
 .web-orbit-core { display: grid; place-items: center; width: 3.5rem; height: 3.5rem; border-radius: 999px; background: var(--accent); color: white; box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 9%, transparent); }
 .locale-badge, .apm-badge { position: absolute; z-index: 2; display: flex; align-items: center; gap: 0.25rem; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); box-shadow: var(--shadow-card); padding: 0.38rem 0.5rem; font-size: 0.48rem; }
 .locale-badge { top: 0.3rem; right: -0.4rem; } .apm-badge { bottom: 0.3rem; left: -0.5rem; color: #16844c; }
-
-.ops-frame { display: grid; grid-template-columns: 2.7rem 1fr; overflow: hidden; border-radius: 1.15rem; }
-.ops-frame aside { display: flex; flex-direction: column; align-items: center; gap: 0.85rem; border-right: 1px solid var(--border); background: var(--surface-secondary); padding: 0.75rem 0; }
-.ops-logo { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 0.45rem; background: var(--foreground); color: var(--background); font-size: 0.55rem; font-weight: 800; }
-.ops-frame aside > span { width: 1.15rem; height: 0.3rem; border-radius: 999px; background: var(--surface-tertiary); }
-.ops-frame aside > span.active { background: var(--accent); }
-.ops-main { padding: 0.9rem; }
-.ops-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem; }
-.ops-stats > div { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.4rem; border: 1px solid var(--border); border-radius: 0.7rem; background: var(--surface); padding: 0.55rem; }
-.ops-stats svg { grid-row: span 2; color: var(--accent); }
-.ops-stats strong { font-size: 0.65rem; } .ops-stats span { color: var(--muted); font-size: 0.46rem; }
-.ops-table { display: grid; margin-top: 0.55rem; }
-.ops-table > div { display: grid; grid-template-columns: 1.6fr 0.8fr 0.8fr; align-items: center; min-height: 2rem; border-bottom: 1px solid var(--border); padding: 0 0.35rem; font-size: 0.48rem; }
-.ops-table > div:first-child { color: var(--muted); }
-.ops-table em { justify-self: start; border-radius: 999px; background: #e5f8ed; color: #137f46; padding: 0.2rem 0.35rem; font-style: normal; }
-.dark .ops-table em { background: #143926; color: #7ee2a8; }
 
 .learning-body {
   display: grid;
@@ -5850,7 +5833,7 @@ html[lang="ja"] .setup-hero-copy h1 {
   .section-header-row { display: block; }
   .section-count { display: block; margin-top: 1rem; }
   .device-row { grid-template-columns: 1fr 0.65fr 1fr; gap: 0.45rem; }
-  .sync-diagram, .browser-frame, .ops-frame, .learning-frame { width: 94%; }
+  .sync-diagram, .browser-frame, .learning-frame { width: 94%; }
   .phone-frame { min-height: 11rem; }
   .database-card { min-height: 8.5rem; }
   .experience-list { margin-top: 3rem; }
@@ -6210,10 +6193,6 @@ html[lang="ja"] .setup-hero-copy h1 {
   }
   .ai-workflow-branch-step h3 { font-size: 0.72rem; }
   .ai-workflow-branch-step p { font-size: 0.56rem; }
-  .ops-frame { grid-template-columns: 2.1rem 1fr; }
-  .ops-main { padding: 0.55rem; }
-  .ops-stats > div { padding: 0.4rem; }
-  .ops-table > div { font-size: 0.42rem; }
   .contact-email, .schedule-call-link { overflow-wrap: anywhere; border-radius: 1rem; }
   .quick-message-textarea { height: 7.5rem; }
   .quick-message-status { align-items: flex-start; }

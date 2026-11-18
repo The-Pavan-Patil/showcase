@@ -9,7 +9,6 @@ module.exports = {
         "http://127.0.0.1:3000/setup",
         "http://127.0.0.1:3000/work/nudge",
         "http://127.0.0.1:3000/work/philips-greenheart",
-        "http://127.0.0.1:3000/work/workforce-management-system",
       ],
       numberOfRuns: 3,
     },

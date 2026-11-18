@@ -27,9 +27,6 @@ describe("metadata routes", () => {
       "https://portfolio.example/work/mainichi-koto",
       "https://portfolio.example/ja/work/mainichi-koto",
       "https://portfolio.example/de/work/mainichi-koto",
-      "https://portfolio.example/work/workforce-management-system",
-      "https://portfolio.example/ja/work/workforce-management-system",
-      "https://portfolio.example/de/work/workforce-management-system",
     ]);
   });
 

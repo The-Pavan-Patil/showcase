@@ -104,31 +104,6 @@ export const jaProjectTranslations: Record<string, ProjectTranslation> = {
     ],
     visualLabel: "多言語対応と監視を備えた企業サイトを表すブラウザ構成",
   },
-  "workforce-management-system": {
-    kicker: "業務管理プラットフォーム",
-    cardHeadline: "1,000件以上の作業員記録を扱う人員管理システム。",
-    summary:
-      "複数の建設現場にまたがる勤怠、設定可能な残業給与、労務、現場、ポートフォリオ業務のためのフルスタック基盤です。AWSにデプロイしました。",
-    role: "フルスタック開発者",
-    experienceContext: "Sonai · 2025年2月–10月",
-    challenge:
-      "会社は、複数の建設現場で作業員記録、勤怠、現場情報、設定可能な残業給与を管理する必要がありました。",
-    approach:
-      "React、TypeScript、Node.js、MongoDBでアプリを作りました。認証とREST APIを実装し、残業計算とExcel出力を加え、AWSへデプロイしました。",
-    outcome:
-      "このプラットフォームにより、1,000件以上の作業員記録を効率よく追跡できるようになりました。手作業だった給与処理の一部も、設定可能な計算と出力に置き換えました。",
-    contributions: [
-      "複数現場にまたがる勤怠と作業員記録のフローを作りました。",
-      "設定可能な残業計算とExcel出力を自動化しました。",
-      "認証付きREST APIを実装し、AWS環境を運用しました。",
-    ],
-    metrics: [
-      { value: "1,000+", label: "作業員記録" },
-      { value: "Multi-site", label: "建設現場の業務" },
-      { value: "AWS", label: "デプロイ済み基盤" },
-    ],
-    visualLabel: "作業員、勤怠、給与フローを示す業務ダッシュボード",
-  },
 };
 
 export const deProjectTranslations: Record<string, ProjectTranslation> = {
@@ -215,32 +190,6 @@ export const deProjectTranslations: Record<string, ProjectTranslation> = {
     ],
     visualLabel:
       "Abstrakte Browser-Komposition für eine mehrsprachige, überwachte Corporate Website",
-  },
-  "workforce-management-system": {
-    kicker: "Operations-Plattform",
-    cardHeadline: "Workforce Operations für mehr als 1.000 Mitarbeiterdatensätze.",
-    summary:
-      "Eine Full-Stack-Plattform für Anwesenheit, konfigurierbare Überstundenabrechnung, Arbeitskräfte, Standorte und Portfolio-Workflows über mehrere Baustellen hinweg, bereitgestellt auf AWS.",
-    role: "Full-Stack-Entwickler",
-    experienceContext: "Sonai · Feb.–Okt. 2025",
-    challenge:
-      "Das Unternehmen musste Mitarbeiterdaten, Anwesenheit, Standorte und konfigurierbare Überstundenabrechnung über mehrere Baustellen hinweg verwalten.",
-    approach:
-      "Ich baute die Anwendung mit React, TypeScript, Node.js und MongoDB, entwickelte Authentifizierung und REST APIs, ergänzte Überstundenberechnung sowie Excel-Export und stellte das System auf AWS bereit.",
-    outcome:
-      "Die Plattform unterstützt die effiziente Verwaltung von mehr als 1.000 Mitarbeiterdatensätzen und ersetzt Teile manueller Lohnprozesse durch konfigurierbare Berechnungen und Exporte.",
-    contributions: [
-      "Anwesenheits- und Mitarbeitenden-Workflows über mehrere Standorte gebaut.",
-      "Konfigurierbare Überstundenberechnungen und Excel-Exporte automatisiert.",
-      "Authentifizierte REST APIs implementiert und das AWS-Deployment betreut.",
-    ],
-    metrics: [
-      { value: "1,000+", label: "Mitarbeiterdatensätze" },
-      { value: "Multi-site", label: "Baustellenbetrieb" },
-      { value: "AWS", label: "bereitgestellte Infrastruktur" },
-    ],
-    visualLabel:
-      "Abstraktes Operations-Dashboard mit Mitarbeitenden-, Anwesenheits- und Lohn-Workflows",
   },
 };
 

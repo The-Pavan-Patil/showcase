@@ -53,9 +53,6 @@ export function HomePage({ locale }: { locale: Locale }) {
     skillGroups,
     socialLinks,
   } = getPortfolioContent(locale);
-  const homepageProjects = projects.filter(
-    (project) => project.slug !== "workforce-management-system",
-  );
   const heroLogos = [
     ...new Map(
       experience
@@ -121,7 +118,7 @@ export function HomePage({ locale }: { locale: Locale }) {
               </div>
             }
             locale={locale}
-            projects={homepageProjects}
+            projects={projects}
           />
         </section>
 

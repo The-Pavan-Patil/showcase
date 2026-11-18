@@ -4,7 +4,6 @@ const projects = [
   ["mainichi-koto", "Mainichi koto"],
   ["nudge", "Nudge"],
   ["philips-greenheart", "Philips Greenheart"],
-  ["workforce-management-system", "Workforce Management"],
 ] as const;
 
 async function expectLanguageOption(

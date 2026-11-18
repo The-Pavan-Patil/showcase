@@ -4,7 +4,6 @@ const routes = [
   ["home", "/"],
   ["nudge", "/work/nudge"],
   ["philips", "/work/philips-greenheart"],
-  ["workforce", "/work/workforce-management-system"],
 ] as const;
 
 for (const [name, route] of routes) {
