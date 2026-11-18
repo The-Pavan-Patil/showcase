@@ -168,7 +168,12 @@ export function HomePage({ locale }: { locale: Locale }) {
                   />
                   {ui.home.contactEyebrow}
                 </p>
-                <h2 id="contact-heading">{ui.home.contactTitle}</h2>
+                <h2 id="contact-heading">
+                  <span>{ui.home.contactTitle}</span>{" "}
+                  <span className="contact-title-accent">
+                    {ui.home.contactTitleAccent}
+                  </span>
+                </h2>
                 <p>{ui.home.contactDescription}</p>
               </div>
               <div className="contact-actions">

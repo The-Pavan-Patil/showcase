@@ -123,6 +123,8 @@ export type UiCopy = {
     };
     contactEyebrow: string;
     contactTitle: string;
+    /** Second line of the contact title; it fades like the hero accent. */
+    contactTitleAccent: string;
     contactDescription: string;
     contactScheduleLabel: string;
     contactScheduleHelper: string;
@@ -386,7 +388,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         characterCount: "{count}/500",
       },
       contactEyebrow: "Contact",
-      contactTitle: "What needs handling?",
+      contactTitle: "Bring me the problem.",
+      contactTitleAccent: "I’ll handle it.",
       contactDescription:
         "I’m open to software engineering roles across product, platform, web, and mobile teams.",
       contactScheduleLabel: "Book a 30-minute chat",
@@ -649,7 +652,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         characterCount: "{count}/500",
       },
       contactEyebrow: "連絡",
-      contactTitle: "何をお任せいただけますか？",
+      contactTitle: "その課題、",
+      contactTitleAccent: "任せてください。",
       contactDescription:
         "プロダクト、プラットフォーム、Web、モバイルのチームで、ソフトウェアエンジニアの仕事を探しています。",
       contactScheduleLabel: "30分のチャットを予約",
@@ -911,7 +915,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
         characterCount: "{count}/500",
       },
       contactEyebrow: "Kontakt",
-      contactTitle: "Was soll ich übernehmen?",
+      contactTitle: "Gib mir das Problem.",
+      contactTitleAccent: "Ich kümmere mich darum.",
       contactDescription:
         "Ich bin offen für Softwareentwickler-Rollen in Produkt-, Plattform-, Web- und Mobile-Teams.",
       contactScheduleLabel: "30-minütiges Gespräch buchen",

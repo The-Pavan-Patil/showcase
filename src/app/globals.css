@@ -3821,7 +3821,34 @@ html[lang="ja"] .about-card-title {
 .contact-section { padding-bottom: clamp(3rem, 8svh, 6rem); scroll-margin-top: 7rem; }
 .contact-card { display: grid; grid-template-columns: 1.25fr 0.75fr; align-items: end; gap: 3rem; overflow: hidden; border-radius: var(--radius-panel); background: var(--foreground); color: var(--background); padding: clamp(2rem, 5vw, 4rem); }
 .contact-card .eyebrow { color: var(--inverse-accent); }
-.contact-card h2 { max-width: 20ch; }
+/* The closing line answers the hero in the hero's own type: heavy, stretched
+   upward, two parts, the second fading from ink into the card. Like the
+   hero, each part keeps to one line: the type shrinks until the longer part
+   fits the column. --contact-title-ems is that part's width in ems, measured
+   per locale with a few per cent to spare. */
+.contact-card > div:first-child { container-type: inline-size; }
+.contact-card h2 {
+  --contact-title-ems: 13.4;
+  margin-top: 1.4rem;
+  font-family: var(--font-hero);
+  font-size: min(3.4rem, calc(100cqi / var(--contact-title-ems)));
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+}
+html[lang="de"] .contact-card h2 { --contact-title-ems: 15.2; }
+.contact-card h2 span { display: block; transform: scaleY(1.2); transform-origin: center bottom; }
+.contact-card h2 .contact-title-accent {
+  background-image: linear-gradient(
+    180deg,
+    var(--background) 10%,
+    color-mix(in srgb, var(--background) 4%, transparent) 88%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+html[lang="ja"] .contact-card h2 { --contact-title-ems: 8.3; letter-spacing: 0; line-height: 1.05; }
 .contact-card > div:first-child > p:last-child { max-width: 38rem; margin-top: 1.2rem; color: color-mix(in srgb, var(--background) 62%, transparent); font-size: var(--text-intro); line-height: 1.6; text-wrap: pretty; }
 .contact-actions { display: flex; flex-direction: column; align-items: stretch; gap: 0.75rem; }
 .schedule-call { display: grid; gap: 0.55rem; }
