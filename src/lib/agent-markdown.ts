@@ -157,7 +157,13 @@ function getCaseStudyMarkdown(project: ProjectCaseStudy) {
     `- Context: ${project.experienceContext}`,
     `- Client: ${project.client}`,
     `- Technologies: ${project.technologies.join(", ")}`,
-    ...(project.liveUrl ? [`- Live product: ${project.liveUrl}`] : []),
+    ...(project.liveUrl
+      ? [
+          project.liveKind === "google-play"
+            ? `- Google Play: ${project.liveUrl}`
+            : `- Live product: ${project.liveUrl}`,
+        ]
+      : []),
     "",
     "## Summary",
     "",

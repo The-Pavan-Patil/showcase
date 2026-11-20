@@ -35,6 +35,8 @@ export const nudge = {
     focus: "50% 50%",
     alt: "Three iPhone screens showing the Nudge social task app interface",
   },
+  liveUrl: "https://play.google.com/store/apps/details?id=com.vendaka.nudge",
+  liveKind: "google-play",
   cardPalette: { base: "#5c2d2d", glow: "#6e4240", deep: "#3a1818" },
   visual: "sync",
   visualLabel: "Nudge task deck showing role-aware gestures, offline queue, and Supabase synchronization",

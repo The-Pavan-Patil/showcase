@@ -88,6 +88,8 @@ export type ProjectCaseStudy = {
   media?: ProjectMedia;
   /** Public URL of the shipped product, shown on the case-study hero. */
   liveUrl?: string;
+  /** Where liveUrl points, which picks the hero button's label. Defaults to "site". */
+  liveKind?: "site" | "google-play";
   cardPalette?: ProjectCardPalette;
   caseStudy?: CaseStudyArticle;
 };

@@ -173,6 +173,8 @@ export type UiCopy = {
     technologiesAria: string;
     liveSite: string;
     liveSiteAria: string;
+    googlePlay: string;
+    googlePlayAria: string;
     factsAria: string;
     articleAria: string;
     role: string;
@@ -440,6 +442,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologiesAria: "{title} technologies",
       liveSite: "View live site",
       liveSiteAria: "View the live {title} site (opens in a new tab)",
+      googlePlay: "Get it on Google Play",
+      googlePlayAria: "Get {title} on Google Play (opens in a new tab)",
       factsAria: "{title} project facts",
       articleAria: "{title} case study article",
       role: "Role",
@@ -704,6 +708,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologiesAria: "{title} の技術",
       liveSite: "公開サイトを見る",
       liveSiteAria: "{title} の公開サイトを見る（新しいタブで開きます）",
+      googlePlay: "Google Play で入手",
+      googlePlayAria: "Google Play で {title} を入手（新しいタブで開きます）",
       factsAria: "{title} のプロジェクト情報",
       articleAria: "{title} のケーススタディ記事",
       role: "役割",
@@ -967,6 +973,8 @@ export const uiCopyByLocale: Record<Locale, UiCopy> = {
       technologiesAria: "{title} Technologien",
       liveSite: "Live-Website ansehen",
       liveSiteAria: "Live-Website von {title} ansehen (öffnet in neuem Tab)",
+      googlePlay: "Jetzt bei Google Play",
+      googlePlayAria: "{title} bei Google Play laden (öffnet in neuem Tab)",
       factsAria: "{title} Projektdaten",
       articleAria: "{title} Fallstudienartikel",
       role: "Rolle",

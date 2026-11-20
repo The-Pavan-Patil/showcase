@@ -143,9 +143,16 @@ export function WorkPage({
                     href={project.liveUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={formatCopy(ui.work.liveSiteAria, { title: project.title })}
+                    aria-label={formatCopy(
+                      project.liveKind === "google-play"
+                        ? ui.work.googlePlayAria
+                        : ui.work.liveSiteAria,
+                      { title: project.title },
+                    )}
                   >
-                    <span>{ui.work.liveSite}</span>
+                    <span>
+                      {project.liveKind === "google-play" ? ui.work.googlePlay : ui.work.liveSite}
+                    </span>
                     <ArrowUpRight aria-hidden="true" size={15} />
                   </a>
                 ) : null}
